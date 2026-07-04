@@ -29,5 +29,5 @@
 always @(*) begin
     case()
 
-    end case
+    endcase
 end
