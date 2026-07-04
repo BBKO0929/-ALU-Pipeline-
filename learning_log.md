@@ -1,7 +1,7 @@
 # 2026 年 7 月 3 日
 ## 今日進度：
 ### 影片：看 TT 小教室第 1~5 課。
-### 刷題：完成 HDLBits 的 "8-bit wide shift register of length 3"。
+### 刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
 
 ## 關鍵知識/詞彙：
   * 數位電路組成（logic gate、memory、flip-flop、wire、bus、IO）
