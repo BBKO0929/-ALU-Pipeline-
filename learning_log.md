@@ -4,7 +4,7 @@
 ### 刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
 
 ## 遇到的困難與解決方案：
-### 問題：在寫語法撰寫不完整，導致編譯錯誤。
+### 問題：在寫always、case語法撰寫不完整，導致編譯錯誤。
 ### 解法：於程式後面加上end、endcase，成功編譯。
 ```verilog
 always @(*) begin
@@ -160,3 +160,369 @@ endmodule
 * wire [7:0] a;
 * wire [4:0] z3;
 * assign z3 = (a >> 3);
+---------------------------------------------
+# 2026 年 7 月 5 日
+## 今日進度：
+### 影片：看 TT 小教室第 8~11 課。
+### 刷題：完成 HDLBits 的 "Adder1" 到 "Adder2"。
+
+## 遇到的困難與解決方案：
+### 問題1：
+* Adder1（用兩個16位元加法器模塊合成出一個32位元加法器）
+* 應題目需求：32位的加法器不需要處理進位（假設為 0）或出位（忽略)
+* **ins1進位端無空接或用1位元的wire對接導致編譯錯誤**
+* 原程式碼：
+  ```verilog
+  module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+    );
+
+    wire k; //處理inst0進位
+    add16 inst0(a[15:0], b[15:0], 1'b0, sum[15:0], k);
+    add16 inst1(a[31:16], b[31:16], k, sum[31:16], sum); 
+    endmodule
+    ```
+  
+### 解法：
+* **宣告一wire"count_useless"用來接最後丟棄的進位**
+  ```verilog
+  module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+    );
+    //module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+    wire k, cout_useless;// count_useless用來接最後丟棄的進位
+    add16 inst0(a[15:0], b[15:0], 1'b0, sum[15:0], k);
+    add16 inst1(a[31:16], b[31:16], k, sum[31:16], cout_useless);
+
+    endmodule
+  ```
+* **更好的寫法（Named Connection）**
+  ```verilog
+  module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+    );
+    wire k;
+
+    // 低 16 位加法
+    add16 inst0(
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum[15:0]),
+        .cout(k)
+    );
+    
+    // 高 16 位加法
+    add16 inst1(
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(k),
+        .sum(sum[31:16]),
+        .cout() // 最高位進位如果不要，在具名寫法中直接留空即可
+    );
+
+    endmodule
+  ```
+  ### 問題2：
+  * Adder2（Module fadd）
+  * 不知為何需特別把module add1寫出來
+  * 程式碼：
+  ```verilog
+  module top_module (
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+    );//
+    
+    wire k;
+    wire cout_unused; // 用來接最後丟棄的進位
+
+    // inst0 算出低 16 位，結果直接寫入 sum[15:0]
+    add16 inst0(a[15:0], b[15:0], 1'b0, sum[15:0], k);
+    
+    // inst1 算出高 16 位，結果直接寫入 sum[31:16]
+    add16 inst1(a[31:16], b[31:16], k, sum[31:16], cout_unused);
+
+    endmodule
+
+    module add1 ( input a, input b, input cin,   output sum, output cout );
+
+    assign sum = (a ^ b) ^ cin;
+    assign cout = a & b | a & cin | b & cin;// Full adder module here
+
+    endmodule
+  ```
+  ### 解法：
+  * **為補全最底層電路，將最底層寫的assign sum = a ^ b ^ cin;，透過中層的add16串 16次，最後再被top_module串了2次，最終在晶片上展開成一個巨大的 32 位元實體計算電路**
+  * 題目用意在於：**模擬「底層 IP 不完整」的真實開發現狀、訓練「多層階層設計（Multi-level Hierarchy）」的思維**
+
+## 關鍵知識/詞彙：
+### if-else
+* 由if開始，當判斷式成立時執行它的邏輯式，如果該判斷式不成立，則繼續看下一個else if的判斷式，直到某一個判斷式成立或是到達最後一個else。
+* 有優先順序，按順序判斷，寫太深會影響電路速度
+* 只能寫在always block裡，不論循序邏輯或是組合邏輯都可以（組合邏輯：blocking ；　循序邏輯：non-blocking）
+* 組合邏輯裡的if-else要寫滿或是充當有預設值，不然會合出Latch
+
+### clock gating
+* Flip-Flop的clock觸發才會耗電，為節省電路功耗（省電），如果連續幾個cycle沒動作就把clock關掉，無觸發所以Q值不變
+```verilog
+always @(posedge clk) begin
+    if (~rst_n) //reset為0（低態）觸發
+        a <= 1'b0;
+    else if (b)
+        a <= 1'b1;
+    else // 可以不寫最後這2行
+        a <= a;
+end
+```
+
+### case
+* 只能寫在always block裡（循序、組合邏輯皆可）
+* 當多選擇成立，則執行第一個成立的logic
+* case、casez較常用，casez可用"?"表don't care
+* 最後加default避免Latch，除非條件都寫滿
+```verilog
+case(狀態選擇)
+    選擇1 : 邏輯式1:
+    選擇2 : 邏輯式2:
+    .
+    .
+    選擇n : 邏輯式n:
+    default : 邏輯式x
+endcase    
+```
+
+### for
+* 只能寫在always block裡
+* 迴圈條件須是固定值
+* 每迴圈控制變量一定要能結束迴圈
+* 常搭配array使用
+```verilog
+for (初始控制變量賦值; 迴圈條件; 每迴控制變量賦值) begin
+    邏輯式;
+end
+```
+* 陷阱
+```verilog
+module for_loop (
+    input clk,
+    input rst_n,
+    output reg [7:0] z
+);
+integer i;
+always @(posedge clk) begin
+    if (~rst_n)
+        z <= 1'b0;
+    else begin
+        for (i=0; i<8; i=i+1)
+            z <= z + i; //不是把z值加上從1累加到7
+    end
+end
+endmodule
+```
+### 遞延訊號
+* 因為常需要根據pipline把需要的訊號延遲幾個cycle
+* 例如某邊data path已經把值算出來，但另一邊卻要晚幾個cycle才準備好，所以可把需要的訊號延遲幾個cycle
+```verilog
+module pipe (
+    input clk,
+    input rst_n,
+    input [7:0] a,
+    output reg [7:0] z[8]
+);
+integer i;
+always @(posedge clk) begin
+    if (~rst_n) begin
+        for (i=0; i<8; i=i+1)
+            z[i] <= 1'b0;
+    end
+    else begin
+        z[0] <= a;
+        for (i=1; i<8; i=i+1)
+            z[i] <= z[i-1]; //每個元素都會拿到前一個cycle值
+    end
+end
+endmodule
+```
+
+### generate
+* 把電路依據控制變量產生"generate"多次（用寫程式的方式，幫你自動大量複製硬體電路、線路或模組）
+* 搭配for迴圈使用，但控制變量需用"genvar"宣告
+* 可產生組合、循序邏輯、module的實例化instantiate
+```verilog
+genvar geni;
+generate
+    for (初始控制變量賦值; 迴圈條件; 每迴控制變量賦值) begin
+        要generate的邏輯式或是instantiate的module
+    end
+endgenerate
+```
+* 範例（批量實例化模組 (Module Instantiation)）：用 generate for 串聯 4 個全加器做成 4-bit 加法器：
+```verilog
+genvar i;
+generate
+    for (i = 0; i < 4; i = i + 1) begin: adder_block
+        // 自動複製 4 個 full_adder 模組，並把引腳與索引值 i 綁定
+        full_adder fa_inst (
+            .a(a[i]),
+            .b(b[i]),
+            .cin(carry[i]),
+            .sum(sum[i]),
+            .cout(carry[i+1])
+        );
+    end
+endgenerate
+```
+
+### 函數（function）
+* 用來將組合邏輯打包起來，方便重複使用
+* 只能寫在module裡，且只在該module裡有效
+* 可以寫在module的任意地方，但建議寫在最後面
+* 只能寫組合邏輯
+* 都是用 blocking（＝）
+* 至少一個輸入變量（input）
+* 只能有一個返回值，沒有輸出
+* function可以調用其他function。
+```verilog
+function [bitwidth-1:0] 返回變數; // 「返回變數」即為函數名
+    input 宣告;
+    其他變數宣告;
+    begin
+        邏輯式;
+    end
+endfunction
+```
+### 函數調用
+* 需賦值給一個變數
+* 可賦值給wire、reg、output
+* 可在assign右邊，也可在always block裡的=、<=右邊
+```verilog
+assign Z = 函數名(input1, input2, ...);
+
+always @(*)
+    Z = 函數名(input1, input2, ...);
+
+always @(posedge clk)
+    Z <= 函數名(input1, input2, ...);
+```
+* EX.信號的前後位元反轉
+```verilog
+module test_func (
+    input [7:0] a,
+    output [7:0] z
+);
+
+assign z = revert(a);
+
+function [7:0] revert;
+    input [7:0] data_in;
+    integer i;
+    begin
+        for(i=0; i<8; i=i+1) begin
+            revert[7-i] = data_in[i];
+        end
+    end
+endfunction
+
+endmodule
+```
+* **有時候在互傳數據時，習慣有的會先傳高位，有的先傳低位**
+
+### define
+* 通常被用來定義一些常數或是程式碼的開關
+* 可以橫跨所有 modules 和 Hierarchy
+* 使用時於名稱前面加一撇（註：即反單引號 `）
+
+| 特性 | ` `define` (全球巨集) | `parameter` (局部參數) |
+| --- | --- | --- |
+| **語法關鍵字** | 開頭帶有反單引號，如 ``define DATA_WIDTH 8` | 正常宣告，如 `parameter DATA_WIDTH = 8;` |
+| **作用範圍** | **全域（Global）**。只要在編譯順序中被讀取，其後所有的 `.v` 檔案、所有 Module 都能直接使用。 | **區域（Local）**。只在宣告它的該個 `module` 內部有效。 |
+| **使用方式** | 呼叫時前面一定要加一撇： |  |
+
+* EX
+```verilog
+`define A_BW 8
+`define B_BW 4
+`define Z_BW (`B_BW+`A_BW)
+
+module test_define_1 (
+    input [`A_BW-1:0] a,
+    input [`B_BW-1:0] b,
+    output [`Z_BW-1:0] z
+);
+assign z = a + b + `Z_BW*2;
+endmodule
+```
+ 
+### parameter
+* 通常被用來定義一些常數或是 FSM state 的名稱
+* 只在該module內有效，但可以在Hierarchy之間傳遞
+* 使用時直接用名稱即可
+* parameter必須有值，可以有算式，會計算好再使用。
+* 語法1
+```verilog
+module m_name (input/output宣告);
+
+parameter 名稱1 = 值1;
+parameter 名稱2 = 值2;
+
+endmodule
+```
+* 語法2
+```verilog
+module m_name #(
+    parameter 名称1 = 值1,
+    parameter 名称2 = 值2
+)(
+    input/output宣告
+);
+```
+* 使用一（module內）：名稱
+* 使用二（傳值）：
+```verilog
+#(.名稱1(新值1), .名稱2(新值2))
+instant_name(IO連線)
+```
+* EX
+```verilog
+module test_parameter_0
+#(
+    parameter A_BW = 8,
+    parameter B_BW = 4,
+    parameter Z_BW = B_BW + A_BW
+) (
+    input [A_BW-1:0] a,
+    input [B_BW-1:0] b,
+    output [Z_BW-1:0] z
+);
+
+assign z = a + b + Z_BW*2;
+
+endmodule
+
+module test_top (
+    input [6:0] in1,
+    input [2:0] in2,
+    output [9:0] out1
+);
+
+test_paramter_0 #(.A_BW(7), .B_BW(3)) //將A、B的值改變，驗證可在Hierarchy之間傳遞
+ u_test_para (.a(in1), .b(in2), .z(out1));
+
+endmodule
+```
+* **state machine建議都使用parameter來寫，可讀性較高**
+
+### define 與 parameter 有什麼不同？
+| 特性 | ` `define` (全球巨集) | `parameter` (局部參數) |
+| --- | --- | --- |
+| **語法關鍵字** | 開頭帶有反單引號，如 ``define DATA_WIDTH 8` | 正常宣告，如 `parameter DATA_WIDTH = 8;` |
+| **作用範圍** | **全域（Global）**。只要在編譯順序中被讀取，其後所有的 `.v` 檔案、所有 Module 都能直接使用。 | **區域（Local）**。只在宣告它的該個 `module` 內部有效。 |
+| **使用方式** | 呼叫時前面一定要加一撇： |  |
+---------------------------------------------
