@@ -526,3 +526,101 @@ endmodule
 | **作用範圍** | **全域（Global）**。只要在編譯順序中被讀取，其後所有的 `.v` 檔案、所有 Module 都能直接使用。 | **區域（Local）**。只在宣告它的該個 `module` 內部有效。 |
 | **使用方式** | 呼叫時前面一定要加一撇： |  |
 ---------------------------------------------
+# 2026 年 7 月 6 日
+## 今日進度：
+### 刷題：完成 HDLBits 的 "carry-slect Adder" 到 "4-bit priority encoder"。
+
+## 遇到的困難與解決方案：
+### 問題1：
+* carry-slect Adder（選擇式加法器）
+* **使用的位元範圍q0[31:16]、q1[31:16]超出了它原本宣告的[15:0]範圍，位元寬度（或範圍）越界錯誤導致編譯錯誤。**
+* 原程式碼：
+  ```verilog
+  module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+    );
+    //module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+    
+    wire k;
+    wire [15:0] q0,q1;
+    add16 inst0(
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .cout(k),
+        .sum(sum[15:0])
+    );
+    
+    add16 inst1(
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .cout(),
+        .sum(q0[31:16]) //位元寬度（或範圍）越界錯誤
+    );
+    
+    add16 inst2(
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .cout(),
+        .sum(q1[31:16]) //位元寬度（或範圍）越界錯誤
+    );
+    
+    always@(*)begin
+        case(k)
+            1'b0 : sum[31:16] = q0;
+            1'b1 : sum[31:16] = q1;
+        endcase
+    end
+
+    endmodule
+    ```
+  
+### 解法：
+* **修正q0、q1在inst1、inst2中的位元寬度**
+  ```verilog
+      add16 inst1(
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .cout(),
+        .sum(q0[15:0]) //[31:16]修正為[15:0]
+    );
+    
+    add16 inst2(
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .cout(),
+        .sum(q1[15:0]) //[31:16]修正為[15:0]
+    );
+  ```
+## 關鍵知識/詞彙：
+### 優先編碼器
+* 一種組合邏輯電路。當輸入一個多位元的向量（Vector）時，如果有多個位元同時為1，它會根據內定的優先權（通常是「最高位元優先」或「最低位元優先」），只輸出那第一個出現的1的二進位位置。
+* 程式碼範例（4-bit priority encoder）：
+  ```verilog
+  // synthesis verilog_input_version verilog_2001
+    module top_module (
+    input [3:0] in,
+    output reg [1:0] pos  );
+    
+    always @(*) begin
+        if(in[0]) //當最低有效為為1，則輸出位置在q0,ex0001
+            pos = 0;
+        else if(in[1]) //ex.0010、0011（q0：don't care，有效位數較低）
+            pos = 1;
+        else if(in[2])
+            pos = 2;
+        else if(in[3])
+            pos = 3;
+        else
+            pos = 0;
+    end
+
+    endmodule
+  ```
+  ---------------------------------------------
