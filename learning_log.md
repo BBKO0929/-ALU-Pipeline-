@@ -650,7 +650,7 @@ endmodule
 # 2026 年 7 月 7 日
 ## 今日進度：
 ### 影片：看 清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。
-### 資料：複習7/5 - 7/6進度。
+### 資料：複習7/3 - 7/6進度。
 ### 刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
 
 ## 遇到的困難與解決方案：
