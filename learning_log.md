@@ -531,7 +531,7 @@ endmodule
 ### 刷題：完成 HDLBits 的 "carry-slect Adder" 到 "a priority encoder for 8-bit inputs"。
 
 ## 遇到的困難與解決方案：
-### 問題1：
+### 問題：
 * carry-slect Adder（選擇式加法器）
 * **使用的位元範圍q0[31:16]、q1[31:16]超出了它原本宣告的[15:0]範圍，位元寬度（或範圍）越界錯誤導致編譯錯誤。**
 * 原程式碼：
@@ -649,19 +649,103 @@ endmodule
 ---------------------------------------------
 # 2026 年 7 月 7 日
 ## 今日進度：
-### 影片：看 清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。
+### 影片：清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。
 ### 資料：複習7/3 - 7/6進度。
-### 刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
+### 刷題：複習7/3 - 7/6進度、完成 HDLBits 的 "Always nolatches" 到 "Create a 100-bit binary ripple-carry adder"。
 
 ## 遇到的困難與解決方案：
-### 問題：在寫always、case語法撰寫不完整，導致編譯錯誤。
-### 解法：於程式後面加上end、endcase，成功編譯。
-```verilog
-always @(*) begin
-    case()
+### 問題：
+* Create a 100-bit binary ripple-carry adder
+* **將module寫在module中、迴圈內呼叫的模組名稱寫錯導致編譯錯誤**
+* 原程式碼
+  ```verilog
+  module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum 
+    );
+    
+    add1 inst0(
+        .a(a[0]),
+        .b(b[0]),
+        .cin(cin),
+        .sum(sum[0]),
+        .cout(cout[0])
+    );
+    
+    genvar i;
+	generate
+        for (i=1 ; i<100 ; i++) begin : full_adder100
+            add100 addi(　//呼叫名稱錯誤
+                .a(a[i]),
+                .b(b[i]),
+                .cin(cout[i-1]),
+                .sum(sum[i]),
+                .cout(cout[i])
+            );
+    	end
+	endgenerate
 
-    endcase
-end
+    module add1( //module需是獨立的
+        input a, b,
+        input cin,
+        output cout,
+        output sum
+    );
+        assign sum = a ^ b ^ cin;
+    	assign cout = a & b | b & cin | a & cin;
+        
+     endmodule
+    
+    endmodule
+  ```
+  
+### 解法：
+* **每個模組都必須是獨立的個體**，把module add1的整段程式碼，移到top_module的endmodule外
+* 把迴圈內部的 add100 改成 add1（最下面定義的基礎 1-bit 全加器名字叫做 add1）
+* 修正後程式碼
+```verilog
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum 
+);
+    
+    add1 inst0( // 第 0 級全加器：手動連接初始的 cin
+        .a(a[0]),
+        .b(b[0]),
+        .cin(cin),
+        .sum(sum[0]),
+        .cout(cout[0])
+    );
+    
+    genvar i;
+	generate
+        for (i=1 ; i<100 ; i++) begin : full_adder100 // 第 1 到 99 級全加器：利用 generate 迴圈自動串聯
+            add1 addi(
+                .a(a[i]),
+                .b(b[i]),
+                .cin(cout[i-1]),
+                .sum(sum[i]),
+                .cout(cout[i])
+            );
+    	end
+	endgenerate
+
+endmodule
+
+module add1(
+        input a, b,
+        input cin,
+        output cout,
+        output sum
+    );
+        assign sum = a ^ b ^ cin;
+    	assign cout = a & b | b & cin | a & cin;
+        
+ endmodule
 ```
 ## 關鍵知識/詞彙：
 ### Active Low
