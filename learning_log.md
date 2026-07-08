@@ -439,7 +439,7 @@ endmodule
 * 可以橫跨所有 modules 和 Hierarchy
 * 使用時於名稱前面加一撇（註：即反單引號 `）
 
-| 特性 | ` `define` (全球巨集) | `parameter` (局部參數) |
+| 特性 |  `define` (全球巨集) | `parameter` (局部參數) |
 | --- | --- | --- |
 | **語法關鍵字** | 開頭帶有反單引號，如 ``define DATA_WIDTH 8` | 正常宣告，如 `parameter DATA_WIDTH = 8;` |
 | **作用範圍** | **全域（Global）**。只要在編譯順序中被讀取，其後所有的 `.v` 檔案、所有 Module 都能直接使用。 | **區域（Local）**。只在宣告它的該個 `module` 內部有效。 |
