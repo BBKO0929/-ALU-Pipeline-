@@ -769,3 +769,168 @@ module add1(
 
     * 改用同步時序電路 (Design Synchronous Logic)：現代 IC 設計最核心的解法。不要直接使用組合邏輯的輸出作為下一個電路的觸發訊號。在組合邏輯後面接一個正反器（Flip-Flop），並由全域時脈（Clock）控制。因為**毛邊只會發生在時脈週期的中間**，只要我們確保在時脈邊緣（Setup Time / Hold Time）來臨時訊號已經穩定，正反器就不會鎖存到毛邊。
 ---------------------------------------------
+# 2026 年 7 月 8 日
+## 今日進度：
+### 資料：複習7/3 - 7/7進度。
+### 刷題：複習7/3 - 7/7進度、完成 HDLBits 的 "100-digit BCD ripple-carry adder（100 位的 BCD 級聯加法器）"。
+
+## 遇到的困難與解決方案：
+### 問題：
+* Create a 100-digit BCD ripple-carry adder
+* **Module埠宣告中，cout被定義成一個"只有 1 位元的單一導線"，沒有維度可以使用中括號[]去指定索引**，所以編譯錯誤
+* 原程式碼
+  ```verilog
+	module top_module( 
+    input [399:0] a, b,
+    input cin,
+    output cout,
+    output [399:0] sum );
+      
+    bcd_fadd inst0(
+        .a(a[3:0]),
+        .b(b[3:0]),
+        .cin(cin),
+        .sum(sum[3:0]),
+        .cout(cout[0]) //沒辦法指定索引值
+    );
+    
+    genvar i;
+    generate
+        for(i=1; i<100; i++)begin : digst100
+            bcd_fadd insti(
+                .a(a[(4*i)+3:(4*i)]),
+                .b(b[(4*i)+3:(4*i)]),
+                .cin(cout[i-1]),
+                .sum(sum[(4*i)+3:(4*i)]),
+                .cout(cout[i]) //沒辦法指定索引值
+            );
+        end
+    endgenerate
+       
+	endmodule
+  ```
+  * 第一次修正後程式碼（加100條內部進位線cout -> cin）
+  * **內部串聯的最後一個進位訊號cout_temp[99]無傳送給輸出埠cout**再次編譯錯誤
+    ```verilog
+    module top_module( 
+    input [399:0] a, b,
+    input cin,
+    output cout,
+    output [399:0] sum );
+    
+    wire [99:0]cout_temp; //加100條內部進位線cout_temp[i] -> cin[i+1]
+    
+    bcd_fadd inst0(
+        .a(a[3:0]),
+        .b(b[3:0]),
+        .cin(cin),
+        .sum(sum[3:0]),
+        .cout(cout_temp[0])
+    );
+    
+    genvar i;
+    generate
+        for(i=1; i<100; i++)begin : digst100
+            bcd_fadd insti(
+                .a(a[(4*i)+3:(4*i)]),
+                .b(b[(4*i)+3:(4*i)]),
+                .cin(cout_temp[i-1]),
+                .sum(sum[(4*i)+3:(4*i)]),
+                .cout(cout_temp[i])
+            );
+        end
+    endgenerate
+
+	endmodule
+    ```  
+### 解法：
+* 修正後程式碼（加100條內部進位線；cout_temp[99]傳送給輸出埠cout）
+```verilog
+  module top_module( 
+    input [399:0] a, b,
+    input cin,
+    output cout,
+    output [399:0] sum );
+    
+    wire [99:0]cout_temp; //加100條內部進位線cout_temp[i] -> cin[i+1]
+    
+    bcd_fadd inst0(
+        .a(a[3:0]),
+        .b(b[3:0]),
+        .cin(cin),
+        .sum(sum[3:0]),
+        .cout(cout_temp[0])
+    );
+    
+    genvar i;
+    generate
+        for(i=1; i<100; i++)begin : digst100
+            bcd_fadd insti(
+                .a(a[(4*i)+3:(4*i)]),
+                .b(b[(4*i)+3:(4*i)]),
+                .cin(cout_temp[i-1]),
+                .sum(sum[(4*i)+3:(4*i)]),
+                .cout(cout_temp[i])
+            );
+        end
+    endgenerate
+    
+    assign cout = cout_temp[99]; //cout_temp[99]傳送給輸出埠cout
+
+	endmodule
+```
+## 關鍵知識/詞彙：
+### Create a 100-digit BCD ripple-carry adder
+* 更好的撰寫方式（減少編譯器的剖析樹（Parse Tree）深度、編譯時間，因為消除了硬體算術公式）
+  ```verilog
+  module top_module( 
+    input [399:0] a, b,
+    input cin,
+    output cout,
+    output [399:0] sum 
+	);
+    
+    wire [99:0] cout_temp; // 100 級的內部進位線
+    
+    //直接平行宣告 100 個 bcd_fadd 實例！
+    // 語法結構：模組名 實例名 [範圍] ( 埠接線 );
+    bcd_fadd inst [99:0] (
+        .a(a),                // 自動將 400-bit 對應到 100 個 4-bit 輸入
+        .b(b),                // 自動將 400-bit 對應到 100 個 4-bit 輸入
+        .cin({cout_temp[98:0], cin}), // 關鍵：把前 99 個進位與初始 cin 串起來當作 100 個 cin
+        .sum(sum),            // 自動將 400-bit 對應到 100 個 4-bit 輸出
+        .cout(cout_temp)      // 100 個進位輸出直接接給 cout_temp
+    );
+    
+    assign cout = cout_temp[99]; // 將最後一級的進位送給頂層
+
+	endmodule
+  ```
+* bcd_fadd模組程式碼
+  ```verilog
+  module bcd_fadd (
+    input [3:0] a,     // 4-bit BCD 數字 (0~9)
+    input [3:0] b,     // 4-bit BCD 數字 (0~9)
+    input cin,         
+    output cout,       
+    output [3:0] sum   
+	);
+
+    reg [4:0] sum_temp; //設計5-bit寬度是為了捕捉最高進位，防止4-bit溢位 (最大值：9 + 9 + 1 = 19)
+
+    always @(*) begin
+        sum_temp = a + b + cin;
+        
+        //判斷有沒有超過十進位的9，超過需加6
+        if (sum_temp > 5'd9) begin
+            sum  = sum_temp + 5'd6; // 超過9，加6
+            cout = 1'b1;            // 產生 BCD 進位
+        end else begin
+            sum  = sum_temp[3:0];   // 沒超過 9，直接當作結果
+            cout = 1'b0;            // 不進位
+        end
+    end
+
+	endmodule
+  ```
+---------------------------------------------
