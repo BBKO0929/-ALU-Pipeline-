@@ -1063,4 +1063,107 @@ module d_latch (
   * Hold time(Th)是指在時鐘有效邊緣(例如上升沿)到來之後，資料輸入端(D)的信號必須繼續保持穩定不變的最短時間。確保Flip-flop能夠完全穩定地鎖存資料，新資料不會過早到達而破壞正在被捕捉的資料。
   * 通常比setup time短得多
   * Hold violation(保持時間違規)發生在資料路徑延遲太短，新資料過早到達的情況。與時鐘週期無關，通常需要透過插入延遲(如buffer)來修復。
+
+### clock skew（時鐘偏斜的影響與計算）
+* 同一個時脈源發出的訊號，到達晶片內不同觸發器（Flip-Flop）的時間差。
+  
+* 為甚麼會產生
+  * 距離不同：有的觸發器離時脈輸入端（Clock Source）很近，有的拉了幾毫米遠。
+  * 電阻電容（RC Delay）：金屬佈線本身有電阻和電容，線越長，訊號傳得越慢。（電容充電時間）
+  * 緩衝器（Buffer）數量不同：為了推動大量硬體，時脈線上會加很多 Buffer，這也會帶來延遲。
+
+* 對電路影響
+  * 導致 Setup Time（建立時間）違規 ── 晶片跑不快
+    * 如果後級的觸發器比前級「晚」收到時脈，前級提早變更資料，後級可能來不及發出正確訊號。
+  * 導致 Hold Time（保持時間）違規 ── 晶片直接報廢
+    * 如果後級的觸發器比前級「早」收到時脈，前級剛吐出的新資料可能會在後級還沒鎖存舊資料前，就直接衝過去把舊資料洗掉
+    
+* 如何解決
+  * 建立「時鐘樹」（Clock Tree Synthesis, CTS）
+    * 不能像接延長線那樣一條線拉到底，必須像大樹的樹枝一樣，確保從樹幹（主時脈）到每個樹葉（觸發器）的路徑 長度、Buffer 數量和負載完全對稱。
+  * Clock Gating
+
+* 設計實踐
+  * 在實際專案中，時鐘樹設計通常佔用顯著的佈線資源和功耗。良好的時鐘樹設計不僅要控制skew，還要考慮功耗、面積、可測試性等多個維度。
+ 
+### setup time violation 修復策略 1 - 增加clk週期（降頻）
+* 優點：實施簡易
+* 缺點：降低系統整體工作頻率、效能，設計中往往是最終選擇的方案
+
+### setup time violation 修復策略 2 - 插入流水線暫存器(Pipelining)
+* 在長的組合邏輯路徑中間插入額外的Flip-Flop，將一個長路徑分割成多個短路徑，從而減少每段的 data path delay
+* 優點：可以顯著提高最大工作頻率，是高性能設計的標準做法。可以讓多個資料同時在不同階段處理，提高吞吐量
+* 缺點：增加了資料的延遲週期(latency)，從輸入到輸出需要更多時鐘週期，還會增加面積和功耗，並可能使控制邏輯變得更複雜。
+* 設計考量：切割點需要仔細選擇（有沒有辦法算出正確的值），要在邏輯的自然邊界處切割，避免造成組合邏輯的不平衡。
+
+### setup time violation 修復策略 3
+### Buffer插入與邏輯複製
+* 當critical path上某個節點的負載(fanout)過大，導致驅動能力不足、轉換時間變慢、net delay增加時，可以採用兩種技術：
+  * Buffer Insertion (插入緩衝器)：在長線路或高fanout節點插入repeater buffer，分段驅動負載，減少整體延遲。（能夠提供額外驅動能力，還能降低線路的RC延遲效應）
+  * Logic Replication (邏輯複製)：複製產生高fanout信號的邏輯gate，讓每個副本驅動部分負載，從而減少單一gate的負擔。
+* 權衡考量：Buffer insertion會增加面積和功耗，而logic replication則會增加更多面積(因為複製了邏輯)。
+
+### Cell Sizing／Gate Upsizing
+* 當timing report顯示cell delay佔比較大(而非net delay)，表示gate本身的驅動能力不足。解決方法是將標準單元庫中的小尺寸cell替換為大尺寸cell
+* 作用機制：更大的cell具有更寬的電晶體通道，能提供更大的驅動電流，加快輸出轉換速度，降低cell delay。
+* 大尺寸cell會增加面積、輸入電容(可能影響前級timing)、和功耗。（針對critical path上delay最大的幾個cell進行選擇性upsizing即可）
+
+### 更換Vt類型(Threshold Voltage Tuning)
+* LVT (Low-Vt)：速度最快(延遲最小)，但漏電流最大，靜態功耗高
+* SVT (Standard-Vt)：性能與功耗的折衷選擇
+* HVT (High-Vt)：速度最慢，但漏電流最小，適合非關鍵路徑
+* 代價與風險：
+  * 漏電功耗大幅上升，影響待機功耗和總功耗預算
+  * Cell變快可能使hold time更緊張，因為最小路徑延遲減小
+  * 可能加劇IR drop問題和on-chip variation，在某些corner下反而更差
+  * 影響yield，因為LVT cell對製程變異更敏感。
+* 最佳實踐：採用multi-Vt設計策略：critical path用LVT，非關鍵路徑用HVT，大部分用SVT。
+
+### setup time violation 修復策略 4
+### 時鐘偏斜優化(Clock Skew Scheduling)
+* 刻意調整 clock skew，可以在不改變電路結構的情況下改善 timing。對於 setup violation，可以引入 positive skew，讓 capture FF 的時鐘稍微延遲到達，給予資料更多傳播時間。
+
+### 邏輯重構(Logic Restructuring)
+* 透過重新組織組合邏輯的結構來減少延遲，例邏輯分解(factoring)、critical path 的優先運算等
+
+### 實體設計優化(Physical Design)
+* 將相關的 cell 放得更近、使用較低層的金屬層以減少電阻、避開擁擠區域、使用更寬的線等
+
+### **綜合性的優化策略**
+* 一般的優化流程：
+  * 先做大架構層面的改動：如增加流水線、降頻(如果可行)、重新 partition 模組等
+  * 再做RTL 層級的優化：如邏輯重構、減少組合邏輯深度、優化狀態機等
+  * 最後在 P&R 階段做細部調整：包括 gate sizing、buffer insertion...
+  * 迭代優化：時序優化是迭代過程。修復一處 violation 可能在別處產生新的問題
+
+### critical path
+* 晶片內所有邏輯路徑中，訊號傳遞速度最慢、延遲（Delay）最長的那一條路徑
+
+### hold time violation 修復策略 1 - 增加資料路徑延遲
+* Hold violation與setup violation本質上相反；setup是資料來得太慢，hold是資料來得太快或變化得太早
+* Hold violation與時鐘週期無關（頻率降到很低，hold問題依然存在）
+* hold violation通常被認為比setup violation更嚴重（降頻無法修）
+* **增加資料路徑延遲**可讓新資料晚一點到達capture FF
+
+### hold time violation 修復策略 2
+### 插入延遲元件
+* 插入Buffer：在資料路徑上插入一個或多個 buffer，增加 propagation delay
+* 插入位置：通常在 launch FF 的輸出端或組合邏輯路徑的早期階段插入（同時影響所有由該 FF 驅動的路徑）
+* 插入Delay Cell：標準單元庫通常提供專用的 delay cell（如 DELAY、DELLN 等），這些 cell 專門用於增加延遲而不改變邏輯功能（相比普通 buffer、delay cell 有更可預測的延遲特性）
+* 注意事項：增加面積和功耗（尤其是動態功耗）。
+
+### 調整時鐘偏斜
+* 減小 clock skew，甚至引入 negative skew（讓 capture FF 的時鐘提前到達），可以給資料更多的保持時間。
+* 注意事項：調整 skew 會同時影響 setup 和 hold timing，需要做好 clock tree 的 balance。
+
+### 插入 Lock-up Latch
+* 在路徑中插入一個低電平有效的 Latch。在時鐘的高電平期間，latch 處於保持狀態，輸出不變；在低電平期間，latch 透明，資料通過。
+* 注意事項：Lock-up latch 會增加 data latency（半個週期），並增加面積和功耗。
+
+### Hold Fix的最佳實踐
+* 實際設計流程中，hold violation的修復通常在P&R的後期階段進行，因為：
+  * Hold timing對實際的placement和routing非常敏感,只有在physical design確定後,才能準確評估hold violations
+  * 現代P&R工具通常有自動的hold fixing功能,會在post-CTS或post-route階段自動插入所需的buffer/delay cell
+  * Hold fix通常是最後的收尾工作，在setup timing基本達標後才進行大規模的hold fixing。
+  * 設計者需要在設定P&R constraints時,給予工具足夠的buffer insertion彈性，並在chip finishing階段仔細檢查hold fix的結果，確保沒有過度修復(over-fixing)或遺漏關鍵路徑。
 ---------------------------------------------
