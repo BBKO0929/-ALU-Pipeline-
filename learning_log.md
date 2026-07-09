@@ -15,23 +15,43 @@ end
 ```
 
 ## 關鍵知識/詞彙：
-  * 數位電路組成（logic gate、memory、flip-flop、wire、bus、IO）
-  * 晶圓廠能製作的layoyt檔（GDS）
-  * Tape out；RTL（Register-Transfer Level）較 Gate-level-netlist 高階
-  * wire：連線（搭配 assign 語法）-> combinational logic
-  * reg（register）：暫存器（搭配 always 語法但不一定合成Flip-Flop）
-  * 硬體思維：同時持續處理（平行處理），程式碼先後順序不影響結果
-  * Multi-driven（重複驅動）：一條線被2個以上訊號驅動
-  * assign語法（持續賦值，不論順序）：用單等號＂＝＂（左邊需是 wire 形式，右邊可 wire 可 reg）。如果左位寬小於右邊，缺少的高位數會消失。
-  * always語法（條件賦值）：
-    * always@(posedge clk)begin -> 循序邏輯（sequential logic），賦值用＂＜＝＂（non-blocking）
-    * always@(*)begin -> 組合邏輯（combinational logic），賦值用＂＝＂(blocking)，可創造出循序/組合邏輯。
-    * always裡面的變數須是reg形式。先給初始值 or 條件寫滿避免"Latch"
-  * 正反器（Flip-Flop）：又稱暫存器，同步數位電路最重要組成元件。與clock同步（上沿 0->1 positive edge, 下沿 1->0 negative edge）。邏輯深度決定電路速度
-  * 分清楚reset訊號跟clock是同步/非同步
-  * 同步reset（reset隨clock動作）：例always@(posedge clk)begin
-  * 非同步reset（reset一來就動作）：例always@(posedge clock or negedge clk rst_n)begin
-  * 震盪器（Oscillator）：always #<一半的週期時間> clk=~clk（通常用在Testbench產生clk，一般數位電路不會這樣寫）
+### 數位電路組成
+* logic gate、memory、flip-flop、wire、bus、IO
+
+### 晶圓廠能製作（Tape out）的layoyt檔
+* GDS
+
+### RTL（Register-Transfer Level）較 Gate-level-netlist比較
+* RTL（Register-Transfer Level）較 Gate-level-netlist 高階
+
+### wire連線
+*（搭配 assign 語法）-> combinational logic
+
+### reg（register）
+* 暫存器（搭配 always 語法但不一定合成Flip-Flop）
+
+### 硬體思維
+* 同時持續處理（平行處理），程式碼先後順序不影響結果
+  
+### Multi-driven（重複驅動）
+* 一條線被2個以上訊號驅動
+  
+### assign語法（持續賦值，不論順序）
+* 用單等號＂＝＂（左邊需是 wire 形式，右邊可 wire 可 reg）。如果左位寬小於右邊，缺少的高位數會消失。
+  
+### always語法（條件賦值）：
+* always@(posedge clk)begin -> 循序邏輯（sequential logic），賦值用＂＜＝＂（non-blocking）
+* always@(*)begin -> 組合邏輯（combinational logic），賦值用＂＝＂(blocking)，可創造出循序/組合邏輯。
+* always裡面的變數須是reg形式。先給初始值 or 條件寫滿避免"Latch"
+  
+### 正反器（Flip-Flop）
+* 又稱暫存器，同步數位電路最重要組成元件。與clock同步（上沿 0->1 positive edge, 下沿 1->0 negative edge）。邏輯深度決定電路速度
+* 分清楚reset訊號跟clock是同步/非同步
+* 同步reset（reset隨clock動作）：例always@(posedge clk)begin
+* 非同步reset（reset一來就動作）：例always@(posedge clk or negedge clk rst_n)begin
+  
+### 震盪器（Oscillator）
+* always #<一半的週期時間> clk=~clk（通常用在Testbench產生clk，一般數位電路不會這樣寫）
 ---------------------------------------------
 # 2026 年 7 月 4 日
 ## 今日進度：
@@ -933,4 +953,114 @@ module add1(
 
 	endmodule
   ```
+---------------------------------------------
+# 2026 年 7 月 9 日
+## 今日進度：
+### 影片：看財經村長-數位IC設計面試1。
+### 刷題：完成 HDLBits - "Combinational Logic" 中的 "Basic gates"。
+
+## 遇到的困難與解決方案：
+### 問題：
+* Ringer
+* **用軟體思維來寫硬體**
+* 原程式碼：
+  ```verilog
+  module top_module (
+    input ring,
+    input vibrate_mode,
+    output ringer,       // Make sound
+    output motor         // Vibrate
+	);
+
+    assign ringer = (ring == 1'b1 && vibrate_mode == 1'b0) ? 1'b1 : 1'b0; //響鈴條件：有來電 (ring) 且 沒有開啟震動模式 (not vibrate_mode)
+    assign motor = (ring == 1'b1 && vibrate_mode == 1'b1) ? 1'b1 : 1'b0; //震動條件：有來電 (ring) 且 開啟了震動模式 (vibrate_mode)
+    
+	endmodule
+  ```
+  * Gatesv(數位訊號處理與向量切片（Vector Slicing）練習)
+  * 題目要求out_different檢查自己與左邊鄰居是否不同，in[3]的左邊是in[0]，但程式碼未將in[3]、in[0]做比較而導致編譯錯誤（位元寬度不匹配）
+  * 原程式碼
+  	```verilog
+   	module top_module( 
+    input [3:0] in,
+    output [2:0] out_both,
+    output [3:1] out_any,
+    output [3:0] out_different );
+    
+    assign out_both = in[3:1] & in[2:0]; //檢查自己與左邊鄰居是否皆為 1 (3-bit 輸出)
+    assign out_any = in[3:1] | in[2:0]; //檢查自己與右邊鄰居是否任一為 1 (3-bit 輸出，注意左側宣告是 [3:1])
+    assign out_different = in[3:1] ^ in[2:0]; //位元寬度不匹配
+
+	endmodule
+  	```
+### 解法：
+* Ringer（更好的寫法）
+* **業界**更推崇的精簡寫法：**直接使用邏輯閘**，**直接寫邏輯運算子**，腦海中可以直接浮現出電路圖。
+* 修改後程式碼
+```verilog
+module top_module (
+    input ring,
+    input vibrate_mode,
+    output ringer,       
+    output motor         
+);
+
+    assign ringer = ring & ~vibrate_mode; //ring 獨立出現，就代表 ring == 1'b1；~vibrate_mode，就代表 vibrate_mode == 1'b0。
+    assign motor = ring & vibrate_mode; 
+    
+endmodule
+```
+* Gatesv(數位訊號處理與向量切片（Vector Slicing）練習)
+* out_different前三個位元 [2:0]：正常跟左邊鄰居比較（不用環繞），最高位元 [3]：單獨拉出來跟 in[0] 做環繞比較。
+* 修改後程式碼
+  ```verilog
+  module top_module( 
+    input [3:0] in,
+    output [2:0] out_both,
+    output [3:1] out_any,
+    output [3:0] out_different );
+    
+    assign out_both = in[3:1] & in[2:0];
+    assign out_any = in[3:1] | in[2:0];
+    assign out_different[2:0] = in[3:1] ^ in[2:0];
+    assign out_different[3] = in[3] ^ in[0];
+
+	endmodule
+  ```
+
+## 關鍵知識/詞彙：
+### Latch、Flip-flop根本差異
+* Latch（平緣觸發）
+  * 當控制信號(clk)處於有效電平時，Latch會持續追蹤輸入端的變化，並將這些變化反映到輸出端。
+    
+* Flip-flop（邊緣觸發）
+  * 只在時鐘信號的特定邊緣(上升沿或下降沿)捕捉輸入資料，並在該瞬間更新輸出。
+
+### Latch的電路實現與HDL描述
+```verilog
+module d_latch (
+     input   rst_n,
+     input   en,
+     input   d,
+     output  q
+);
+
+// 1. (!rst_n) -> 低電平重設，輸出 0
+// 2. (en)     -> 致能開啟，輸出 d (隨輸入變動)
+// 3. : q      -> 致能關閉，維持原值 (鎖存狀態)
+
+	assign q = (!rst_n) ? 0 : (en) ? d : q;
+
+ endmodule
+```
+
+### Setup Time與Hold Time的定義與重要性
+* Setup Time
+  * Setup time(Tsu)是指在時鐘有效邊緣(例如上升沿)到來之前，資料輸入端(D)的信號必須保持穩定不變的最短時間。確保Flip-flop內部的主Latch能夠正確地採樣並鎖存輸入資料。
+  * Setup time的長短取決於Flip-flop內部電路的速度特性。
+  
+* Hold Time
+  * Hold time(Th)是指在時鐘有效邊緣(例如上升沿)到來之後，資料輸入端(D)的信號必須繼續保持穩定不變的最短時間。確保Flip-flop能夠完全穩定地鎖存資料，新資料不會過早到達而破壞正在被捕捉的資料。
+  * 通常比setup time短得多
+  * Hold violation(保持時間違規)發生在資料路徑延遲太短，新資料過早到達的情況。與時鐘週期無關，通常需要透過插入延遲(如buffer)來修復。
 ---------------------------------------------
