@@ -25,7 +25,7 @@ end
 * RTL（Register-Transfer Level）較 Gate-level-netlist 高階
 
 ### wire連線
-*（搭配 assign 語法）-> combinational logic
+* （搭配 assign 語法）-> combinational logic
 
 ### reg（register）
 * 暫存器（搭配 always 語法但不一定合成Flip-Flop）
@@ -39,7 +39,7 @@ end
 ### assign語法（持續賦值，不論順序）
 * 用單等號＂＝＂（左邊需是 wire 形式，右邊可 wire 可 reg）。如果左位寬小於右邊，缺少的高位數會消失。
   
-### always語法（條件賦值）：
+### always語法（條件賦值，有優先權問題）：
 * always@(posedge clk)begin -> 循序邏輯（sequential logic），賦值用＂＜＝＂（non-blocking）
 * always@(*)begin -> 組合邏輯（combinational logic），賦值用＂＝＂(blocking)，可創造出循序/組合邏輯。
 * always裡面的變數須是reg形式。先給初始值 or 條件寫滿避免"Latch"
@@ -829,9 +829,9 @@ module add1(
        
 	endmodule
   ```
-  * 第一次修正後程式碼（加100條內部進位線cout -> cin）
-  * **內部串聯的最後一個進位訊號cout_temp[99]無傳送給輸出埠cout**再次編譯錯誤
-    ```verilog
+* 第一次修正後程式碼（加100條內部進位線cout -> cin）
+* **內部串聯的最後一個進位訊號cout_temp[99]無傳送給輸出埠cout**再次編譯錯誤
+  ```verilog
     module top_module( 
     input [399:0] a, b,
     input cin,
@@ -862,7 +862,7 @@ module add1(
     endgenerate
 
 	endmodule
-    ```  
+  ```  
 ### 解法：
 * 修正後程式碼（加100條內部進位線；cout_temp[99]傳送給輸出埠cout）
 ```verilog
@@ -1166,4 +1166,59 @@ module d_latch (
   * 現代P&R工具通常有自動的hold fixing功能,會在post-CTS或post-route階段自動插入所需的buffer/delay cell
   * Hold fix通常是最後的收尾工作，在setup timing基本達標後才進行大規模的hold fixing。
   * 設計者需要在設定P&R constraints時,給予工具足夠的buffer insertion彈性，並在chip finishing階段仔細檢查hold fix的結果，確保沒有過度修復(over-fixing)或遺漏關鍵路徑。
+---------------------------------------------
+# 2026 年 7 月 10 日
+## 今日進度：
+### 資料：複習7/3 - 7/9內容。
+### 刷題：複習 HDLBits 的 "Modules" 到 "Basic Gates"；完成 HDLBits - Arithmetic circuits 的 half adder 到 signed addition overflow。
+
+## 遇到的困難與解決方案：
+### 問題：誤解溢位判斷。
+### 解法：
+### 溢位只會發生在「這兩種情況」
+* 正數 ＋ 正數 ＝ 變成負數（正溢位）
+* 負數 ＋ 負數 ＝ 變成正數（負溢位）
+
+### 溢位
+* 專指「有號數（Signed Number）」在進行加減法運算時，因為答案太大或太小，導致 8-bit 的空間裝不下，進而使「符號位元（Sign bit）」被錯誤篡改的硬體災難。
+
+### 今日例題 - signed addition overflow
+```verilog
+module top_module (
+    input [7:0] a,
+    input [7:0] b,
+    output [7:0] s,
+    output overflow
+); //
+
+    assign s = a + b;// 兩數相加
+    assign overflow = ~(a[7] ^ b[7]) & (a[7] ^ s[7]);// 判斷溢位：最高位元同為1 or 0且與最高輸出位元數字相反
+
+endmodule
+```
+
+## 關鍵知識/詞彙：
+### Variable index　變數索引（為什麼「變數索引」在硬體裡是巨大的 MUX？）
+* 在寫 C++ 或 Python 時，data[index] 只是叫 CPU 去記憶體某個地址「看一眼」，記憶體很大、index 再大也沒差。
+* 晶片不是軟體，晶片是「用金屬線焊死」的電路板！。如果電路是 out = data[index]，這代表硬體必須做到：「不論 index 傳進來是多少，out 都要能拿到對應的資料。」（不可以有空的資料）
+* 當 data 的範圍很大時，晶片的速度（時脈頻率）會被拖垮！
+
+### Variable part-select 變數局部選擇（變數動態切片 +: 與 -）: 
+* 在硬體設計中，合成器有一個死命令：「拉出來的總線（Bus），在晶片做出來時，有幾根銅線必須是確定的！」
+* 假設寫 out = data[index : index+3]：
+  * 冒號左右兩邊都有變數（index 和 index+3），在數學解析上會判定「這個範圍的寬度可能隨時在變」，導致編譯錯誤
+* 正確寫法（焊死寬度，只動起點）
+  * data[起點 +: 寬度] or data[起點 -: 寬度]
+  * "+"代表從起點往高位元數 4 個；"-"代表從起點往低位元數 4 個
+* 今日範例程式 256-to-1 multiplexer
+  ```verilog
+  module top_module( 
+    input [1023:0] in,
+    input [7:0] sel,
+    output [3:0] out );
+    
+    assign out = in[sel*4 +: 4]; //選出 1024bit 資料中，某位置的 4bit 資料
+
+	endmodule
+  ```      
 ---------------------------------------------
