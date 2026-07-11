@@ -1365,7 +1365,7 @@ endmodule
     input cin,
     output cout,
     output [15:0] sum 
-);
+	);
     
     // 宣告 5 根進位線（k[0] 到 k[4]）
     wire [4:0] k;
