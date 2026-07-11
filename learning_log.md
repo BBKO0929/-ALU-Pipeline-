@@ -1203,7 +1203,7 @@ endmodule
 * 晶片不是軟體，晶片是「用金屬線焊死」的電路板！。如果電路是 out = data[index]，這代表硬體必須做到：「不論 index 傳進來是多少，out 都要能拿到對應的資料。」（不可以有空的資料）
 * 當 data 的範圍很大時，晶片的速度（時脈頻率）會被拖垮！
 
-### Variable part-select 變數局部選擇（變數動態切片 +: 與 -）: 
+### Variable part-select 變數局部選擇（變數動態切片 +: 與 -:）
 * 在硬體設計中，合成器有一個死命令：「拉出來的總線（Bus），在晶片做出來時，有幾根銅線必須是確定的！」
 * 假設寫 out = data[index : index+3]：
   * 冒號左右兩邊都有變數（index 和 index+3），在數學解析上會判定「這個範圍的寬度可能隨時在變」，導致編譯錯誤
@@ -1221,4 +1221,172 @@ endmodule
 
 	endmodule
   ```      
+---------------------------------------------
+# 2026 年 7 月 11 日
+## 今日進度：
+### 資料：複習7/3 - 7/10內容。
+### 刷題：複習 HDLBits 的 "Modules" 到 "multiplexers"；完成 HDLBits - Arithmetic circuits。
+
+## 遇到的困難與解決方案：
+### 問題：create a 4-digit BCD ripple-carry adder
+* 在做賦值後出現寬度截斷警告（Truncation Warning）。
+* 原程式碼：
+  ```verilog
+  module top_module ( 
+    input [15:0] a, b,
+    input cin,
+    output cout,
+    output [15:0] sum );
+    
+    wire [3:0]k;
+    bcd_fadd inst0(
+        .a(a[3:0]),
+        .b(b[3:0]),
+        .cin(cin),
+        .sum(sum[3:0]),
+        .cout(k[0])
+    );
+    
+    genvar i;
+    generate
+        for(i=1; i<4; i++)begin : bcd_adder16
+            bcd_fadd insti(
+                .a(a[4*i+3 : 4*i]), //等號右邊算出來的結果是一個 32-bit 整數，但等號左邊的接收目標寬度卻只有 4-bit
+                .b(b[4*i+3 : 4*i]), //等號右邊算出來的結果是一個 32-bit 整數，但等號左邊的接收目標寬度卻只有 4-bit
+                .cin(k[i-1]),
+                .sum(sum[4*i+3 : 4*i]),//等號右邊算出來的結果是一個 32-bit 整數，但等號左邊的接收目標寬度卻只有 4-bit
+                .cout(k[i])
+            );
+        end
+    endgenerate
+    
+    assign cout = k[3];
+
+	endmodule
+  ```
+  * 所以編譯器強會行把高位元的 28 個 bit 全部丟棄，只留下最低的 4 個 bit。
+### 解法：
+### 改用變數動態切片 +: 與 -: 撰寫，明確告訴編譯器「起點是 4*i，寬度死死就是 4」
+* 修改後程式碼
+  ```verilog
+  module top_module ( 
+    input [15:0] a, b,
+    input cin,
+    output cout,
+    output [15:0] sum );
+    
+    wire [3:0]k;
+    bcd_fadd inst0(
+        .a(a[3:0]),
+        .b(b[3:0]),
+        .cin(cin),
+        .sum(sum[3:0]),
+        .cout(k[0])
+    );
+    
+    genvar i;
+    generate
+        for(i=1; i<4; i++)begin : bcd_adder16
+            bcd_fadd insti(
+                .a(a[4*i +: 4]), //動態切片 +: 與 -: 撰寫
+                .b(b[4*i +: 4]), //動態切片 +: 與 -: 撰寫
+                .cin(k[i-1]),
+                .sum(sum[4*i +: 4]), //動態切片 +: 與 -: 撰寫
+                .cout(k[i])
+            );
+        end
+    endgenerate
+    
+    assign cout = k[3];
+
+	endmodule
+  ```
+
+### 溢位
+* 專指「有號數（Signed Number）」在進行加減法運算時，因為答案太大或太小，導致 8-bit 的空間裝不下，進而使「符號位元（Sign bit）」被錯誤篡改的硬體災難。
+
+### 今日例題 - signed addition overflow
+```verilog
+module top_module (
+    input [7:0] a,
+    input [7:0] b,
+    output [7:0] s,
+    output overflow
+); //
+
+    assign s = a + b;// 兩數相加
+    assign overflow = ~(a[7] ^ b[7]) & (a[7] ^ s[7]);// 判斷溢位：最高位元同為1 or 0且與最高輸出位元數字相反
+
+endmodule
+```
+
+## 關鍵知識/詞彙：
+### 16-bit BCD_adder
+* 雖編譯成功且執行結果正確，但在硬體描述語言中踩到了「一線多接（Multiple Drivers）」的語法地雷！
+* 雖然在某些極端寬容的編譯器可以過，但在很多標準的 Linter（語法檢查器）或 HDLBits 的環境中，將最後一級同時接到內部陣列又透過 assign 指定的方式，容易導致陣列邊界混淆或多重驅動判定錯誤。
+* 原程式碼：
+  ```verilog
+  module top_module ( 
+    input [15:0] a, b,
+    input cin,
+    output cout,
+    output [15:0] sum );
+    
+    wire [3:0]k;
+    bcd_fadd inst0(
+        .a(a[3:0]),
+        .b(b[3:0]),
+        .cin(cin),
+        .sum(sum[3:0]),
+        .cout(k[0])
+    );
+    
+    genvar i;
+    generate
+        for(i=1; i<4; i++)begin : bcd_adder16
+            bcd_fadd insti(
+                .a(a[4*i +: 4]),
+                .b(b[4*i +: 4]),
+                .cin(k[i-1]),
+                .sum(sum[4*i +: 4]),
+                .cout(k[i]) //k[3] 被千位數加法器的 .cout(k[3]) 驅動（塞資料進去）。
+            );
+        end
+    endgenerate
+    
+    assign cout = k[3]; //同時又宣告了 assign cout = k[3];
+
+	endmodule
+  ```
+* 更好的撰寫方式
+  ```verilog
+  module top_module ( 
+    input [15:0] a, b,
+    input cin,
+    output cout,
+    output [15:0] sum 
+);
+    
+    // 宣告 5 根進位線（k[0] 到 k[4]）
+    wire [4:0] k;
+    
+    // 把頭尾焊死接到頂層介面
+    assign k[0] = cin;
+    assign cout = k[4];
+    
+    genvar i;
+    generate
+        for(i=0; i<4; i++) begin : bcd_adder16
+            bcd_fadd insti(
+                .a(a[4*i+3 : 4*i]),
+                .b(b[4*i+3 : 4*i]),
+                .cin(k[i]),       // i=0 時就是 cin
+                .sum(sum[4*i+3 : 4*i]),
+                .cout(k[i+1])     // i=3 時輸出給 k[4]，就是 cout
+            );
+        end
+    endgenerate
+
+	endmodule
+  ```
 ---------------------------------------------
