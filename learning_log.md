@@ -346,6 +346,7 @@ always @(posedge clk) begin
 end
 endmodule
 ```
+
 ### 遞延訊號
 * 因為常需要根據pipline把需要的訊號延遲幾個cycle
 * 例如某邊data path已經把值算出來，但另一邊卻要晚幾個cycle才準備好，所以可把需要的訊號延遲幾個cycle
@@ -418,6 +419,7 @@ function [bitwidth-1:0] 返回變數; // 「返回變數」即為函數名
     end
 endfunction
 ```
+
 ### 函數調用
 * 需賦值給一個變數
 * 可賦值給wire、reg、output
@@ -494,6 +496,7 @@ parameter 名稱2 = 值2;
 
 endmodule
 ```
+
 * 語法2
 ```verilog
 module m_name #(
@@ -503,6 +506,7 @@ module m_name #(
     input/output宣告
 );
 ```
+
 * 使用一（module內）：名稱
 * 使用二（傳值）：
 ```verilog
@@ -537,6 +541,7 @@ test_paramter_0 #(.A_BW(7), .B_BW(3)) //將A、B的值改變，驗證可在Hiera
 
 endmodule
 ```
+
 * **state machine建議都使用parameter來寫，可讀性較高**
 
 ### define 與 parameter 有什麼不同？
@@ -779,14 +784,15 @@ module add1(
 
 ### Hazard
 * 因為**硬體元件的物理延遲或設計缺陷**，導致電路在某個瞬間產生錯誤輸出（毛邊），或是讓處理器讀取到錯誤資料
+  
 * 分類
     * Static Hazard：輸入改變後，原本預期要維持穩定的輸出，卻在中間短暫跳變。
         * Static 1-Hazard：預期維持 1，中間卻掉了下去（1 → 0 → 1）。
         * Static 0-Hazard：預期維持 0，中間卻彈了上來（0 → 1 → 0）。
     * Dynamic Hazard：預期要從 0 變 1（或 1 變 0），但因為多條路徑延遲，輸出沒有一次到位，而是跳動了多次（0 → 1 → 0 → 1）。
+      
 * 防範方式
     * 加入冗餘項 (Redundant Terms / Hazard Cover)：利用卡諾圖（Karnaugh Map）圈選相鄰群組時，在兩個群組的交界處額外多圈一個「冗餘乘積項」（卡諾圖上的圈圈重疊）。多出來的邏輯閘能確保當輸入訊號在兩組之間切換時，輸出不會因為延遲而掉下去。
-
     * 改用同步時序電路 (Design Synchronous Logic)：現代 IC 設計最核心的解法。不要直接使用組合邏輯的輸出作為下一個電路的觸發訊號。在組合邏輯後面接一個正反器（Flip-Flop），並由全域時脈（Clock）控制。因為**毛邊只會發生在時脈週期的中間**，只要我們確保在時脈邊緣（Setup Time / Hold Time）來臨時訊號已經穩定，正反器就不會鎖存到毛邊。
 ---------------------------------------------
 # 2026 年 7 月 8 日
@@ -926,6 +932,7 @@ module add1(
 
 	endmodule
   ```
+  
 * bcd_fadd模組程式碼
   ```verilog
   module bcd_fadd (
@@ -1264,7 +1271,7 @@ endmodule
 
 	endmodule
   ```
-  * 所以編譯器強會行把高位元的 28 個 bit 全部丟棄，只留下最低的 4 個 bit。
+  * 編譯器強會行把高位元的 28 個 bit 全部丟棄，只留下最低的 4 個 bit。
 ### 解法：
 ### 改用變數動態切片 +: 與 -: 撰寫，明確告訴編譯器「起點是 4*i，寬度死死就是 4」
 * 修改後程式碼
@@ -1302,6 +1309,7 @@ endmodule
 	endmodule
   ```
 
+## 關鍵知識/詞彙：
 ### 溢位
 * 專指「有號數（Signed Number）」在進行加減法運算時，因為答案太大或太小，導致 8-bit 的空間裝不下，進而使「符號位元（Sign bit）」被錯誤篡改的硬體災難。
 
@@ -1320,7 +1328,6 @@ module top_module (
 endmodule
 ```
 
-## 關鍵知識/詞彙：
 ### 16-bit BCD_adder
 * 雖編譯成功且執行結果正確，但在硬體描述語言中踩到了「一線多接（Multiple Drivers）」的語法地雷！
 * 雖然在某些極端寬容的編譯器可以過，但在很多標準的 Linter（語法檢查器）或 HDLBits 的環境中，將最後一級同時接到內部陣列又透過 assign 指定的方式，容易導致陣列邊界混淆或多重驅動判定錯誤。
@@ -1389,4 +1396,53 @@ endmodule
 
 	endmodule
   ```
+---------------------------------------------
+# 2026 年 7 月 13 日
+## 今日進度：
+### 資料：複習7/3 - 7/11內容。
+### 刷題：完成 HDLBits - Karnaugh Map to Circuit。
+
+## 遇到的困難與解決方案：
+### 問題：using one 4-to-1 multiplexer and as many 2-to-1 multiplexers as required
+* 如何優化並寫成更精簡程式碼
+* 原程式碼：
+  ```verilog
+	module top_module (
+    input c,
+    input d,
+    output [3:0] mux_in
+	); 
+    
+    assign mux_in[0] = c ? 1'b1 : d ? 1'b1 : 0; //如果 c 是 1 輸出 1；否則如果 d 是 1 輸出 1；如果都不是就輸出 0。
+    assign mux_in[1] = 1'b0; //直接接地（GND）
+    assign mux_in[3] = (c & d) ? 1'b1 : 1'b0; //當 c 和 d 同時為 1 時輸出 1。
+    assign mux_in[2] = (~d) ? 1'b1 : 1'b0; //如果 ~d 成立就輸出 1，否則輸出 0。
+    
+	endmodule
+
+  ```
+
+### 解法：
+### 改寫in[0]、in[2]、in[3]程式碼
+* 修改後程式碼
+  ```verilog
+	module top_module (
+    input c,
+    input d,
+    output [3:0] mux_in
+	);    
+    
+    assign mux_in[0] = c | d;  // OR 閘（c or d 任一為 1 就輸出 1）
+    assign mux_in[1] = 1'b0;   // 接地
+    assign mux_in[2] = ~d;     // NOT 閘（反相 d 輸出 1）
+    assign mux_in[3] = c & d;  // AND 閘（當 c and d 為 1 就輸出 1）
+    
+	endmodule
+  ```
+
+## 關鍵知識/詞彙：
+### 再次分析位元運算子（Bitwise）」與「邏輯運算子（Logical）
+* 當訊號只有 1-bit 時，0 就是假，1 就是真。這時候位元運算（~, &）跟邏輯運算（!, &&）在數學上的結果完全等價，合成器最後長出來的實體電路也是同一個邏輯閘。  
+* 雖然怎麼寫都對，但通常硬體工程師在編寫組合邏輯（處理資料、訊號線）時，會優先使用位元運算子（~, &, |），因為這樣最直覺地對應到硬體邏輯閘。 
+* 邏輯運算子（!, &&, ||）通常只會保留給條件判斷（例如 if (rst_n && valid) 這種用來控制狀態機或觸發條件的地方）。
 ---------------------------------------------
