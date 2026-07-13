@@ -48,7 +48,7 @@ end
 * 又稱暫存器，同步數位電路最重要組成元件。與clock同步（上沿 0->1 positive edge, 下沿 1->0 negative edge）。邏輯深度決定電路速度
 * 分清楚reset訊號跟clock是同步/非同步
 * 同步reset（reset隨clock動作）：例always@(posedge clk)begin
-* 非同步reset（reset一來就動作）：例always@(posedge clk or negedge clk rst_n)begin
+* 非同步reset（reset一來就動作）：例always@(posedge clk or negedge rst_n)begin //低電位非同步reset
   
 ### 震盪器（Oscillator）
 * always #<一半的週期時間> clk=~clk（通常用在Testbench產生clk，一般數位電路不會這樣寫）
@@ -1400,10 +1400,11 @@ endmodule
 # 2026 年 7 月 13 日
 ## 今日進度：
 ### 資料：複習7/3 - 7/11內容。
-### 刷題：完成 HDLBits - Karnaugh Map to Circuit。
+### 刷題：完成 HDLBits 的 Karnaugh Map to Circuit 到 DFF with byte enable。
 
 ## 遇到的困難與解決方案：
-### 問題：using one 4-to-1 multiplexer and as many 2-to-1 multiplexers as required
+### 問題：
+### using one 4-to-1 multiplexer and as many 2-to-1 multiplexers as required
 * 如何優化並寫成更精簡程式碼
 * 原程式碼：
   ```verilog
@@ -1422,8 +1423,38 @@ endmodule
 
   ```
 
+### DFF with byte enable
+* if - else 造成了不必要的「優先權」與「資料遺失」
+* 原程式碼：
+  ```verilog
+  module top_module (
+    input clk,
+    input resetn,
+    input [1:0] byteena,
+    input [15:0] d,
+    output [15:0] q
+	);
+    
+    always@(posedge clk)begin //DFF 正緣觸發
+        if(~resetn)　//低態reset
+            q <= 16'h0;
+        else if(byteena[1])
+            q[15:8] <= d[15:8]; //byteena[1] controls the upper byte
+        else if(byteena[0])
+            q[7:0] <= d[7:0]; //byteena[0] controls the lower byte 
+        else
+            q <= d;
+    end
+
+	endmodule
+
+  ```
+* 當 **byteena = 2'b11（兩個位元組都要寫入）時**：因為 if (byteena[1]) 成立了，硬體執行完 q[15:8] <= d[15:8] 之後，就會直接跳過後面的 else if (byteena[0])，結果導致低位元組（q[7:0]）完全沒有更新。
+* 當 **byteena = 2'b00（兩個位元組都不寫入，維持原值）時**：硬體會一路走到最後的 else，執行 q <= d;。這意味著即使致能訊號是 0，輸入資料 d 還是被硬生生寫進去了，暫存器失去了「保留舊值」的功能。
+
 ### 解法：
-### 改寫in[0]、in[2]、in[3]程式碼
+### using one 4-to-1 multiplexer and as many 2-to-1 multiplexers as required
+* 改寫in[0]、in[2]、in[3]程式碼
 * 修改後程式碼
   ```verilog
 	module top_module (
@@ -1440,9 +1471,115 @@ endmodule
 	endmodule
   ```
 
+### DFF with byte enable
+* 在實體晶片中，高位元組（High Byte, [15:8]）和低位元組（Low Byte, [7:0]）的寫入控制是各自獨立、互不干涉的。
+* 在重置之外，我們應該用兩個獨立的 if 條件句來分別控制它們，而當致能訊號為 0 時，什麼都不要寫（隱式保留原值）
+* 修改後程式碼：
+  ```verilog
+    module top_module (
+    input clk,
+    input resetn,
+    input [1:0] byteena,
+    input [15:0] d,
+    output [15:0] q 
+	);
+    
+    
+    always @(posedge clk) begin
+        if (~resetn) begin
+            q <= 16'h0;       
+        end 
+		else begin
+		
+            if (byteena[1]) begin
+                q[15:8] <= d[15:8]; 
+            end
+            
+            if (byteena[0]) begin
+                q[7:0] <= d[7:0];   
+            end
+            
+            // 如果 byteena[1] 或 byteena[0] 為 0，
+            // 沒寫 else 代表硬體會自動維持 q 的上一個狀態（保留原值），這才是正確的暂存器行為！
+        end
+    end
+
+	endmodule
+  ```
+* 另寫法：
+  ```verilog
+  always @(posedge clk) begin
+    	if (~resetn) begin
+        	q <= 16'h0;
+    	end
+  		else begin
+        	q[15:8] <= byteena[1] ? d[15:8] : q[15:8]; // 1 就寫入新值，0 就維持原本的 q
+        	q[7:0]  <= byteena[0] ? d[7:0]  : q[7:0];
+    	end
+	end
+  ```
+    
+
 ## 關鍵知識/詞彙：
 ### 再次分析位元運算子（Bitwise）」與「邏輯運算子（Logical）
 * 當訊號只有 1-bit 時，0 就是假，1 就是真。這時候位元運算（~, &）跟邏輯運算（!, &&）在數學上的結果完全等價，合成器最後長出來的實體電路也是同一個邏輯閘。  
 * 雖然怎麼寫都對，但通常硬體工程師在編寫組合邏輯（處理資料、訊號線）時，會優先使用位元運算子（~, &, |），因為這樣最直覺地對應到硬體邏輯閘。 
 * 邏輯運算子（!, &&, ||）通常只會保留給條件判斷（例如 if (rst_n && valid) 這種用來控制狀態機或觸發條件的地方）。
+
+### 高電位非同步reset（8 D flip-flops with active high asynchronous reset）
+* 範例 - Dff8ar
+  ```verilog
+  module top_module (
+    input clk,
+    input areset,   // 高電位非同步reset
+    input [7:0] d,
+    output [7:0] q
+	);
+    //觸發條件： clk 的正邊緣，以及 areset 的正邊緣（因為是高電位有效）
+    always@(posedge clk or posedge areset)begin
+        if(areset)
+            q <= 0;
+        else
+            q <= d;
+    end
+
+	endmodule
+  ```
+  
+### 高電位同步reset
+  * 範例 - Dff8r（8 D flip-flops with active high synchronous reset）
+    ```verilog
+    module top_module (
+    input clk,
+    input reset,            // 同步 reset
+    input [7:0] d,
+    output [7:0] q
+	);
+    
+    always@(posedge clk)begin
+        if(reset)
+            q <= 0;
+        else
+            q <= d;
+    end
+
+	endmodule
+
+    ```
+
+### 使用 begin...end 的 4 大核心好處
+1. 確保多個硬體動作「同生共死」
+* 晶片設計中，常常要在某個條件成立時，同時改變多個訊號（例如：重置時，要把 q 清零，同時把 valid 訊號也清零）。
+* 好處： 用 begin...end 包起來，這兩件事在硬體上才會同時受到同一個條件控制。
+
+2. 徹底絕殺「隱形 Bug」
+* 如果只有一行而沒加 begin...end，未來你在維護、修改程式碼時，隨手多補了一行指令，編譯器並不會報錯，但這行新指令會直接脫離控制，產生非常難抓的邏輯 Bug（通常要進模擬器看波形才會發現）。
+* 好處： 從一開始就寫好 begin...end，未來要隨時增加、刪除程式碼都非常安全。
+
+3. 程式碼架構層次分明（極速 Debug）
+* 當程式碼變得非常龐大，有大量的 if-else 嵌套（Nest）時，良好縮排的 begin...end 會形成一塊一塊的「電路區域」。
+* 好處： 大幅縮短 Debug 的時間。
+
+4. 業界標準規範（專業度的體現）
+* 在聯發科（MediaTek）或各大 IC 設計廠的 Coding Style Guide（程式碼規範原則） 中，為了防止上述的各種人類肉眼失誤，通常都是強迫一律加上 begin...end。
 ---------------------------------------------
