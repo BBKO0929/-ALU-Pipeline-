@@ -1583,3 +1583,69 @@ endmodule
 4. 業界標準規範（專業度的體現）
 * 在聯發科（MediaTek）或各大 IC 設計廠的 Coding Style Guide（程式碼規範原則） 中，為了防止上述的各種人類肉眼失誤，通常都是強迫一律加上 begin...end。
 ---------------------------------------------
+# 2026 年 7 月 14 日
+## 今日進度：
+### 刷題：完成 HDLBits 的 D latch 到 Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）。
+
+## 遇到的困難與解決方案：
+### 問題：
+### Exams/ece241 2014 q4
+* z 的輸出邏輯錯誤 (Timing Bug)： z 是一個純組合邏輯，它是直接接在暫存器輸出 Q 後面的 NOR 閘。
+* 將 z 一併寫在循序邏輯電路中，造成 output z 資料獲取比實際慢一個 D 正反器的時脈週期
+* 原程式碼：
+  ```verilog
+	module top_module (
+    input clk,
+    input x,
+    output z
+	);
+    
+    reg [2:0]q;
+    
+    always@(posedge clk)begin
+        q[0] <= x ^ q[0];
+        q[1] <= x & (~q[1]);
+        q[2] <= x | (~q[2]);
+        z <= ~(q[0] | q[1] | q[2]); //將 z 一併寫在循序邏輯電路中
+    end
+
+	endmodule
+  ```
+  * 硬體長相：因為把 z <= ... 寫在 always @(posedge clk) 裡面，編譯器會認定：「z 也是一個必須在時脈正邊緣更新的暫存器！」
+  * 實際電路：q[0], q[1], q[2] 的訊號先拉到一個 NOR 閘。NOR 閘的輸出，會再接一個實體的 D 暫存器，最後這個暫存器的輸出端才是 z。
+    * 所以訊號從 q 到 z 之間，多過了一次「時脈關卡」。
+
+### 解法：
+### Exams/ece241 2014 q4
+* 將 z 移到 always 區塊外面，用 assign 賦值
+* 修改後程式碼
+  ```verilog
+	module top_module (
+    input clk,
+    input x,
+    output z
+	);
+    
+    reg [2:0]q;
+    
+    always@(posedge clk)begin
+        q[0] <= x ^ q[0];
+        q[1] <= x & (~q[1]);
+        q[2] <= x | (~q[2]);
+    end
+    assign z = ~(q[0] | q[1] | q[2]);
+
+	endmodule
+  ```
+  * 硬體長相：因為 assign 是組合邏輯。
+  * 實際電路：q[0], q[1], q[2] 的輸出線拉出來，直接接進一個實體的 NOR 閘，NOR 閘的輸出端直接就是 z 了。
+    * 所以沒有任何額外的暫存器。只要 q 發生改變，訊號穿過 NOR 閘（僅有極微小的物理延遲），z 就會**立刻**跟著改變。
+
+## 關鍵知識/詞彙：
+### 再次分析時序、組合邏輯
+### 時序邏輯（需要存狀態、記憶上一次的值）
+* 用 always @(posedge clk) 搭配 reg 與 <=（non-blocking）。
+
+### 組合邏輯（純運算、不需記憶，只想即時得到結果）
+* 用 assign 搭配 wire 與 = （blocking）。
+---------------------------------------------
