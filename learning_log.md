@@ -1698,7 +1698,7 @@ endmodule
 ### 解法：
 ### 範例程式 - Edgedetect（正邊緣偵測）
 * 題目需求：檢測當輸入信號從一個時鐘週期內的 0 變為下一個時鐘週期內的 1 。 應該在 0 變為 1 的時鐘週期之後，設置該位。
-* 程式
+* 程式碼
   ```verilog
   module top_module (
     input clk,
