@@ -1687,7 +1687,8 @@ endmodule
         
         if (reset) begin
             out <= 32'b0; 
-        end else begin
+        end
+  		else begin
             out <= (~in) & in_previous; //只有在發生負邊緣的那一個週期 out 會是 1，下一個週期如果 in 維持 0（沒有新的邊緣），out 就會立刻自動變回 0。
         end
     end
@@ -1696,7 +1697,7 @@ endmodule
   ```
 
 ### 解法：
-### 範例程式 - Edgedetect（正邊緣偵測）
+### Edgedetect（正邊緣偵測）
 * 題目需求：檢測當輸入信號從一個時鐘週期內的 0 變為下一個時鐘週期內的 1 。 應該在 0 變為 1 的時鐘週期之後，設置該位。
 * 程式碼
   ```verilog
@@ -1738,12 +1739,11 @@ endmodule
     reg [31:0] in_previous;
     
     always @(posedge clk) begin
-        //每個時脈週期都把當前的 in 存下來，避免 reset 撤銷時產生假的邊緣
-        in_previous <= in; 
-        
+        in_previous <= in; //每個時脈週期都把當前的 in 存下來，避免 reset 撤銷時產生假的邊緣
         if (reset) begin
             out <= 32'b0;
-        end else begin
+        end
+  		else begin
             out <= (~in) & in_previous; // 負邊緣偵測
         end
     end
@@ -1755,7 +1755,7 @@ endmodule
      ```verilog
      out <= out | ((~in) & in_previous);
      ```
-   * 「現在的 out 等於（原本的 out 狀態）或上（剛剛發生的負邊緣）。」只要 out 的某個 bit 曾經變成了 1，因為 1 | 任何值 = 1，它就會一輩子被鎖定在 1，再也不會自己掉回 0。
+   * 「現在的 out 等於原本的 out 狀態。」只要 out 的某個 bit 曾經變成了 1，因為 1 | 任何值 = 1，它就會鎖定在 1，不會自己掉回 0。
 * 修正後程式碼
   ```verilog
   module top_module (
@@ -1775,7 +1775,8 @@ endmodule
         // 同步重置與捕獲邏輯
         if (reset) begin
             out <= 32'b0; // reset 優先，全部清零
-        end else begin
+        end
+  		else begin
             // 若有下降沿就置 1，否則維持原狀（利用按位或 OR）
             out <= out | (~in & d_last);
         end
