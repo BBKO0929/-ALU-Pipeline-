@@ -169,12 +169,12 @@ endmodule
 **把一個8 bits整數除以8後四捨五入**
 * wire [7:0] a;
 * wire [5:0] z1;
-* assign z1 = (a >> 3) + a[2];
+* assign z1 = (a >> 3) + a[2]; //a[2]是位移之前的bit
 
 **把一個8 bits整數除以8後無條件進位**
 * wire [7:0] a;
 * wire [5:0] z2;
-* assign z2 = (a >> 3) + |a[2:0];
+* assign z2 = (a >> 3) + |a[2:0]; // |a[2:0] 是位移之前的 a[2] | a[1] | a[0]
   
 **把一個8 bits整數除以8後無條件捨去**
 * wire [7:0] a;
@@ -612,7 +612,7 @@ endmodule
         .b(b[31:16]),
         .cin(1'b0),
         .cout(),
-        .sum(q0[15:0]) //[31:16]修正為[15:0]
+        .sum(q0[15:0]) //[31:16]修正為[15:0]，雖同為 16 bits，但宣告範圍僅在 [15:0]
     );
     
     add16 inst2(
@@ -620,7 +620,7 @@ endmodule
         .b(b[31:16]),
         .cin(1'b1),
         .cout(),
-        .sum(q1[15:0]) //[31:16]修正為[15:0]
+        .sum(q1[15:0]) //[31:16]修正為[15:0]，雖同為 16 bits，但宣告範圍僅在 [15:0]
     );
   ```
 ## 關鍵知識/詞彙：
@@ -803,7 +803,7 @@ module add1(
 ## 遇到的困難與解決方案：
 ### 問題：
 * Create a 100-digit BCD ripple-carry adder
-* **Module埠宣告中，cout被定義成一個"只有 1 位元的單一導線"，沒有維度可以使用中括號[]去指定索引**，所以編譯錯誤
+* **Module埠宣告中，cout被定義成一個"只有 1 位元的單一導線"，沒有維度可以使用中括號 [] 去指定索引**，所以編譯錯誤
 * 原程式碼
   ```verilog
 	module top_module( 
@@ -1310,24 +1310,6 @@ endmodule
   ```
 
 ## 關鍵知識/詞彙：
-### 溢位
-* 專指「有號數（Signed Number）」在進行加減法運算時，因為答案太大或太小，導致 8-bit 的空間裝不下，進而使「符號位元（Sign bit）」被錯誤篡改的硬體災難。
-
-### 今日例題 - signed addition overflow
-```verilog
-module top_module (
-    input [7:0] a,
-    input [7:0] b,
-    output [7:0] s,
-    output overflow
-); //
-
-    assign s = a + b;// 兩數相加
-    assign overflow = ~(a[7] ^ b[7]) & (a[7] ^ s[7]);// 判斷溢位：最高位元同為1 or 0且與最高輸出位元數字相反
-
-endmodule
-```
-
 ### 16-bit BCD_adder
 * 雖編譯成功且執行結果正確，但在硬體描述語言中踩到了「一線多接（Multiple Drivers）」的語法地雷！
 * 雖然在某些極端寬容的編譯器可以過，但在很多標準的 Linter（語法檢查器）或 HDLBits 的環境中，將最後一級同時接到內部陣列又透過 assign 指定的方式，容易導致陣列邊界混淆或多重驅動判定錯誤。
@@ -1365,6 +1347,7 @@ endmodule
 
 	endmodule
   ```
+  
 * 更好的撰寫方式
   ```verilog
   module top_module ( 
@@ -1420,7 +1403,6 @@ endmodule
     assign mux_in[2] = (~d) ? 1'b1 : 1'b0; //如果 ~d 成立就輸出 1，否則輸出 0。
     
 	endmodule
-
   ```
 
 ### DFF with byte enable
@@ -1447,7 +1429,6 @@ endmodule
     end
 
 	endmodule
-
   ```
 * 當 **byteena = 2'b11（兩個位元組都要寫入）時**：因為 if (byteena[1]) 成立了，硬體執行完 q[15:8] <= d[15:8] 之後，就會直接跳過後面的 else if (byteena[0])，結果導致低位元組（q[7:0]）完全沒有更新。
 * 當 **byteena = 2'b00（兩個位元組都不寫入，維持原值）時**：硬體會一路走到最後的 else，執行 q <= d;。這意味著即使致能訊號是 0，輸入資料 d 還是被硬生生寫進去了，暫存器失去了「保留舊值」的功能。
@@ -1648,4 +1629,199 @@ endmodule
 
 ### 組合邏輯（純運算、不需記憶，只想即時得到結果）
 * 用 assign 搭配 wire 與 = （blocking）。
+---------------------------------------------
+# 2026 年 7 月 15 日
+## 今日進度：
+### 資料：複習7/3 - 7/14內容。
+### 刷題：複習 HDLBits 的 "Modules" 到 "Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）"；完成 HDLBits - sequential logic。
+
+## 遇到的困難與解決方案：
+### 問題：
+### Edgedetect（正邊緣偵測）
+* 不理解邊緣偵測的核心硬體思想，最初思想為當clk正緣發生且有資料(in)輸入(資料為真)則邊緣偵測(pedge)為真。
+
+### Edgecapture（邊緣捕獲暫存器）
+1. 問題一
+	* 當 reset 訊號為高電位時，程式只會執行 if 裡面的 out <= 0。此時 else 裡面的 in_previous <= in 完全不會被執行！
+	* 導致在 reset 期間，in_previous 保持在舊的值。一旦 reset 變回 0 的下一個瞬間，因為 in_previous 沒有跟著被重置或同步更新，會瞬間觸發一個錯誤的負邊緣訊號，導致輸出產生非預期的脈衝。
+* 程式
+```verilog
+  	module top_module (
+    input clk,
+    input reset,
+    input [31:0] in,
+    output [31:0] out
+	);
+    
+    reg [31:0]in_previous;
+    
+    always@(posedge clk)begin
+        if(reset)begin
+            out <= 0;
+        end
+        else begin
+            out <= (~in) & in_previous;
+            in_previous <= in;
+        end
+    end
+
+	endmodule
+```
+
+2. 問題二
+   * 第一次修正後，偵測後立刻歸零，但題目要求的是「捕獲並保持（鎖定）」，所以再次編譯錯誤
+* 程式碼
+  ```verilog
+  module top_module (
+    input clk,
+    input reset,
+    input [31:0] in,
+    output [31:0] out 
+	);
+    
+    reg [31:0] in_previous;
+    
+    always @(posedge clk) begin
+        
+        in_previous <= in; 
+        
+        if (reset) begin
+            out <= 32'b0; 
+        end else begin
+            out <= (~in) & in_previous; //只有在發生負邊緣的那一個週期 out 會是 1，下一個週期如果 in 維持 0（沒有新的邊緣），out 就會立刻自動變回 0。
+        end
+    end
+
+	endmodule
+  ```
+
+### 解法：
+### 範例程式 - Edgedetect（正邊緣偵測）
+* 題目需求：檢測當輸入信號從一個時鐘週期內的 0 變為下一個時鐘週期內的 1 。 應該在 0 變為 1 的時鐘週期之後，設置該位。
+* 程式
+  ```verilog
+  module top_module (
+    input clk,
+    input [7:0] in,
+    output [7:0] pedge
+	);
+    
+    reg [7:0]in_previous; // 用來儲存「上一個週期」輸入值的暫存器
+    
+    always@(posedge clk)begin
+        pedge <= in & (~in_previous); //今天的 pedge 等於：今天為 1 且 昨天為 0
+        in_previous <= in; //將今天的輸入值存進去，變成昨天的狀態，更新狀態
+    end
+
+	endmodule
+  ```
+
+### 邊緣偵測的核心硬體思想 - 準備一個「昨天」的暫存器
+* 硬體上偵測「變化」需拿「（現在）的數值」跟「（前一個週期）的數值」做對比
+* 如題意：正邊緣偵測要求的是 - 只有在 in 從 0 變 1 的那一下 pedge 輸出 1，之後即使 in 繼續維持 1，pedge（輸出）也必須立刻降回 0
+* 其他邊緣偵測：
+  * 負邊緣偵測：只有在輸入 0 變 1 的那一下邊緣偵測輸出 1，之後即使輸入繼續維持 1，輸出也必須立刻降回 0
+  * 雙邊緣偵測：在輸入 0 變 1 、 1 變 0 的那一下邊緣偵測輸出 1，之後即使輸入繼續維持 1，輸出也必須立刻降回 0
+
+### Edgecapture（邊緣捕獲暫存器）
+1. 修正一
+   * 不管有沒有 reset，in_previous 每個週期都應該要把當前的 in 存下來，或者在 reset 時也將它清零/初始化。
+* 程式碼
+  ```verilog
+  module top_module (
+    input clk,
+    input reset,
+    input [31:0] in,
+    output [31:0] out 
+	);
+    
+    reg [31:0] in_previous;
+    
+    always @(posedge clk) begin
+        //每個時脈週期都把當前的 in 存下來，避免 reset 撤銷時產生假的邊緣
+        in_previous <= in; 
+        
+        if (reset) begin
+            out <= 32'b0;
+        end else begin
+            out <= (~in) & in_previous; // 負邊緣偵測
+        end
+    end
+
+	endmodule
+  ```
+2. 修正二
+   * 利用 OR 來鎖定狀態，修正 out <= (~in) & in_previous; 這行
+     ```verilog
+     out <= out | ((~in) & in_previous);
+     ```
+   * 「現在的 out 等於（原本的 out 狀態）或上（剛剛發生的負邊緣）。」只要 out 的某個 bit 曾經變成了 1，因為 1 | 任何值 = 1，它就會一輩子被鎖定在 1，再也不會自己掉回 0。
+* 修正後程式碼
+  ```verilog
+  module top_module (
+    input clk,
+    input reset,
+    input [31:0] in,
+    output [31:0] out 
+	);
+    
+    // 用來記錄「上一個週期」輸入值的 32-bit 暫存器
+    reg [31:0] d_last;
+
+    always @(posedge clk) begin
+        // 每個時脈正邊緣，更新「昨天的值」
+        d_last <= in;
+        
+        // 同步重置與捕獲邏輯
+        if (reset) begin
+            out <= 32'b0; // reset 優先，全部清零
+        end else begin
+            // 若有下降沿就置 1，否則維持原狀（利用按位或 OR）
+            out <= out | (~in & d_last);
+        end
+    end
+
+	endmodule
+  ```
+
+## 關鍵知識/詞彙：
+### 時序怎麼運作（以非阻塞賦值來看）
+1. 當 posedge clk 來臨的一瞬間，pedge 會使用這一刻之前的 in 與 in_last 的舊值來做運算
+2. 計算完 pedge 的同時，in_last 才會被更新為目前的 in
+3. 這樣就在同一個時脈邊緣完成了「比較」與「存檔」兩個動作
+
+### 範例 - Edgedetect（正邊緣偵測）時，in[0]的前一訊號為何？
+* 程式
+  ```verilog
+  module top_module (
+    input clk,
+    input [7:0] in,
+    output [7:0] pedge
+	);
+    
+    reg [7:0]in_previous; // 用來儲存「上一個週期」輸入值的暫存器
+    
+    always@(posedge clk)begin
+        pedge <= in & (~in_previous); //今天的 pedge 等於：今天為 1 且 昨天為 0
+        in_previous <= in; //將今天的輸入值存進去，變成昨天的狀態，更新狀態
+    end
+
+	endmodule
+  ```
+* 在剛上電或剛開始執行時，如果我們沒有做任何處理，in_previous 的值在硬體上是「隨機、未知的（Undetermined / X）」。
+  
+1. 如果完全不重置（不給初始值），會發生什麼事？
+    * 在實際的 FPGA 或晶片剛接通電源（上電）的那一瞬間，所有的 D 暫存器（包括 in_previous）裡面的電晶體會隨機倒向某一邊。
+    * 在硬體模擬（Simulation）中，in_previous 的初始值會是 X (Unknown，未知值)。
+    * 此時如果 in[0] 輸入是 0，而 in_previous[0] 是 X，會導致你的輸出 out 也是 X。直到時脈經過了第一個上升沿，把 in 的值存進in_previous 之後，電路才會開始正常工作。
+  
+2. 在 Verilog 中，我們如何解決「第一個狀態未知」的問題？
+    * 利用 reset 訊號進行「強制初始化」（最標準的做法）
+    * 在宣告時直接給予預設值（FPGA 常用）
+       ```verilog
+       reg [7:0] in_previous = 7'b0; // 上電時自動載入為 0
+       ```
+
+### 邊緣捕獲的關鍵要求
+* 一旦某個 bit 偵測到下降沿（從 1 變 0），該 bit 的輸出 out 就必須一直鎖定在 1。就算後面沒有新的下降沿、就算 in 訊號一直變來變去，out 也必須牢牢記住「曾經發生過下降沿」這件事，直到按下 reset 為止。
 ---------------------------------------------
