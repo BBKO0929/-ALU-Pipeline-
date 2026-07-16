@@ -1886,3 +1886,142 @@ endmodule
    * 硬體成本與設計難度：
      * 標準的 FPGA 或標準元件庫（Standard Cell Library）裡，雙邊沿暫存器的電路結構比單邊沿複雜得多（面積大、放線難），因此只會用在記憶體、傳輸介面等「最需要衝極速、省功耗的刀口上」。
 ---------------------------------------------
+# 2026 年 7 月 16 日
+## 今日進度：
+### 影片：看 TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】
+### 刷題：完成 HDLBits - counters 的 Four-bit binary counter  到 slow decade counter。
+
+## 遇到的困難與解決方案：
+### 問題：
+### slow decade counter
+* 將同步致能訊號與非同步觀念搞混
+
+### 解法：
+1. 非同步重置(Asynchronous Reset)
+   * 運作機制： 只要重置按鈕一按下去，電路立刻歸零，完全不管時脈有沒有在跑
+   * 優點：
+     * 不需要時脈（Clock-less）： 晶片剛上電時，時脈產生器（PLL）可能還沒穩定（甚至根本還沒開始送時脈）。此時，非同步重置可以在沒有時脈訊號的情況下，直接把整顆晶片初始化到安全狀態
+     * 節省面積： 大部分晶片底層的標準元件（Standard Cell）或 FPGA 的 D 暫存器，硬體內部本來就內建了一根「非同步重置」的實體接腳（Clear Pin）。直接使用它不需要額外的邏輯閘
+   * 缺點：
+     * 非同步釋放帶來的危機： 當你要放開重置（Reset Release）時，如果放開的瞬間剛好卡在時脈的上升沿，暫存器會陷入 「亞穩態（Metastability）」。這會導致晶片當機或輸出亂碼
+       
+2. 同步重置 (Synchronous Reset)
+   * 運作機制： 重置訊號按下去後什麼事都不會立刻發生，必須等到 下一個時脈正緣 來臨，電路才會重置
+   * 優點：
+     * 百毒不侵： 因為它由 clk 統一過濾，所以重置訊號上的毛刺（Glitches，小雜訊）會被時脈自動濾除
+     * 100% 同步： 整個晶片的所有暫存器都在同一個時脈緣一起重置、一起釋放，絕對不會有亞穩態問題，時序分析（STA）非常簡單
+   * 缺點：
+     * 必須有時脈： 如果時脈因為意外停掉（Clock Gate 關閉或 PLL 沒準備好），這個重置就完全失效了。
+     * 浪費電路面積： 如果硬體暫存器本身沒有同步重置腳位，編譯器必須在 D 暫存器的輸入端前多塞一個 AND 閘來實現同步重置，這會增加晶片面積和延遲
+
+## 關鍵知識/詞彙：
+### 一、Coding Style
+1. 訊號取名
+   * 取名規則：
+     * 名字要有意義，讓大家都看得懂訊號代表的意思。
+     * input: i_xxx
+	 * output: o_xxx
+     * wire: w_xxx
+     * reg: r_xxx
+     * state machine: *_ cs, *_ curr_state, *_ ns, *_ next_state
+     * 訊號、10、module名稱用小寫；常數、parameter、define用大寫。
+     * 傳輸訊號名稱加上prefix(前綴)，o_aa2bb _* 代表從block“aa”到block“bb”的訊號
+     * *_ n或 *_ b代表active low訊號
+     * 一個檔案一個module，檔名就是module name
+     * instant name建議是u_module_name
+   * 避免使用
+     * n+數字、n123等
+     * vdd、gnd、vss保留給power、ground使用
+
+2. always block
+   * Combionational Logic
+     ```verilog
+     always @ (*) begin
+		// logic uses blocking "="
+	 end
+     ```
+   * Sequential logic
+     ```verilog
+     always @ (posedge i_clk or negedge i_rst_n) begin
+	 	if (!i_rst_n) begin
+	 	//reset the DFF
+	 	end
+     	else begin
+	 	// DFF logic uses non-blocking " <= "
+	 	end
+	 end
+     ```
+   * RTL裡不要用任何#delay
+   * Combinational就是這個cycle出值；Sequential就是下一個cycle出值
+   * 避免combinational loop（把自己產生的組合邏輯又餵回給自己用來產生那個邏輯）
+
+3. DFF（D Flip-flop）
+   ```verilog
+   always @ (posedge i_clk or negedge i_rst_n) begin
+   		if (!i_rst_n)
+   			//reset the DFF
+   		else if
+   		// DFF logic uses non-blocking " <= "
+   end
+   ```
+   * 注意DFF的clock和reset是誰
+   * DFF要有reset，條件要寫滿，以免變成Latch
+   * clock和非同步reset在scan時一定要可控(controllable)，如果不行要加scanmux
+   * 盡量整個design都用一樣的clock edge
+   * 盡量避免 clock 連到 DFF 的 data pin
+   * 注意發送端和接收端的 clock 是否一樣，不一樣要處理 CDC（clock domain crossing）的問題
+   * 最後一個else最好不要賦新值（assign 回自己或完全不寫），這樣可以讓合成工具自動插入clock gating
+   * DFF array太寬和太深時（例如超過1000個DFFs）建議改用memory，面積比較划算，繞線比較沒問題。e.g.reg[255:0]r_array[1024];
+     
+4. State Machine
+   ```verilog
+   parameter IDLE = 1'b0;
+   parameter RUN = 1'b1;
+
+   always @ (posedge i_clk or negedge i_rst_n) begin
+   		if (!i_rst_n)
+   			r_xxx_cs <= IDLE;
+   		else
+   			r_xxx_cs <= r_xxx_ns;
+   end
+
+   always @(*) begin
+   		case (r_xxx_cs)
+   		IDLE:
+   			if (i_start) r_xxx_ns = RUN;
+   			else r_xxx_ns = IDLE;
+   		RUN:
+   			if (i_stop) r_xxx_ns = IDLE;
+   			else r_xxx_ns = RUN;
+   			default: r_xxx_ns = IDLE;
+   		endcase
+   end
+   ```
+   * States 用 parameter 定義
+   * current state要有 reset 條件
+   * current state 在 non-blocking 的 always block 裡 assign 成 next state
+   * next state 在 blocking 的 always block 裡用 case 靠 current state 來決定
+   * 每一個 state 都要寫到，先寫跳出當下 state 的條件，最後一個 else 就是停留在當下的 state
+   * next state 記得加上 default 條件，回到 IDLE 狀態
+
+5. Block 之間
+   * input signals通常可以直接用，但邏輯不要太深，除非 timing 真的很差，再 Flop 後使用
+   * output signals 建議 Flop 後再給其他blocks
+   * 不要把邏輯寫在 pin 的連接上 e.g.i_a(w_b&w_c);
+   * 整個 design 都用到的常數用 define 定義，部分design的參數用 parameter 傳遞
+   * 善用前輩設計好的design，例如FIFO、synchronizer。
+   * 善用comment，尤其在input/output上，讓別人也看得懂意思。
+
+### 二、Synchronizer
+1. 簡介、用途
+  * 同步器，Synchronizer是SoC裡常見的元件
+  * 處理不同clock之間的訊號接收
+  * 同步數位電路都是由clock驅動，電路在同一個時鐘邊沿(clock edge)工作
+  * SoC裡可以有許多不同步的時鐘，有得快，有得慢
+  * 訊號需要從某一個時鐘域(Clock domain)傳遞到另一個時鐘域，術語稱為 CDC(Clock Domain Crossing)，就需要同步器。
+
+2. Metastability（亞穩態）
+   * 當一個DFF的 setup time 或 Hold time 不滿足時，它的Q將"不可預測"，稱為 Metastability 亞穩態。
+   * 沒有辦法可以"完全"解決，只能大幅度降低產生的機率。
+   * MTBF(mean time between failure)意思是發生兩次錯誤之間的間隔，這個指標常用來衡量CDC的情形，越大越好（代表隔了很長一段時間才發生下一次錯誤）。   
+---------------------------------------------
