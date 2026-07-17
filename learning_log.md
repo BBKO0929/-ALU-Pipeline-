@@ -1894,7 +1894,7 @@ endmodule
 ## 遇到的困難與解決方案：
 ### 問題：
 ### slow decade counter
-* 將同步致能訊號與非同步觀念搞混
+* 將同步致能訊號與同步、非同步 reset 觀念搞混
 
 ### 解法：
 1. 非同步重置(Asynchronous Reset)
@@ -2024,4 +2024,400 @@ endmodule
    * 當一個DFF的 setup time 或 Hold time 不滿足時，它的Q將"不可預測"，稱為 Metastability 亞穩態。
    * 沒有辦法可以"完全"解決，只能大幅度降低產生的機率。
    * MTBF(mean time between failure)意思是發生兩次錯誤之間的間隔，這個指標常用來衡量CDC的情形，越大越好（代表隔了很長一段時間才發生下一次錯誤）。   
+---------------------------------------------
+# 2026 年 7 月 17 日
+## 今日進度：
+### 影片：看 TT 小教室 Verilog RTL design 進階教學【Memory】
+### 刷題：完成 HDLBits 的 "counter 1-12" 到 "4-digit BCD counter (Countbcd)"；待完成 "12-hour clock"。
+
+## 遇到的困難與解決方案：
+### 問題：
+### 4-digit BCD counter (Countbcd)
+* q[15:0]個別拆成4個bit（q[3:0]、q[7:4]...、q[15:12]）計算的用意為何
+* 原程式碼
+  ```verilog
+  module top_module (
+    input clk,
+    input reset,   
+    output [3:1] ena,
+    output [15:0] q);
+    
+    
+    assign ena[1] = q[3:0] == 4'd9; //當個位數字counter數到9，十位數字counter致能
+    assign ena[2] = (q[3:0] == 4'd9 && q[7:4] == 4'd9);//當個位、十位數字counter數到9，千位數字counter致能
+    assign ena[3] = (q[3:0] == 4'd9 && q[7:4] == 4'd9 && q[11:8] == 4'd9 );//當個位、十位、百位數字counter數到9，千位數字counter致能
+    
+    //構建個、十、百、千位數字counter
+    counter10 inst0(
+        .clk(clk),
+        .reset(reset),
+        .enable(1), //個位數字永遠致能
+        .q(q[3:0])
+    );
+    
+    counter10 inst1(
+        .clk(clk),
+        .reset(reset),
+        .enable(ena[1]),
+        .q(q[7:4])
+    );
+    
+    counter10 inst2(
+        .clk(clk),
+        .reset(reset),
+        .enable(ena[2]),
+        .q(q[11:8])
+    );
+    
+    counter10 inst3(
+        .clk(clk),
+        .reset(reset),
+        .enable(ena[3]),
+        .q(q[15:12])
+    );
+    
+
+	endmodule
+
+	module counter10( //構建0 到 9 的計數（BCD 計數器）
+    	input clk,
+    	input reset,
+    	input enable,
+    	output reg [3:0] q);
+    
+    	always@(posedge clk)begin
+        	if(reset)begin
+            	q <= 4'd0;
+        	end
+        	else if(enable)begin  
+            	q <= (q < 4'd9) ? q + 4'b0001 : 0;
+        	end
+    	end
+
+	endmodule
+  ```
+### 解法：
+### 4-digit BCD counter (Countbcd)
+* 這題考的是 BCD（Binary-Coded Decimal，二進位碼十進位）。簡單來說，這是一種「**用二進位的外殼，強行裝載十進位靈魂**」的設計方式。
+* 如果你**不拆開**，直接把 q 當成一個普通的 16-bit 二進位計數器，對人類習慣的十進位顯示器（例如七段顯示器）來說**必須額外寫一個極其複雜的「二進位轉十進位（Binary to BCD）」數學電路**，會大幅消耗晶片的面積與效能。
+* 拆開計算有三大優勢：
+  * 4位元剛好裝得下數字 9
+  * 直覺對應人類的顯示介面（晶片外面負責接「七段顯示器」的電路，完全不需要做任何數學運算，直接顯示對應數字）
+  * 硬體設計的「模組化與級聯」（只需要設計一個 counter10 子模組（只管 0~9），然後複製 4 次（個、十、百...），再用組合邏輯（ena）把他們串起來）- 分治法（Divide and Conquer）
+
+## 關鍵知識/詞彙：
+### Exams/ece241 2014 q7a - Design a 1-12 counter
+* 題目：Design a 1-12 counter with the following inputs and outputs:
+  * Reset Synchronous active-high reset that forces the counter to 1
+  * Enable Set high for the counter to run
+  * Clk Positive edge-triggered clock input
+  * Q[3:0] The output of the counter
+  * c_enable, c_load, c_d[3:0] Control signals going to the provided 4-bit counter, so correct operation can be verified.
+  * You have the following components available:the 4-bit binary counter (count4) below, which has Enable and synchronous parallel-load inputs (load has higher priority than enable). The count4 module is provided to you. Instantiate it in your circuit. ; logic gates
+
+* 程式碼：
+  ```verilog
+  module top_module (
+    input clk,
+    input reset,
+    input enable,
+    output [3:0] Q,
+    output c_enable,
+    output c_load,
+    output [3:0] c_d
+	); //
+
+	//實例化題目提供的 4-bit 內建計數器
+    count4 my_counter(
+        .clk(clk),
+        .enable(c_enable),
+        .load(c_load),
+        .d(c_d),
+        .Q(Q)
+    );
+    assign c_enable = enable; //產生要送往子模組 count4 的控制訊號
+    assign c_load = reset | ((Q == 4'd12) && enable); // 當 reset 為 1，或者（目前是 12 且 enable 為 1 要往上加時），就要觸發 load
+    assign c_d = 4'd1; //c_load為 1 時動作，不論是 reset 還是從 12 回彈，目標值都是 1
+
+	endmodule
+  ```
+
+### Exams/ece241 2014 q7b - create a digital wall clock
+* 程式碼：
+  ```verilog
+  module top_module (
+    input clk,
+    input reset,
+    output OneHertz,
+    output [2:0] c_enable
+	); // 
+    
+    wire [3:0]q0, q1, q2;
+    
+    assign c_enable[0] = 1'd1; //個位數計數永遠致能
+    assign c_enable[1] = (q0 == 4'd9); //個位數數到9，十位計數致能
+    assign c_enable[2] = (q0 == 4'd9 && q1 == 4'd9);////個位數數到9，十位數數到9，百位計數致能
+
+  //構建 3 台counter
+    bcdcount inst0(
+        .clk(clk),
+        .reset(reset),
+        .enable(c_enable[0]),
+        .Q(q0)
+    );
+    
+    bcdcount inst1(
+        .clk(clk),
+        .reset(reset),
+        .enable(c_enable[1]),
+        .Q(q1)
+    );
+    
+    bcdcount inst2(
+        .clk(clk),
+        .reset(reset),
+        .enable(c_enable[2]),
+        .Q(q2)
+    );
+
+    assign OneHertz = (q0 == 4'd9 && q1 == 4'd9 && q2 == 4'd9 ); //當數字為999時輸出1，每隔1000 cycle出現999一次，觸發一次（1Hz）之後就歸0正好1000Hz/1000=1Hz
+    
+	endmodule
+  ```
+
+### Memory
+1. 簡介
+   * SoC裡必要的元件
+   * 用來"記憶"：資料、計算過程、狀態等
+   * 所占的面積甚至可以超越組合邏輯的面積
+   * 設計數位電路時需要考慮：
+     * 儲存的架構：用哪一種型態的儲存器？分享還是專用？
+     * 如何讀寫資料：1讀1寫、2讀、2寫、只讀不寫
+     * bandwidth是否滿足throughput：每個 cycle 能獲得多少資料？
+     * Latency（延遲）: 1 cycle, 2 cycles, ...
+     * 接口的規範：AXI；push／pop；rd_en／wr_en
+
+2. Memory 型態
+
+| 型態 | 每個cycle讀/寫 | Reset | Latency | 速度 | 面積 | 功耗 |
+| --- | --- | --- | --- | --- | --- | --- |
+| DFF Array | N讀N寫 | 1 cycle | 0 | 最快 | 最大 | 最大 |
+| FIFO | 1讀1寫 | 1 | 0/1 | 次快 | 大 | 大 |
+| 1 port SRAM | 1讀 or 1寫 | N | 1 | 快 | 小 | 小 | 
+| 2 port SRAM | 1讀1寫 | N | 1 | 可 | 中 | 中 |
+| Dual port SRAM | 1讀1寫 or 2讀 or 2寫 | N/2 | 1 | 慢 | 大 | 大 |
+| ROM | 1讀 | 不能 | 1 | 慢 | 小 | 小 |
+* N：儲存空間的深度
+
+3. DFF Array
+   * 宣告一個2-Dimensional reg就是一個DFF array
+     * reg [WIDTH-1:0] dff_array[DEPTH];
+     * WIDTH是這個array的寬度：用位寬選
+     * DEPTH是這個array的深度：用地址選
+   * 每個clock cycle都可以讀寫任一個地址的任意位寬
+   * rd _* /wr _* 可以擴充組數增加bandwidth
+   * 寫：
+     ```verilog
+     generate
+	 for (geni=0; geni<`DEPTH; geni=geni+1) begin
+     always @(posedge i_clk or negedge i_hrst_n) begin
+	 	if (~i_hrst_n)
+	 		dff_array[geni] <= 1'b0;
+	 	else if (wr_en && (wr_addr == geni))
+	 		dff_array[geni] <= wr_data;
+     		end
+     	end
+     endgenerate
+     ```
+     * 讀：
+       ```verilog
+       assign rd_data = dff_array[rd_addr];
+       ```
+     * 在設計時深度不要太大（想像讀取時是一個巨大的MUX去選出要讀取的data），通常建議 [WIDTH]*[DEPTH] 不要上萬
+   
+4. FIFO（First in First out）
+   * 有一個入口和一個出口，一進一出，先進先出的儲存元件
+   * 讀是pop；寫是push；與clock同步
+   * 有read/write兩個同步的指標(rd_ptr/wr_ptr)，ptr是指pointer
+   * push：(wr_ptr + 1) % (FIFO_DEPTH) //寫入之後再把 wr_ptr + 1
+   * pop: (rd_ptr + 1) % (FIFO_DEPTH) //讀取之後再把 rd_ptr + 1
+   * rd_ptr == wr_ptr：FIFO是空的(empty) //**資料無法pop**，會造成"underflow"
+   * rd_ptr == (wr_ptr+1)%(FIFO_DEPTH)：FIFO 是滿的(full) //**資料無法再push**，會造成"overflow"
+   * diff是FIFO裡資料的個數。選擇性的output
+   * FIFO內部可以使用DFF array實現，也可以使用2port SRAM實現。
+   * I/O宣告：
+     ```verilog
+     module fifo
+	 #(
+     parameter FIFO_WIDTH = 16,
+	 parameter FIFO_DEPTH = 4,
+	 parameter FIFO_DEPTH_BW = 2
+     )
+     
+	 (
+	 input i_clk,
+	 input i_hrst_n,
+	 output o_empty,
+	 output o_full,
+	 output [FIFO_DEPTH_BW:0] o_diff,
+	 input i_push,
+	 input [FIFO_WIDTH-1:0] i_push_data,
+	 input i_pop,
+	 output [FIFO_WIDTH-1:0] o_pop_data
+     );
+     ```
+
+5. SRAM
+   * static random-access memory 靜態隨機存取記憶體
+   * 用在需要"大量儲存資料"或是"計算過程與結果"的地方
+   * 只要保持通電，儲存的資料就可以恆常保持，斷電後，SRAM儲存的資料就消失
+   * 廠商提供Memory Compiler，生成不同種類的SRAM給不同的應用
+   * 通常單片SRAM都有長寬比例與最大值的限制
+    
+6. 應用方式
+   *  DFF array：
+     * 隨時存取大量的資料、超高頻寬、超小Latency
+     * 儲存的資料量不大，例如小於1萬bits
+       
+   * FIFO
+     * 資料排隊依序傳送
+     * 可以適當增加bandwidth，一次push或pop多筆資料
+     * 非同步FIFO可以處理CDC問題
+
+   * 1 port SRAM
+     * 同一週期只需1讀或1寫的操作
+     * 節省面積
+       
+   * 2 port SRAM
+     * 同一週期需要1讀且1寫的操作
+     * 加大位寬以增加頻寬
+     * 處理CDC問題
+     * 節省面積
+     * Timing 較差
+       
+   * Dual port SRAM
+     * 同一週期需要2讀或2寫的操作
+     * 先進製程(<40nm)盡可能避免使用此類型
+     * 面積大
+
+   * ROM
+     * 事先決定內容，不可改
+     * 斷電後內容不消失
+     * CPU Boot ROM：開機CPU就去讀（例如：初始化）
+
+### 待完成
+```verilog
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output pm,
+    output [7:0] hh,
+    output [7:0] mm,
+    output [7:0] ss); 
+    
+    wire [5:0] c_enable;
+    assign c_enable[0] = 1'b1;
+    assign c_enable[1] = (s0[3:0] == 9);
+    assign c_enable[2] = (s0[3:0] == 9 && s1[7:4] == 5);
+    assign c_enable[3] = (s0[3:0] == 9 && s1[7:4] == 5 && m0[3:0] == 9);
+    assign c_enable[4] = (s0[3:0] == 9 && s1[7:4] == 5 && m0[3:0] == 9 && m1[7:4] == 5);
+    assign c_enable[5] = (s0[3:0] == 9 && s1[7:4] == 5 && m0[3:0] == 9 && m1[7:4] == 5 && h0[3:0] == 9);
+    assign pm = (s0[3:0] == 9 && s1[7:4] == 5 && m0[3:0] == 9 && m1[7:4] == 5 && h0[3:0] == 1 && h1[7:4] == 1);
+    
+    counter9 s0(
+        .clk(clk),
+        .reset(reset),
+        .enable(c_enable[0]),
+        .ss(ss[3:0])
+    );
+    
+    counter5 s1(
+        .clk(clk),
+        .reset(reset),
+        .enable(c_enable[1]),
+        .ss(ss[7:4])
+    );
+    
+    counter9 m0(
+        .clk(clk),
+        .reset(reset),
+        .enable(c_enable[2]),
+        .mm(mm[3:0])
+    );
+    
+    counter5 m1(
+        .clk(clk),
+        .reset(reset),
+        .enable(c_enable[3]),
+        .mm(mm[7:4])
+    );
+    
+    counter9 h0(
+        .clk(clk),
+        .reset(reset),
+        .enable(c_enable[4]),
+        .hh(hh[3:0])
+    );
+    
+    counter2 h1(
+        .clk(clk),
+        .reset(reset),
+        .enable(c_enable[5]),
+        .hh(hh[7:4])
+    );
+
+endmodule
+
+module counter9(
+    input clk,
+    input reset,
+    input enable,
+    output reg [3:0] q);
+    
+    always@(posedge clk)begin
+        if(reset)begin
+            q <= 4'd0;
+        end
+        else if(enable)begin  
+            q <= (q < 4'd9) ? q + 4'b0001 : 0;
+        end
+    end
+    
+endmodule
+
+module counter5(
+    input clk,
+    input reset,
+    input enable,
+    output reg [3:0] q);
+    
+    always@(posedge clk)begin
+        if(reset)begin
+            q <= 4'd0;
+        end
+        else if(enable)begin  
+            q <= (q < 4'd5) ? q + 4'b0001 : 0;
+        end
+    end
+    
+endmodule
+
+module counter2(
+    input clk,
+    input reset,
+    input enable,
+    output reg [3:0] q);
+    
+    always@(posedge clk)begin
+        if(reset)begin
+            q <= 4'd0;
+        end
+        else if(enable)begin  
+            q <= (q < 4'd2) ? q + 4'b0001 : 0;
+        end
+    end
+    
+endmodule
+```
 ---------------------------------------------
