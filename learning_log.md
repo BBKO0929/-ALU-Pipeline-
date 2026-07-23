@@ -190,6 +190,8 @@ endmodule
 ### 問題1：
 * Adder1（用兩個16位元加法器模塊合成出一個32位元加法器）
 * 應題目需求：32位的加法器不需要處理進位（假設為 0）或出位（忽略)
+<img width="528" height="342" alt="image" src="https://github.com/user-attachments/assets/ef7a65b8-8aba-43e0-82f1-93c8f5cb9194" />
+
 * **ins1進位端無空接或用1位元的wire對接導致編譯錯誤**
 * 原程式碼：
   ```verilog
@@ -252,6 +254,8 @@ endmodule
   ### 問題2：
   * Adder2（Module fadd）
   * 不知為何需特別把module add1寫出來
+  <img width="658" height="636" alt="image" src="https://github.com/user-attachments/assets/e6433c6c-69ac-486e-a1fa-9090a46052d1" />
+  
   * 程式碼：
   ```verilog
   module top_module (
@@ -290,6 +294,8 @@ endmodule
 * 組合邏輯裡的if-else要寫滿或是充當有預設值，不然會合出Latch
 
 ### clock gating
+<img width="520" height="258" alt="image" src="https://github.com/user-attachments/assets/bae8818a-7af7-491f-b103-b26f397f130d" />
+
 * Flip-Flop的clock觸發才會耗電，為節省電路功耗（省電），如果連續幾個cycle沒動作就把clock關掉，無觸發所以Q值不變
 ```verilog
 always @(posedge clk) begin
@@ -371,6 +377,7 @@ always @(posedge clk) begin
 end
 endmodule
 ```
+<img width="737" height="228" alt="image" src="https://github.com/user-attachments/assets/9d222c2a-40cc-4148-91f3-f1a0f6d6e910" />
 
 ### generate
 * 把電路依據控制變量產生"generate"多次（用寫程式的方式，幫你自動大量複製硬體電路、線路或模組）
@@ -454,6 +461,8 @@ endfunction
 
 endmodule
 ```
+<img width="1028" height="68" alt="image" src="https://github.com/user-attachments/assets/274cd8dd-74c6-4a1b-a03c-b43b4b29b6ec" />
+
 * **有時候在互傳數據時，習慣有的會先傳高位，有的先傳低位**
 
 ### define
@@ -481,7 +490,8 @@ module test_define_1 (
 assign z = a + b + `Z_BW*2;
 endmodule
 ```
- 
+<img width="538" height="64" alt="image" src="https://github.com/user-attachments/assets/91351fab-1534-4bb7-bfe7-58012261b5af" />
+
 ### parameter
 * 通常被用來定義一些常數或是 FSM state 的名稱
 * 只在該module內有效，但可以在Hierarchy之間傳遞
@@ -515,12 +525,12 @@ instant_name(IO連線)
 ```
 * EX
 ```verilog
-module test_parameter_0
-#(
+module test_parameter_0#(
     parameter A_BW = 8,
     parameter B_BW = 4,
     parameter Z_BW = B_BW + A_BW
-) (
+)
+(
     input [A_BW-1:0] a,
     input [B_BW-1:0] b,
     output [Z_BW-1:0] z
@@ -541,6 +551,7 @@ test_paramter_0 #(.A_BW(7), .B_BW(3)) //將A、B的值改變，驗證可在Hiera
 
 endmodule
 ```
+<img width="857" height="99" alt="image" src="https://github.com/user-attachments/assets/d838dbc9-fddc-4462-bb0f-85065e9d300a" />
 
 * **state machine建議都使用parameter來寫，可讀性較高**
 
@@ -559,6 +570,8 @@ endmodule
 ### 問題：
 * carry-slect Adder（選擇式加法器）
 * **使用的位元範圍q0[31:16]、q1[31:16]超出了它原本宣告的[15:0]範圍，位元寬度（或範圍）越界錯誤導致編譯錯誤。**
+<img width="551" height="376" alt="image" src="https://github.com/user-attachments/assets/0530f38b-d2fe-4996-aa6c-43adb3870768" />
+
 * 原程式碼：
   ```verilog
   module top_module(
@@ -627,8 +640,9 @@ endmodule
 ### 優先編碼器
 * 一種組合邏輯電路。當輸入一個多位元的向量（Vector）時，如果有多個位元同時為1，它會根據內定的優先權（通常是「最高位元優先」或「最低位元優先」），只輸出那第一個出現的1的二進位位置。
 * 程式碼範例（4-bit priority encoder）：
+<img width="943" height="105" alt="image" src="https://github.com/user-attachments/assets/00830233-3492-4dec-89df-450df98e20ef" />
+
   ```verilog
-  // synthesis verilog_input_version verilog_2001
     module top_module (
     input [3:0] in,
     output reg [1:0] pos  );
@@ -986,6 +1000,8 @@ module add1(
   ```
   * Gatesv(數位訊號處理與向量切片（Vector Slicing）練習)
   * 題目要求out_different檢查自己與左邊鄰居是否不同，in[3]的左邊是in[0]，但程式碼未將in[3]、in[0]做比較而導致編譯錯誤（位元寬度不匹配）
+<img width="960" height="246" alt="image" src="https://github.com/user-attachments/assets/e2810095-f470-4a6b-b27d-3914b8dbbbb6" />
+
   * 原程式碼
   	```verilog
    	module top_module( 
@@ -1000,6 +1016,7 @@ module add1(
 
 	endmodule
   	```
+   
 ### 解法：
 * Ringer（更好的寫法）
 * **業界**更推崇的精簡寫法：**直接使用邏輯閘**，**直接寫邏輯運算子**，腦海中可以直接浮現出電路圖。
@@ -1044,6 +1061,8 @@ endmodule
   * 只在時鐘信號的特定邊緣(上升沿或下降沿)捕捉輸入資料，並在該瞬間更新輸出。
 
 ### Latch的電路實現與HDL描述
+<img width="196" height="286" alt="image" src="https://github.com/user-attachments/assets/60c7747b-b0f1-46a7-b6f7-c8995f339fe5" />
+
 ```verilog
 module d_latch (
      input   rst_n,
@@ -1062,6 +1081,8 @@ module d_latch (
 ```
 
 ### Setup Time與Hold Time的定義與重要性
+<img width="400" height="158" alt="image" src="https://github.com/user-attachments/assets/5220f383-c71d-47c3-b344-c70dfdb6acbb" />
+
 * Setup Time
   * Setup time(Tsu)是指在時鐘有效邊緣(例如上升沿)到來之前，資料輸入端(D)的信號必須保持穩定不變的最短時間。確保Flip-flop內部的主Latch能夠正確地採樣並鎖存輸入資料。
   * Setup time的長短取決於Flip-flop內部電路的速度特性。
@@ -1072,6 +1093,10 @@ module d_latch (
   * Hold violation(保持時間違規)發生在資料路徑延遲太短，新資料過早到達的情況。與時鐘週期無關，通常需要透過插入延遲(如buffer)來修復。
 
 ### clock skew（時鐘偏斜的影響與計算）
+<img width="231" height="239" alt="image" src="https://github.com/user-attachments/assets/15418ac1-440d-420c-8644-a10223246c89" />
+<img width="337" height="313" alt="image" src="https://github.com/user-attachments/assets/ba0c8bac-59a2-4208-9c7e-76f5280483e4" />
+
+
 * 同一個時脈源發出的訊號，到達晶片內不同觸發器（Flip-Flop）的時間差。
   
 * 為甚麼會產生
@@ -1098,6 +1123,8 @@ module d_latch (
 * 缺點：降低系統整體工作頻率、效能，設計中往往是最終選擇的方案
 
 ### setup time violation 修復策略 2 - 插入流水線暫存器(Pipelining)
+<img width="453" height="265" alt="image" src="https://github.com/user-attachments/assets/627fc495-9eba-49e8-91e5-33d86bc13a93" />
+
 * 在長的組合邏輯路徑中間插入額外的Flip-Flop，將一個長路徑分割成多個短路徑，從而減少每段的 data path delay
 * 優點：可以顯著提高最大工作頻率，是高性能設計的標準做法。可以讓多個資料同時在不同階段處理，提高吞吐量
 * 缺點：增加了資料的延遲週期(latency)，從輸入到輸出需要更多時鐘週期，還會增加面積和功耗，並可能使控制邏輯變得更複雜。
@@ -1227,7 +1254,8 @@ endmodule
     assign out = in[sel*4 +: 4]; //選出 1024bit 資料中，某位置的 4bit 資料
 
 	endmodule
-  ```      
+  ```   
+  
 ---------------------------------------------
 # 2026 年 7 月 11 日
 ## 今日進度：
@@ -1271,6 +1299,7 @@ endmodule
 
 	endmodule
   ```
+  
   * 編譯器強會行把高位元的 28 個 bit 全部丟棄，只留下最低的 4 個 bit。
 ### 解法：
 ### 改用變數動態切片 +: 與 -: 撰寫，明確告訴編譯器「起點是 4*i，寬度死死就是 4」
@@ -1379,6 +1408,7 @@ endmodule
 
 	endmodule
   ```
+  
 ---------------------------------------------
 # 2026 年 7 月 13 日
 ## 今日進度：
@@ -1388,6 +1418,8 @@ endmodule
 ## 遇到的困難與解決方案：
 ### 問題：
 ### using one 4-to-1 multiplexer and as many 2-to-1 multiplexers as required
+<img width="388" height="361" alt="image" src="https://github.com/user-attachments/assets/511aa44c-348d-41be-bb10-6f97ac0a3164" />
+
 * 如何優化並寫成更精簡程式碼
 * 原程式碼：
   ```verilog
@@ -1407,6 +1439,8 @@ endmodule
 
 ### DFF with byte enable
 * if - else 造成了不必要的「優先權」與「資料遺失」
+<img width="932" height="113" alt="image" src="https://github.com/user-attachments/assets/8b8a3b2d-b80d-4c60-beae-c8e60469a240" />
+
 * 原程式碼：
   ```verilog
   module top_module (
@@ -1430,6 +1464,7 @@ endmodule
 
 	endmodule
   ```
+  
 * 當 **byteena = 2'b11（兩個位元組都要寫入）時**：因為 if (byteena[1]) 成立了，硬體執行完 q[15:8] <= d[15:8] 之後，就會直接跳過後面的 else if (byteena[0])，結果導致低位元組（q[7:0]）完全沒有更新。
 * 當 **byteena = 2'b00（兩個位元組都不寫入，維持原值）時**：硬體會一路走到最後的 else，執行 q <= d;。這意味著即使致能訊號是 0，輸入資料 d 還是被硬生生寫進去了，暫存器失去了「保留舊值」的功能。
 
@@ -1573,6 +1608,8 @@ endmodule
 ### Exams/ece241 2014 q4
 * z 的輸出邏輯錯誤 (Timing Bug)： z 是一個純組合邏輯，它是直接接在暫存器輸出 Q 後面的 NOR 閘。
 * 將 z 一併寫在循序邏輯電路中，造成 output z 資料獲取比實際慢一個 D 正反器的時脈週期
+<img width="463" height="345" alt="image" src="https://github.com/user-attachments/assets/41b0f37d-3c79-4e73-bdde-d185887ceab1" />
+
 * 原程式碼：
   ```verilog
 	module top_module (
@@ -1641,6 +1678,8 @@ endmodule
 * 不理解邊緣偵測的核心硬體思想，最初思想為當clk正緣發生且有資料(in)輸入(資料為真)則邊緣偵測(pedge)為真。
 
 ### Edgecapture（邊緣捕獲暫存器）
+<img width="647" height="232" alt="image" src="https://github.com/user-attachments/assets/87135924-2e42-482c-9537-fdf29bedc062" />
+
 1. 問題一
 	* 當 reset 訊號為高電位時，程式只會執行 if 裡面的 out <= 0。此時 else 裡面的 in_previous <= in 完全不會被執行！
 	* 導致在 reset 期間，in_previous 保持在舊的值。一旦 reset 變回 0 的下一個瞬間，因為 in_previous 沒有跟著被重置或同步更新，會瞬間觸發一個錯誤的負邊緣訊號，導致輸出產生非預期的脈衝。
@@ -1792,6 +1831,8 @@ endmodule
 3. 這樣就在同一個時脈邊緣完成了「比較」與「存檔」兩個動作
 
 ### 範例 - Edgedetect（正邊緣偵測）時，in[0]的前一訊號為何？
+<img width="607" height="153" alt="image" src="https://github.com/user-attachments/assets/28c5e5b1-9c17-43e9-a91a-50656969ae26" />
+
 * 程式
   ```verilog
   module top_module (
@@ -1836,6 +1877,8 @@ endmodule
    * 等到 clk 邊緣（上升沿或下降沿）來臨，暫存器才會抓取當下最穩定的正確資料，並延遲到下一刻。
 
 3. 今日範例
+<img width="300" height="102" alt="image" src="https://github.com/user-attachments/assets/6bb186e6-b66c-4a64-97f6-f08b99a87d10" />
+
    ```verilog
    module top_module (
     input clk,
@@ -1865,7 +1908,7 @@ endmodule
      * 當「上升沿」來臨時：q_pos 變成了 d ^ q_neg。此時輸出的 q = q_pos ^ q_neg 就變成了 (d ^ q_neg) ^ q_neg。根據 XOR 特性，兩個 q_neg 互相抵銷了！所以 q 瞬間變成了 d！
      * 當「下降沿」來臨時：q_neg 變成了 d ^ q_pos。此時輸出的 q = q_pos ^ q_neg 就變成了 q_pos ^ (d ^ q_pos)。同理，兩個 q_pos 互相抵銷了！所以 q 也瞬間變成了 d！
 
-4. 應用
+5. 應用
    * DDR 記憶體 (Double Data Rate SDRAM) ── 最著名的應用
      * 應用方式： 記憶體晶片與 CPU 之間的資料匯流排（Data Bus），就是利用雙邊沿觸發技術。
      * 效果： 如果記憶體時脈是 1600 MHz，傳統單邊沿（SDR）只能達到 1600 Mbps 的傳輸率；而改用雙邊沿觸發後，在同一個時脈下，傳輸率直接翻倍變成 3200 Mbps！這也是為什麼我們買記憶體時，標示的頻率通常是實際時脈的兩倍。
@@ -1878,7 +1921,7 @@ endmodule
      * 應用方式： 為了降低晶片內部時脈產生器（PLL/DLL）的設計難度，工程師會讓發送端與接收端改用雙邊沿來抽樣資料。
      * 效果： 我們只需要產生 10 GHz 的時脈，就能傳輸 20 Gbps 的資料流，大大降低了高頻類比電路的設計門檻。
 
-5. 問題 - 為什麼不把晶片裡的暫存器全部改成雙邊沿？
+6. 問題 - 為什麼不把晶片裡的暫存器全部改成雙邊沿？
    * 對時脈「工作週期（Duty Cycle）」要求極苛刻：
      * 單邊沿觸發只看上升沿，所以時脈訊號是「High 佔 60%、Low 佔 40%」還是五五開，完全不影響系統運作。
      * 但雙邊沿觸發同時看兩邊。如果時脈工作週期不是完美的 50%，那麼「奇數週期」和「偶數週期」的時間長度就會不一樣，這會導致電路的時序分析（Static Timing Analysis）變得極其痛苦，非常容易出錯。
@@ -2020,7 +2063,13 @@ endmodule
   * SoC裡可以有許多不同步的時鐘，有得快，有得慢
   * 訊號需要從某一個時鐘域(Clock domain)傳遞到另一個時鐘域，術語稱為 CDC(Clock Domain Crossing)，就需要同步器。
 
-2. Metastability（亞穩態）
+2. Setup Time & Hold Time
+<img width="912" height="400" alt="image" src="https://github.com/user-attachments/assets/c93d6b8b-74d1-4ae3-84a4-b7cb89a23bd4" />
+ 
+3. Metastability（亞穩態）
+<img width="699" height="239" alt="image" src="https://github.com/user-attachments/assets/bc8d7b65-5a4a-4a4f-85c1-f6b5bd0f2cbc" />
+<img width="502" height="330" alt="image" src="https://github.com/user-attachments/assets/fd4bec73-800b-4167-a471-5bc3d61a4073" />
+
    * 當一個DFF的 setup time 或 Hold time 不滿足時，它的Q將"不可預測"，稱為 Metastability 亞穩態。
    * 沒有辦法可以"完全"解決，只能大幅度降低產生的機率。
    * MTBF(mean time between failure)意思是發生兩次錯誤之間的間隔，這個指標常用來衡量CDC的情形，越大越好（代表隔了很長一段時間才發生下一次錯誤）。   
@@ -2034,6 +2083,8 @@ endmodule
 ### 問題：
 ### 4-digit BCD counter (Countbcd)
 * q[15:0]個別拆成4個bit（q[3:0]、q[7:4]...、q[15:12]）計算的用意為何
+<img width="938" height="230" alt="image" src="https://github.com/user-attachments/assets/bacd286d-dcd8-42c1-a779-9a115c71b3da" />
+
 * 原程式碼
   ```verilog
   module top_module (
@@ -2107,13 +2158,7 @@ endmodule
 
 ## 關鍵知識/詞彙：
 ### Exams/ece241 2014 q7a - Design a 1-12 counter
-* 題目：Design a 1-12 counter with the following inputs and outputs:
-  * Reset Synchronous active-high reset that forces the counter to 1
-  * Enable Set high for the counter to run
-  * Clk Positive edge-triggered clock input
-  * Q[3:0] The output of the counter
-  * c_enable, c_load, c_d[3:0] Control signals going to the provided 4-bit counter, so correct operation can be verified.
-  * You have the following components available:the 4-bit binary counter (count4) below, which has Enable and synchronous parallel-load inputs (load has higher priority than enable). The count4 module is provided to you. Instantiate it in your circuit. ; logic gates
+<img width="943" height="481" alt="image" src="https://github.com/user-attachments/assets/378391f6-addb-4e2c-971a-c945ba41638a" />
 
 * 程式碼：
   ```verilog
@@ -2143,6 +2188,8 @@ endmodule
   ```
 
 ### Exams/ece241 2014 q7b - create a digital wall clock
+<img width="943" height="296" alt="image" src="https://github.com/user-attachments/assets/0944c545-e2cf-414b-90e9-0960f35a4a58" />
+
 * 程式碼：
   ```verilog
   module top_module (
@@ -2426,7 +2473,7 @@ endmodule
 ### 資料：複習7/3 - 7/17內容。
 ### 刷題：複習 HDLBits 7/3 - 7/17 進度。
 ---------------------------------------------
-# 2026 年 7 月 21 日
+# 2026 年 7 月 23 日
 ## 今日進度：
 ### 資料：利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj
 ### Vivado：嘗試在 Vivado 上寫簡單半加器模型並模擬測試
@@ -2466,7 +2513,7 @@ half_adder inst0(
 ```
 
 * 模擬結果
-<img width="645" height="379" alt="image" src="https://github.com/user-attachments/assets/bee9f709-9827-4281-b63d-0b86ae58a50a" />
+<img width="780" height="415" alt="image" src="https://github.com/user-attachments/assets/b1f33562-5125-4ad4-8991-89a545118c93" />
 
 ## 關鍵知識/詞彙：
 ### Testbench（測試平台）
