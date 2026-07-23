@@ -2426,3 +2426,175 @@ endmodule
 ### 資料：複習7/3 - 7/17內容。
 ### 刷題：複習 HDLBits 7/3 - 7/17 進度。
 ---------------------------------------------
+# 2026 年 7 月 21 日
+## 今日進度：
+### 資料：利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj
+### Vivado：嘗試在 Vivado 上寫簡單半加器模型並模擬測試
+
+## 今日成果探討：
+### half-adder
+* Design sources
+```verilog
+module half_adder(
+
+input a,b,
+output carry,
+output sum
+
+    );
+    
+    assign sum = a ^ b;
+    assign carry = a & b;
+    
+endmodule
+```
+
+* Simulation sources
+```verilog
+module half_adder_tb();
+
+reg t_a, t_b; //輸入用reg
+wire Sum, Carry; //輸出用wire
+
+// 實例化
+half_adder inst0( 
+    .a(t_a),
+    .b(t_b),
+    .sum(Sum),
+    .carry(Carry)
+);
+```
+
+* 模擬結果
+<img width="645" height="379" alt="image" src="https://github.com/user-attachments/assets/bee9f709-9827-4281-b63d-0b86ae58a50a" />
+
+## 關鍵知識/詞彙：
+### Testbench（測試平台）
+1. 提供驅動訊號（時脈與輸入資料）
+* 硬體電路是不會自己運作的。Testbench 可以模擬真實世界中的外部輸入例如：
+	* 自動生成規律震盪的 Clock（時脈）
+    * 觸發系統開機的 Reset（重置訊號）
+    * 按時間順序餵入各種測試資料（如 10ns 時輸入數字 5，20ns 時輸入數字 10）
+
+2. 驗證邏輯功能（不用每次都燒錄進晶片）
+* 將代碼燒錄進 FPGA 晶片通常需要花費 幾十分鐘到數個小時
+    * 沒有 Testbench： 每改一行代碼，就要花一小時燒錄，再用示波器抓訊號，效率極低
+    * 使用 Testbench： 在電腦上跑模擬只需要幾秒鐘，就能透過波形圖（Waveform）即時查看晶片內部的每一個運算結果
+
+3. 自動化測試與自我檢查（Self-Checking）
+* 可以寫入預期結果（Golden Model），當電路輸出錯誤時，Testbench 會自動在終端機列印
+
+4. Testbench 與一般RTL電路的差別
+
+| 特性 | 一般 RTL 電路 (Design) | 測試平台 Testbench |
+| --- | --- | --- |
+| 最終去處 | 會被合成門陣列，燒錄進晶片 | 只在電腦軟體中執行，不會變成實體晶片 |
+| 最終去處 | 嚴格，只能寫「可合成 (Synthesizable)」語法 | 寬鬆，可以使用延遲 #、印出文字 $display 等模擬專用語法 |
+| 輸入輸出 | 有 input 與 output ports（腳位） | 沒有 ports（最外圍封閉的虛擬測試環境）|
+
+### Testbench 基本語法
+1. 時間單位與精度 (``timescale`)
+* 放在檔案最開頭，用來指定 # 代表多少時間
+```verilog
+`timescale 1ns / 1ps  
+// 前者 1ns 表示單位（#10 代表 10ns）
+// 後者 1ps 表示模擬精度（可精確到 0.001ns）
+```
+
+2. 模組宣告（無 Input / Output 腳位）
+* Testbench 是一個封閉的虛擬測試環境，所以不需要定義 Port 腳位
+```verilog
+module tb_example();  /
+    // 裡面存放訊號與測試邏輯
+endmodule
+```
+
+3. 訊號型態宣告 (reg 與 wire)
+* 對應你要測試的主電路（UUT, Unit Under Test）：
+  * reg：用來連接主電路的 input（由 Testbench 賦值與控制）
+  * wire：用來連接主電路的 output（接收主電路輸出的結果，用於觀察波形）
+```verilog
+reg        clk;     // 輸入給主電路的時脈
+reg        rst_n;   // 輸入給主電路的重置
+reg  [7:0] data_in; // 輸入給主電路的資料
+
+wire [7:0] data_out;// 接收主電路的輸出
+```
+
+4. 實例化主電路 (Instantiation)
+* 放在檔案最開頭，用來指定 # 代表多少時間
+```verilog
+// 格式：主電路名稱 實體名稱 (.主電路腳位(Testbench訊號))
+my_design uut (
+    .clk     (clk),
+    .rst_n   (rst_n),
+    .in_a    (data_in),
+    .out_b   (data_out)
+);
+```
+
+5. 時脈 (Clock) 生成
+* 模擬器裡沒有實體晶片的震盪器，必須自己寫邏輯來產生 clk
+```verilog
+// 方式 A：使用 initial 與 forever（最常見）
+initial begin
+    clk = 0;
+    forever #10 clk = ~clk; // 每 10ns 翻轉一次，產生 50MHz 的時脈（週期 20ns）
+end
+
+// 方式 B：使用 always
+initial clk = 0;
+always #10 clk = ~clk;
+```
+
+6. 測試流程控制 (initial 區塊與 # 延遲)
+* initial 裡面的程式碼只會從第 0 秒開始執行一次，並且由上到下依序執行。# 代表等待的時間
+```verilog
+initial begin
+    // 1. 初始化訊號
+    clk     = 0;
+    rst_n   = 0;  // 觸發低電位重置
+    data_in = 8'd0;
+
+    // 2. 等待 50ns 後解除重置
+    #50;
+    rst_n   = 1;
+
+    // 3. 依序給予測試資料
+    #20; data_in = 8'd15;  // 20ns 後把 data_in 改成 15
+    #20; data_in = 8'd42;  // 再過 20ns 改成 42
+    #100;
+
+    // 4. 結束模擬
+    $finish; 
+end
+```
+
+7. 文字列印與監控系統任務 ($display, $monitor)
+* 類似 C 語言的 printf，可以在 Vivado 下方的 Tcl Console 視窗印出文字資訊，方便快速除錯
+  * $display：程式執行到該行時只印出一張單點資訊
+  * $monitor：只要監控的變數有變化，就會自動印出來（常用於即時追蹤）
+```verilog
+initial begin
+    // 當 data_in 或 data_out 發生改變時，自動印出時間與數值
+    $monitor("Time=%0t ns | in=%d | out=%d", $time, data_in, data_out);
+end
+
+initial begin
+    #100;
+    $display("模擬結束！當前 data_out 為：%d", data_out);
+end
+```
+
+8. 自動檢查輸出 (if - else 與 $fatal)
+* 可以寫邏輯讓 Testbench 自己比對輸出是否正確，省去親自看波形的麻煩。
+```verilog
+#20;
+if (data_out !== 8'd57) begin
+    $display("錯誤：計算結果不符合預期！");
+    $finish; // 或者使用 $fatal; 強制終止模擬
+end else begin
+    $display("正確！結果符合 57");
+end
+```
+---------------------------------------------
