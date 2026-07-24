@@ -2647,3 +2647,117 @@ end else begin
 end
 ```
 ---------------------------------------------
+# 2026 年 7 月 24 日
+## 今日進度：
+### 影片：財經村長 - 如何面試上一線數位IC公司 II
+
+## 關鍵知識/詞彙：
+### 亞穩態深度解析
+<img width="347" height="207" alt="image" src="https://github.com/user-attachments/assets/74ab4088-2dd4-44e8-999e-9b247d2b1e2c" />
+
+1. 為何會發生：
+   * 對 DFF 而言，clock edge 附近有兩個限制：
+     * Setup time：clock edge 前資料要先穩定一段時間
+     * Hold time：clock edge 後資料還要再穩定一段時間
+   * 如果 D 在這個視窗內跳動（setup/hold violation），FF 內部的兩個反相器回授會被推到一個「平衡點」附近，進入亞穩態，Q 輸出無法預測。
+
+2. 最常見的發生場景：
+   * Clock Domain Crossing（CDC）：非同步訊號或另一個 clock domain 的訊號，進入本 domain 直接被 FF 取樣，最易觸發亞穩態。
+   * 非同步 Reset/Interrupt 解除：reset deassert 或外部中斷若沒有同步處理，也會在 clock edge 附近發生問題。
+
+3.解決方案：
+* 單 bit：2-FF Synchronizer（最常見）
+   *用兩個站存器讓 Data 有時間充放電，接收較穩定的資料，適用場景 1bit
+   * 把非同步訊號先送進兩級 FF（同一個 clock）：async_in -> FF1 -> FF2 -> sync_out。FF1 可能亞穩，但大多在下一拍前收斂；FF2 取到的就穩很多。
+   * 設計簡單、overhead 低，是標準做法。（降頻、將兩邊頻率改為倍數關係...）
+* 多 bit 資料：需更完整機制
+   * 多 bit 不能只用 2-FF，需要：握手協議（valid/ready、req/ack）、Async FIFO（含 Gray code 指標）、或 source-synchronous 架構，確保資料整體一致性
+* 硬體選型與時序餘裕
+   * 選用 library 中 metastability-hardened flop、降頻、改善 clock 品質、降低抖動、增加 slack，從根本降低亞穩態發生機率（以 MTBF 指標衡量）。
+
+### CDC : Clock Domain Crossing 跨時鐘域
+1. 簡介：
+   * 指一個訊號或資料從 Clock A 的邏輯，跑到 Clock B 的邏輯，而且 A、B 的時鐘彼此不同步（頻率不同或相位不固定）。因為取樣點不受控，容易引發多種嚴重問題。
+
+2. 狀況類型
+   * 亞穩態（Metastability）
+     * B 域的 FF 在某個 clock edge 取樣到「正在變化」的 A 域訊號，Q 可能晚很久才穩定，導致下一級邏輯誤判。這是 CDC 最根本的危險。
+   * 資料撕裂（Multi-bit Tearing）
+     * 多位元資料若各 bit 不是同時穩定，B 域可能抓到「一半舊值、一半新值」，形成根本不存在的數值，造成邏輯錯誤。
+   * 事件丟失/重複（Pulse Crossing）
+     * A 域的一個短脈波，在 B 域可能太窄被漏掉；或因為同步過程被延長而被看成兩次事件，導致功能異常。（快傳至慢：資料遺失；慢傳至快：重複執行）
+
+3. 設計原則
+   * 在現代 SoC 設計中，CDC 問題是導致晶片流片失敗的常見原因之一。正確的 CDC 處理策略（同步器、握手、FIFO）必須在架構設計階段就明確規劃，而非事後修補。
+
+### Async FIFO 設計：Gray Code 指標的重要性
+<img width="482" height="311" alt="image" src="https://github.com/user-attachments/assets/881d502d-0645-4a13-8445-bd297fb20372" />
+
+1. 簡介
+   * 是解決多 bit CDC 問題的標準方案，其核心挑戰在於讀指標（在讀 clock 域）與寫指標（在寫 clock 域）需要跨越 clock domain 比較。
+
+2. 使用 Gray Code 的關鍵原因：
+   * Gray Code 相鄰數值只有 1 bit 改變，即使在 CDC 過程中發生亞穩態，最多只影響 1 bit，確保指標比較的正確性。
+   * 而 Binary Code 相鄰值可能多個 bit 同時改變，CDC 過程中可能讀到中間過渡值，造成 FIFO full/empty 判斷錯誤。
+
+3. 注意事項
+   * Full Flag／Empty Flag產生
+   * 深度選擇
+     * 需根據兩個 clock 的頻率差與突發資料量計算。預留足夠的 margin 以容納同步延遲（通常 2~3 個 cycle）。
+
+### 低功耗設計（Low Power Design）
+1. 時脈閘控技術（Clock Gating）
+   * 通常運用在邏輯合成期間。其中的暫存器（flops）被優化成時脈閘控結構，進而節省了多工器（MUX）的面積，並減少整個時脈網路（clock net）的開關活動。
+   * 根據動態功率方程式 <img width="188" height="25" alt="image" src="https://github.com/user-attachments/assets/d37f2729-0db1-4434-9320-cd81f2a23d2a" />
+   ，時脈閘控的目標是：
+     * 降低電容負載（透過面積減少）
+     * 減少開關活動因子（關閉不必要的翻轉）
+   * 特性與適用場景：
+     * 優點：技術簡單、易於實現，大多數 EDA 工具與標準流程均支援，幾乎零風險。
+     * 缺點：需依賴邏輯合成工具執行優化，工程師需正確撰寫 RTL 並設定合成條件。
+     * 適用：模塊在部分時間不需要運作時，閘控其 clock，避免無效翻轉消耗動態功率。
+     * 典型節省：通常可降低整體動態功耗 20%~40%，視設計而異。 
+
+2. 多電壓技術（Multi Voltage / Voltage Islands）
+<img width="474" height="317" alt="image" src="https://github.com/user-attachments/assets/35622b49-701c-4446-a534-8f1631b51acd" />
+
+   * 藉由性能特性來區分晶片功能的技術。晶片上某個模塊是高性能的（需要較高電壓以達到速度要求），而其餘部分性能較低，可使用較低電壓運作。
+   * 高電壓高頻率的地方使用自己的能耗，低電壓低頻率的地方使用自己的能耗。
+   * 根據功率方程式，電壓降低，靜態與動態功耗均降低，因此低性能模塊使用低電壓可顯著節省功耗。
+   * 設計複雜度
+     * 電壓島（Voltage Islands）：不同電壓域在 layout 上的物理區域劃分
+     * Level Shifter（LS）：不同電壓交叉點必須插入電壓位準偏移器，確保訊號電平相容
+     * 需要在不同電壓特性下分別分析各模塊的時序、功耗與可靠性
+     * UPF（Unified Power Format）或 CPF 格式描述電源意圖
+
+3. 電源閘控技術（Power Gating）
+<img width="432" height="318" alt="image" src="https://github.com/user-attachments/assets/8086a184-b5a3-413d-b5cb-ea78cd5c494f" />
+
+   * 如同多電壓技術，晶片上的功能被區分開來，但此技術在功率區域的電源連接了電源開關（Power Switch），可以有效地完全關閉一個模塊的電源。
+   * 功率方程式中，將電壓歸零也會使功耗歸零，進而在模塊關閉時同時節省靜態與動態功率，是所有技術中節能效果最佳的。
+   * 必要設計元素
+     * 電源開關（Power Switch）：控制模塊電源的 ON/OFF
+     * 隔離閘（Isolation Gate）：電源關閉時，提供電源區域邊界一個已知狀態（通常為 0 或 1），避免浮接訊號影響其他模塊
+     * 電源管理單元（PMU）：控制電源開關與隔離單元的致能訊號，確保斷電與通電有正確的啟動順序
+     * 電源狀態表：定義所有電壓 ON/OFF 的狀態組合
+   * 當關閉時，module 裡面的每個模組都有自己的 state ，須妥善傳輸與保存（還是須讓下一個module知道狀態）
+
+4. 電源閘控時的保存狀態（State Retention）
+<img width="489" height="347" alt="image" src="https://github.com/user-attachments/assets/f4ba1e1e-6ce0-410b-8aa4-69925c1ee50f" />
+
+   * 狀態保存技術（或稱暫存器保存技術，Register Retention）是一種與電源閘控配合使用的技術。在每個關閉的模塊中，當模塊為 OFF 狀態時，模塊中部分或全部的暫存器會保存其原先的數值。當模塊通電時，之前保存的數值就會被恢復。
+   * 若不保存狀態，模塊重新上電後必須從 INIT 狀態重新執行，耗費額外的時間與功率。保存狀態可以讓模塊快速恢復至斷電前的運作狀態，大幅縮短喚醒時間，對需要頻繁睡眠/喚醒的應用（如手機 SoC）至關重要。
+   * 實現需求：
+     * 元件資料庫中需有保存型暫存器（Retention Flop），具備額外的 Shadow Register 儲存保存值
+     * PMU 訊號控制序列中需加入 SAVE / RESTORE 訊號
+     * 在斷電前執行 SAVE，上電穩定後執行 RESTORE，確保順序正確
+     * UPF 中需明確指定哪些 FF 需要 retention 屬性
+     * Retention Flop 與普通 Flop 的差異：
+       * Retention Flop 內部有一個由獨立低功耗電源供電的 shadow latch，在主電源關閉時保存資料，主電源恢復後再還原。
+
+### Stuck-at Fault 可測性分析
+1. 通常為晶片 Tape out 回來之後有些Pattern要打，確定晶片有無問題
+2. 測試概念：
+   * 要偵測 Stuck-at 1，需要讓正常電路輸出 0，若輸出為 1 則表示有故障。要偵測 Stuck-at 0，則需讓正常輸出為 1。若電路結構上無法讓故障點呈現正確值，即為不可測故障。
+
+---------------------------------------------
