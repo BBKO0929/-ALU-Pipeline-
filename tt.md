@@ -1,29 +1,56 @@
 # 暑假自主研究與學習、Debug日誌
 
 
-<a id="toc"></a>
+<a id="toc-date"></a>
 
-## 📅 目錄（點日期直接跳轉）
+## 📅 目錄一：依日期（含當日重點）
 
-| 日期 | 當日重點 |
+| 日期 | 影片 | 資料 |
+|---|---|---|
+| [7/3](#m07d03) | 看 TT 小教室第 1~5 課。 | — |
+| [7/4](#m07d04) | 看 TT 小教室第 6~7 課。 | — |
+| [7/5](#m07d05) | 看 TT 小教室第 8~11 課。 | — |
+| [7/6](#m07d06) | — | — |
+| [7/7](#m07d07) | 清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。 | 複習7/3 - 7/6進度。 |
+| [7/8](#m07d08) | — | 複習7/3 - 7/7進度。 |
+| [7/9](#m07d09) | 看財經村長-數位IC設計面試1。 | — |
+| [7/10](#m07d10) | — | 複習7/3 - 7/9內容。 |
+| [7/11](#m07d11) | — | 複習7/3 - 7/10內容。 |
+| [7/13](#m07d13) | — | 複習7/3 - 7/11內容。 |
+| [7/14](#m07d14) | — | — |
+| [7/15](#m07d15) | — | 複習7/3 - 7/14內容。 |
+| [7/16](#m07d16) | 看 TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】 | — |
+| [7/17](#m07d17) | 看 TT 小教室 Verilog RTL design 進階教學【Memory】 | — |
+| [7/21](#m07d21) | — | 複習7/3 - 7/17內容。 |
+| [7/23](#m07d23) | — | 利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj |
+| [7/24](#m07d24) | 財經村長 - 如何面試上一線數位IC公司 II | — |
+
+---
+
+<a id="toc-issue"></a>
+
+## 🐛 目錄二：依「遇到的問題」快速跳轉
+
+| 日期 | 當天遇到的問題 |
 |---|---|
-| [7/3](#m07d03) | 影片：看 TT 小教室第 1~5 課。；刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。 |
-| [7/4](#m07d04) | 影片：看 TT 小教室第 6~7 課。；刷題：複習 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。 |
-| [7/5](#m07d05) | 影片：看 TT 小教室第 8~11 課。；刷題：完成 HDLBits 的 "Adder1" 到 "Adder2"。 |
-| [7/6](#m07d06) | 刷題：完成 HDLBits 的 "carry-slect Adder" 到 "a priority encoder for 8-bit inputs"。 |
-| [7/7](#m07d07) | 影片：清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。；資料：複習7/3 - 7/6進度。；刷題：複習7/3 - 7/6進度、完成 HDLBits 的 "Always nolatches" 到 "Create a 100-bit binary ripple-carry adder"。 |
-| [7/8](#m07d08) | 資料：複習7/3 - 7/7進度。；刷題：複習7/3 - 7/7進度、完成 HDLBits 的 "100-digit BCD ripple-carry adder（100 位的 BCD 級聯加法器）"。 |
-| [7/9](#m07d09) | 影片：看財經村長-數位IC設計面試1。；刷題：完成 HDLBits - "Combinational Logic" 中的 "Basic gates"。 |
-| [7/10](#m07d10) | 資料：複習7/3 - 7/9內容。；刷題：複習 HDLBits 的 "Modules" 到 "Basic Gates"；完成 HDLBits - Arithmetic circuits 的 half adder 到 signed addition overflow。 |
-| [7/11](#m07d11) | 資料：複習7/3 - 7/10內容。；刷題：複習 HDLBits 的 "Modules" 到 "multiplexers"；完成 HDLBits - Arithmetic circuits。 |
-| [7/13](#m07d13) | 資料：複習7/3 - 7/11內容。；刷題：完成 HDLBits 的 Karnaugh Map to Circuit 到 DFF with byte enable。 |
-| [7/14](#m07d14) | 刷題：完成 HDLBits 的 D latch 到 Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）。 |
-| [7/15](#m07d15) | 資料：複習7/3 - 7/14內容。；刷題：複習 HDLBits 的 "Modules" 到 "Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）"；完成 HDLBits - sequential logic。 |
-| [7/16](#m07d16) | 影片：看 TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】；刷題：完成 HDLBits - counters 的 Four-bit binary counter  到 slow decade counter。 |
-| [7/17](#m07d17) | 影片：看 TT 小教室 Verilog RTL design 進階教學【Memory】；刷題：完成 HDLBits 的 "counter 1-12" 到 "4-digit BCD counter (Countbcd)"；待完成 "12-hour clock"。 |
-| [7/21](#m07d21) | 資料：複習7/3 - 7/17內容。；刷題：複習 HDLBits 7/3 - 7/17 進度。 |
-| [7/23](#m07d23) | 資料：利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj；Vivado：嘗試在 Vivado 上寫簡單半加器模型並模擬測試 |
-| [7/24](#m07d24) | 影片：財經村長 - 如何面試上一線數位IC公司 II |
+| [7/3](#m07d03-issue) | 在寫always、case語法撰寫不完整，導致編譯錯誤。 |
+| [7/4](#m07d04-issue) | 在Connecting Signals to Module Ports的時候，搞錯"by position"與"by name"這兩種方法，by position與順序有關。 |
+| [7/5](#m07d05-issue) | Adder1（用兩個16位元加法器模塊合成出一個32位元加法器）；Adder2（Module fadd） |
+| [7/6](#m07d06-issue) | carry-slect Adder（選擇式加法器） |
+| [7/7](#m07d07-issue) | Create a 100-bit binary ripple-carry adder |
+| [7/8](#m07d08-issue) | Create a 100-digit BCD ripple-carry adder |
+| [7/9](#m07d09-issue) | Ringer |
+| [7/10](#m07d10-issue) | 誤解溢位判斷。 |
+| [7/11](#m07d11-issue) | create a 4-digit BCD ripple-carry adder |
+| [7/13](#m07d13-issue) | using one 4-to-1 multiplexer and as many 2-to-1 multiplexers as required |
+| [7/14](#m07d14-issue) | Exams/ece241 2014 q4 |
+| [7/15](#m07d15-issue) | Edgedetect（正邊緣偵測） |
+| [7/16](#m07d16-issue) | slow decade counter |
+| [7/17](#m07d17-issue) | 4-digit BCD counter (Countbcd) |
+
+---
+
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -31,10 +58,15 @@
 
 ## 📌 2026 年 7 月 3 日
 
-## 今日進度：
-### 影片：看 TT 小教室第 1~5 課。
-### 刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
+### 今日進度
 
+**🎬 影片**
+- 看 TT 小教室第 1~5 課。
+
+**📝 刷題**
+- 完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
+
+<a id="m07d03-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：在寫always、case語法撰寫不完整，導致編譯錯誤。
 ### 解法：於程式後面加上end、endcase，成功編譯。
@@ -85,7 +117,7 @@ end
 ### 震盪器（Oscillator）
 * always #<一半的週期時間> clk=~clk（通常用在Testbench產生clk，一般數位電路不會這樣寫）
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -93,10 +125,15 @@ end
 
 ## 📌 2026 年 7 月 4 日
 
-## 今日進度：
-### 影片：看 TT 小教室第 6~7 課。
-### 刷題：複習 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
+### 今日進度
 
+**🎬 影片**
+- 看 TT 小教室第 6~7 課。
+
+**📝 刷題**
+- 複習 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
+
+<a id="m07d04-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：在Connecting Signals to Module Ports的時候，搞錯"by position"與"by name"這兩種方法，by position與順序有關。
 ### 解法：複習兩種觀念，並搞懂兩者順序關聯，by position與順序有關，by name與順序無關。
@@ -220,7 +257,7 @@ endmodule
 * wire [4:0] z3;
 * assign z3 = (a >> 3);
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -228,10 +265,15 @@ endmodule
 
 ## 📌 2026 年 7 月 5 日
 
-## 今日進度：
-### 影片：看 TT 小教室第 8~11 課。
-### 刷題：完成 HDLBits 的 "Adder1" 到 "Adder2"。
+### 今日進度
 
+**🎬 影片**
+- 看 TT 小教室第 8~11 課。
+
+**📝 刷題**
+- 完成 HDLBits 的 "Adder1" 到 "Adder2"。
+
+<a id="m07d05-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題1：
 * Adder1（用兩個16位元加法器模塊合成出一個32位元加法器）
@@ -608,7 +650,7 @@ endmodule
 | **作用範圍** | **全域（Global）**。只要在編譯順序中被讀取，其後所有的 .v 檔案、所有 Module 都能直接使用。 | **區域（Local）**。只在宣告它的該個 module 內部有效。 |
 | **使用方式** | 呼叫時前面一定要加一撇 | |
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -616,9 +658,12 @@ endmodule
 
 ## 📌 2026 年 7 月 6 日
 
-## 今日進度：
-### 刷題：完成 HDLBits 的 "carry-slect Adder" 到 "a priority encoder for 8-bit inputs"。
+### 今日進度
 
+**📝 刷題**
+- 完成 HDLBits 的 "carry-slect Adder" 到 "a priority encoder for 8-bit inputs"。
+
+<a id="m07d06-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 * carry-slect Adder（選擇式加法器）
@@ -739,7 +784,7 @@ endmodule
     endmodule
     ```
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -747,11 +792,18 @@ endmodule
 
 ## 📌 2026 年 7 月 7 日
 
-## 今日進度：
-### 影片：清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。
-### 資料：複習7/3 - 7/6進度。
-### 刷題：複習7/3 - 7/6進度、完成 HDLBits 的 "Always nolatches" 到 "Create a 100-bit binary ripple-carry adder"。
+### 今日進度
 
+**🎬 影片**
+- 清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。
+
+**📚 資料**
+- 複習7/3 - 7/6進度。
+
+**📝 刷題**
+- 複習7/3 - 7/6進度、完成 HDLBits 的 "Always nolatches" 到 "Create a 100-bit binary ripple-carry adder"。
+
+<a id="m07d07-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 * Create a 100-bit binary ripple-carry adder
@@ -869,7 +921,7 @@ module add1(
     * 加入冗餘項 (Redundant Terms / Hazard Cover)：利用卡諾圖（Karnaugh Map）圈選相鄰群組時，在兩個群組的交界處額外多圈一個「冗餘乘積項」（卡諾圖上的圈圈重疊）。多出來的邏輯閘能確保當輸入訊號在兩組之間切換時，輸出不會因為延遲而掉下去。
     * 改用同步時序電路 (Design Synchronous Logic)：現代 IC 設計最核心的解法。不要直接使用組合邏輯的輸出作為下一個電路的觸發訊號。在組合邏輯後面接一個正反器（Flip-Flop），並由全域時脈（Clock）控制。因為**毛邊只會發生在時脈週期的中間**，只要我們確保在時脈邊緣（Setup Time / Hold Time）來臨時訊號已經穩定，正反器就不會鎖存到毛邊。
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -877,10 +929,15 @@ module add1(
 
 ## 📌 2026 年 7 月 8 日
 
-## 今日進度：
-### 資料：複習7/3 - 7/7進度。
-### 刷題：複習7/3 - 7/7進度、完成 HDLBits 的 "100-digit BCD ripple-carry adder（100 位的 BCD 級聯加法器）"。
+### 今日進度
 
+**📚 資料**
+- 複習7/3 - 7/7進度。
+
+**📝 刷題**
+- 複習7/3 - 7/7進度、完成 HDLBits 的 "100-digit BCD ripple-carry adder（100 位的 BCD 級聯加法器）"。
+
+<a id="m07d08-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 * Create a 100-digit BCD ripple-carry adder
@@ -1042,7 +1099,7 @@ module add1(
 	endmodule
   ```
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -1050,10 +1107,15 @@ module add1(
 
 ## 📌 2026 年 7 月 9 日
 
-## 今日進度：
-### 影片：看財經村長-數位IC設計面試1。
-### 刷題：完成 HDLBits - "Combinational Logic" 中的 "Basic gates"。
+### 今日進度
 
+**🎬 影片**
+- 看財經村長-數位IC設計面試1。
+
+**📝 刷題**
+- 完成 HDLBits - "Combinational Logic" 中的 "Basic gates"。
+
+<a id="m07d09-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 * Ringer
@@ -1275,7 +1337,7 @@ module d_latch (
   * Hold fix通常是最後的收尾工作，在setup timing基本達標後才進行大規模的hold fixing。
   * 設計者需要在設定P&R constraints時,給予工具足夠的buffer insertion彈性，並在chip finishing階段仔細檢查hold fix的結果，確保沒有過度修復(over-fixing)或遺漏關鍵路徑。
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -1283,10 +1345,15 @@ module d_latch (
 
 ## 📌 2026 年 7 月 10 日
 
-## 今日進度：
-### 資料：複習7/3 - 7/9內容。
-### 刷題：複習 HDLBits 的 "Modules" 到 "Basic Gates"；完成 HDLBits - Arithmetic circuits 的 half adder 到 signed addition overflow。
+### 今日進度
 
+**📚 資料**
+- 複習7/3 - 7/9內容。
+
+**📝 刷題**
+- 複習 HDLBits 的 "Modules" 到 "Basic Gates"；完成 HDLBits - Arithmetic circuits 的 half adder 到 signed addition overflow。
+
+<a id="m07d10-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：誤解溢位判斷。
 ### 解法：
@@ -1337,7 +1404,7 @@ endmodule
 	endmodule
   ```   
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -1345,10 +1412,15 @@ endmodule
 
 ## 📌 2026 年 7 月 11 日
 
-## 今日進度：
-### 資料：複習7/3 - 7/10內容。
-### 刷題：複習 HDLBits 的 "Modules" 到 "multiplexers"；完成 HDLBits - Arithmetic circuits。
+### 今日進度
 
+**📚 資料**
+- 複習7/3 - 7/10內容。
+
+**📝 刷題**
+- 複習 HDLBits 的 "Modules" 到 "multiplexers"；完成 HDLBits - Arithmetic circuits。
+
+<a id="m07d11-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：create a 4-digit BCD ripple-carry adder
 * 在做賦值後出現寬度截斷警告（Truncation Warning）。
@@ -1496,7 +1568,7 @@ endmodule
 	endmodule
   ```
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -1504,10 +1576,15 @@ endmodule
 
 ## 📌 2026 年 7 月 13 日
 
-## 今日進度：
-### 資料：複習7/3 - 7/11內容。
-### 刷題：完成 HDLBits 的 Karnaugh Map to Circuit 到 DFF with byte enable。
+### 今日進度
 
+**📚 資料**
+- 複習7/3 - 7/11內容。
+
+**📝 刷題**
+- 完成 HDLBits 的 Karnaugh Map to Circuit 到 DFF with byte enable。
+
+<a id="m07d13-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### using one 4-to-1 multiplexer and as many 2-to-1 multiplexers as required
@@ -1692,7 +1769,7 @@ endmodule
 4. 業界標準規範（專業度的體現）
 * 在聯發科（MediaTek）或各大 IC 設計廠的 Coding Style Guide（程式碼規範原則） 中，為了防止上述的各種人類肉眼失誤，通常都是強迫一律加上 begin...end。
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -1700,9 +1777,12 @@ endmodule
 
 ## 📌 2026 年 7 月 14 日
 
-## 今日進度：
-### 刷題：完成 HDLBits 的 D latch 到 Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）。
+### 今日進度
 
+**📝 刷題**
+- 完成 HDLBits 的 D latch 到 Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）。
+
+<a id="m07d14-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### Exams/ece241 2014 q4
@@ -1767,7 +1847,7 @@ endmodule
 ### 組合邏輯（純運算、不需記憶，只想即時得到結果）
 * 用 assign 搭配 wire 與 = （blocking）。
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -1775,10 +1855,15 @@ endmodule
 
 ## 📌 2026 年 7 月 15 日
 
-## 今日進度：
-### 資料：複習7/3 - 7/14內容。
-### 刷題：複習 HDLBits 的 "Modules" 到 "Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）"；完成 HDLBits - sequential logic。
+### 今日進度
 
+**📚 資料**
+- 複習7/3 - 7/14內容。
+
+**📝 刷題**
+- 複習 HDLBits 的 "Modules" 到 "Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）"；完成 HDLBits - sequential logic。
+
+<a id="m07d15-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### Edgedetect（正邊緣偵測）
@@ -2036,7 +2121,7 @@ endmodule
    * 硬體成本與設計難度：
      * 標準的 FPGA 或標準元件庫（Standard Cell Library）裡，雙邊沿暫存器的電路結構比單邊沿複雜得多（面積大、放線難），因此只會用在記憶體、傳輸介面等「最需要衝極速、省功耗的刀口上」。
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -2044,10 +2129,15 @@ endmodule
 
 ## 📌 2026 年 7 月 16 日
 
-## 今日進度：
-### 影片：看 TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】
-### 刷題：完成 HDLBits - counters 的 Four-bit binary counter  到 slow decade counter。
+### 今日進度
 
+**🎬 影片**
+- 看 TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】
+
+**📝 刷題**
+- 完成 HDLBits - counters 的 Four-bit binary counter  到 slow decade counter。
+
+<a id="m07d16-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### slow decade counter
@@ -2188,7 +2278,7 @@ endmodule
    * 沒有辦法可以"完全"解決，只能大幅度降低產生的機率。
    * MTBF(mean time between failure)意思是發生兩次錯誤之間的間隔，這個指標常用來衡量CDC的情形，越大越好（代表隔了很長一段時間才發生下一次錯誤）。   
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -2196,10 +2286,15 @@ endmodule
 
 ## 📌 2026 年 7 月 17 日
 
-## 今日進度：
-### 影片：看 TT 小教室 Verilog RTL design 進階教學【Memory】
-### 刷題：完成 HDLBits 的 "counter 1-12" 到 "4-digit BCD counter (Countbcd)"；待完成 "12-hour clock"。
+### 今日進度
 
+**🎬 影片**
+- 看 TT 小教室 Verilog RTL design 進階教學【Memory】
+
+**📝 刷題**
+- 完成 HDLBits 的 "counter 1-12" 到 "4-digit BCD counter (Countbcd)"；待完成 "12-hour clock"。
+
+<a id="m07d17-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### 4-digit BCD counter (Countbcd)
@@ -2589,7 +2684,7 @@ module counter2(
 endmodule
 ```
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -2597,11 +2692,16 @@ endmodule
 
 ## 📌 2026 年 7 月 21 日
 
-## 今日進度：
-### 資料：複習7/3 - 7/17內容。
-### 刷題：複習 HDLBits 7/3 - 7/17 進度。
+### 今日進度
 
-[⬆ 回目錄](#toc)
+**📚 資料**
+- 複習7/3 - 7/17內容。
+
+**📝 刷題**
+- 複習 HDLBits 7/3 - 7/17 進度。
+
+
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -2609,9 +2709,13 @@ endmodule
 
 ## 📌 2026 年 7 月 23 日
 
-## 今日進度：
-### 資料：利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj
-### Vivado：嘗試在 Vivado 上寫簡單半加器模型並模擬測試
+### 今日進度
+
+**📚 資料**
+- 利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj
+
+**🔧 其他**
+- Vivado：嘗試在 Vivado 上寫簡單半加器模型並模擬測試
 
 ## 今日成果探討：
 ### half-adder
@@ -2780,7 +2884,7 @@ end else begin
 end
 ```
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
 
@@ -2788,8 +2892,10 @@ end
 
 ## 📌 2026 年 7 月 24 日
 
-## 今日進度：
-### 影片：財經村長 - 如何面試上一線數位IC公司 II
+### 今日進度
+
+**🎬 影片**
+- 財經村長 - 如何面試上一線數位IC公司 II
 
 ## 關鍵知識/詞彙：
 ### 亞穩態深度解析
@@ -2900,6 +3006,6 @@ end
 2. 測試概念：
    * 要偵測 Stuck-at 1，需要讓正常電路輸出 0，若輸出為 1 則表示有故障。要偵測 Stuck-at 0，則需讓正常輸出為 1。若電路結構上無法讓故障點呈現正確值，即為不可測故障。
 
-[⬆ 回目錄](#toc)
+[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
 
 ---
