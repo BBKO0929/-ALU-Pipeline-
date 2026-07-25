@@ -2759,5 +2759,102 @@ end
 1. 通常為晶片 Tape out 回來之後有些Pattern要打，確定晶片有無問題
 2. 測試概念：
    * 要偵測 Stuck-at 1，需要讓正常電路輸出 0，若輸出為 1 則表示有故障。要偵測 Stuck-at 0，則需讓正常輸出為 1。若電路結構上無法讓故障點呈現正確值，即為不可測故障。
+---------------------------------------------
+# 2026 年 7 月 25 日
+## 今日進度：
+### 影片：
+1. 第1講 Vivado設計流程及使用模式
+2. "How to use Vivado® Design Suite Part-5 Timing Summary Report"
+3. 63 - Vivado's Timing Reports
+4. Xilinx Vivado Tutorial: Timing Analysis and Critical Path Optimization
+
+## 關鍵知識/詞彙：
+### Vivado 完整流程概念
+<img width="264" height="230" alt="image" src="https://github.com/user-attachments/assets/78066304-e249-4fa9-b87c-ba7c289a82c7" />
+
+1. Simulation（模擬）
+   * 主要作用： 執行 Behavioral Simulation（行為級模擬）。
+   * 搭配你寫好的 Testbench 跑波形圖（Waveform）。在完全不需要連接任何硬體板子的情況下，先確認寫好的 Verilog/VHDL 邏輯功能是否正確。
+
+2. RTL Analysis（RTL 分析 / 電路結構檢視）
+   * 主要作用： 展開程式碼的 Schematic（電路原理圖） 與語法檢查。
+   * 軟體會初步解析你的程式碼，把它畫成邏輯閘、暫存器（Flip-Flops）與多工器（Mux）組成的架構圖。你可以用它來確認： Vivado 解讀出的電路結構，是否跟自己所想像的一模一樣。
+     
+3. Synthesis（邏輯綜合）
+   * 主要作用： 將文字程式碼轉換為門級網表（Gate-level Netlist）。
+   * 軟體會把你寫的抽象邏輯（如 +、 -、 if-else），翻譯成 FPGA 晶片內部實際存在的底層單元，例如 LUT (Look-Up Table)、Flip-Flop (FF) 和 Block RAM。
+     
+4. Implementation（布局與布線 - Place & Route）
+   * 主要作用： 將綜合後的電路實體化，並進行時序分析。
+   * Placement (布局)： 決定把 Synthesis 產生的 LUT 和 FF 放到 FPGA 晶片上的哪個具體物理位置。
+   * Routing (布線)： 將晶片內部的金屬導線接通。
+   * Timing Analysis (時序分析)： 檢查訊號傳輸速度是否太慢、會不會產生 Setup/Hold Time 違規（Timing Violation）。
+
+5. Program and Debug（燒錄與硬體除錯）
+   * 主要作用： 生成燒錄檔、連線 FPGA 開發板與在線除錯。
+   * Generate Bitstream： 將 Implementation 的結果打包成 .bit 燒錄檔。
+   * Hardware Manager： 透過 USB 線連接開發板，把 .bit 檔燒進 FPGA 晶片。
+   Logic Analyzer (ILA)： 當板子運作不正常時，可以在晶片內加入抓訊號的儀器，即時回傳晶片內部的波形到 Vivado 畫面上進行除錯。
+
+6. 標準開發流程順序：
+   * Simulation (先模擬) -> Synthesis (邏輯綜合) -> Implementation (布局布線) -> Program and Debug (產出 bit 檔並燒錄)
+
+### XDC 檔（Xilinx Design Constraints）
+1. 簡介
+   * Vivado 的約束檔（Constraint File），副檔名為 .xdc。
+   * XDC 檔就是指定「這個器官要連接到 FPGA 晶片的哪一個實體腳位」，以及「系統的時脈頻率是多少」。
+
+2. XDC 檔最常見的兩大功能：
+   * Pin Assignment（管腳約束 / 腳位綁定）：指定你的輸入輸出訊號對應到板子上的哪個按鈕或 LED 燈。
+     ```verilog
+     # 把 LED 訊號綁定到 FPGA 的 Y13 腳位，並設定電壓標準為 LVCMOS33
+		set_property PACKAGE_PIN Y13 [get_ports {led}]
+		set_property IOSTANDARD LVCMOS33 [get_ports {led}]
+     ```
+   * Clock Constraint（時脈約束）：告訴 Vivado 你的 Clock 頻率是多少（讓 Vivado 知道怎麼計算 WNS 報告）。
+     ```verilog
+     # 告訴 Vivado，sys_clk 這個腳位輸入的時脈週期是 10ns (也就是 100MHz)
+		create_clock -period 10.000 -name sys_clk [get_ports sys_clk]
+     ```
+   
+### Timing Report（時序報告）
+<img width="756" height="125" alt="image" src="https://github.com/user-attachments/assets/b2da2c7b-28ca-4346-b51f-6256f45d8d5e" />
+
+<img width="1358" height="725" alt="image" src="https://github.com/user-attachments/assets/18e836a5-0775-4527-a430-e66fdf442b1d" />
+
+
+1. 簡介
+   * 跑完 Implementation 後，Vivado 會幫你做全面嚴格的「時序檢查」。
+   * 就像是電路的「體檢報告」。它告訴你：你的電路傳輸速度，能不能跟上你設定的 Clock（時脈）頻率？
+
+2. 報告中最重要的地方
+   * 最核心的就是查看電路有沒有 Timing Violation（時序違規），也就是訊號會不會「來不及跑完」。
+   * 標準就是 Slack（時序裕量）：
+     * Slack > 0（綠色）： 訊號傳輸時間绰绰有餘，電路可以在預期頻率下完美運作。
+     * Slack < 0（紅色）： 訊號傳輸太慢了（Setup Time Violation）或太快了（Hold Time Violation），電路在實體晶片上會出錯（爆 Bug）。
+
+3. WNS（Worst Negative Slack 最壞負裕量）
+   * 定義： 全晶片所有路徑中，最嚴重的那條「延遲/卡頓」路徑缺了多少時間。
+   * 重點評估：
+     * 如果 WNS >= 0 ns：代表整張晶片的時序全部過關（Timing Met）。
+     * 如果 WNS = -1.2 ns：代表最慢的那條路徑，超出了規定的時脈週期 1.2 ns，須優化程式碼或降低 Clock 頻率。
+
+### Utilization 報告（資源使用率）
+<img width="380" height="205" alt="image" src="https://github.com/user-attachments/assets/3470d57f-b3f7-48f5-b4ce-1e9914a2fe44" />
+
+1. 定義： 你的程式碼佔用了這顆 FPGA 晶片百分之多少的硬體資源。
+   
+2. 重要性： 觀察晶片會不會「被塞爆」。如果 Utilization 超過 80% ~ 90%，Vivado 的 Implementation 會變得極度困難，甚至會導致時序爆發（WNS 變成負值）。
+   
+3. LUT / FF 用量
+
+| 資源名稱 | 全名 | 核心功能與作用 |
+| :--- | :--- | :--- |
+| LUT | Look-Up Table (查找表) | 實現**組合邏輯（Combinational Logic）**。例如加法、減法、`if-else`、`case` 判斷。 |
+| FF | Flip-Flop (觸發器/暫存器) | 實現**時序邏輯（Sequential Logic）**。用來儲存 1 bit 的資料，必須靠 Clock 驅動。 |
+
+### 實際開發的連鎖反應
+1. Timing Report、Utilization兩個報告要「一起看」
+   * 如果 Utilization 報告顯示 LUT / FF 用量超過 80%~90%，晶片裡面會變得非常擁擠。Vivado 在做 Implementation時，被迫要把相連的邏輯放到距離很遠的地方，繞很長的金屬線。會導致訊號傳輸延遲大幅增加，最後在 Timing Report 裡跳出紅色的 WNS < 0（時序違規）。
 
 ---------------------------------------------
