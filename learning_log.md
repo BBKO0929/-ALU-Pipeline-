@@ -2871,15 +2871,57 @@ end
 ### 8-bit Logical Left Barrel Shifter
 * Design sources
 ```verilog
+module Logical_Left_Barrel_Shifter(
 
+    input [7:0]d_in,
+    input [2:0]shamt,
+    output [7:0]d_out
+    
+ );
+    
+    wire [7:0] t1, t2;
+    
+    // Shift by 1 bit if shift_amt[0] == 1
+    assign t1 = shamt[0] ? {d_in[6:0], 1'b0} : d_in;
+    // Shift by 2 bit if shift_amt[1] == 1
+    assign t2 = shamt[1] ? {t1[5:0], 2'b00} : t1;
+    // Shift by 4 bit if shift_amt[2] == 1
+    assign d_out = shamt[2] ? {t2[3:0], 4'b0000} : t2;
+    
+endmodule
 ```
 
 * Simulation sources
 ```verilog
+module barrel_shifter_tt();
 
+reg [7:0]d_in;
+reg [2:0]shamt;
+wire [7:0]d_out;
+
+Logical_Left_Barrel_Shifter tt(
+    .d_in(d_in),
+    .shamt(shamt),
+    .d_out(d_out)
+);
+
+initial begin
+    d_in = 8'b10110011; // Initialize input data 
+    // Test all shift amounts from 0 to 7
+    for(shamt=0; shamt<8; shamt=shamt+1)begin
+        #10;// Wait 10 time units for output to stabilize
+        $display("Time=%0t | shift_amt=%0d | data_in=%b | data_out=%b"
+        ,$time, shamt, d_in, d_out);
+    end
+    #10;
+    $finish;
+end
 ```
 
 * 模擬結果
+<img width="536" height="377" alt="image" src="https://github.com/user-attachments/assets/3b93234d-1639-46c6-b798-0b28319c5f0f" />
+<img width="512" height="159" alt="image" src="https://github.com/user-attachments/assets/1bba3fc9-40d6-4fe6-8058-f67cada8dd00" />
+
 
 
 ## 關鍵知識/詞彙：
