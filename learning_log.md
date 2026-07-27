@@ -2856,5 +2856,88 @@ end
 ### 實際開發的連鎖反應
 1. Timing Report、Utilization兩個報告要「一起看」
    * 如果 Utilization 報告顯示 LUT / FF 用量超過 80%~90%，晶片裡面會變得非常擁擠。Vivado 在做 Implementation時，被迫要把相連的邏輯放到距離很遠的地方，繞很長的金屬線。會導致訊號傳輸延遲大幅增加，最後在 Timing Report 裡跳出紅色的 WNS < 0（時序違規）。
+---------------------------------------------
+# 2026 年 7 月 27 日
+## 今日進度：
+### 資料：
+1. Barrel Shifters in Verilog: A Beginner’s Guide to Fast Multi-Bit Shifting
+2. How to Design an Efficient Barrel Shifter in Verilog: Step-by-Step Guide
 
+## 今日成果探討：
+### 設計初步 32-bit 構造、模型以及所支援的運算
+<img width="544" height="316" alt="image" src="https://github.com/user-attachments/assets/edfdfcaf-8039-4a88-8e76-640d7a6a100d" />
+<img width="923" height="507" alt="image" src="https://github.com/user-attachments/assets/24a57abe-c425-42a0-8ac1-af8253aafec1" />
+
+### 8-bit Logical Left Barrel Shifter
+* Design sources
+```verilog
+
+```
+
+* Simulation sources
+```verilog
+
+```
+
+* 模擬結果
+
+
+## 關鍵知識/詞彙：
+### 邏輯移位／算數移位
+1. 左移與右移的核心差別
+   * 數學語意上的不同（乘法 vs 除法）：
+     * 左移（Left Shift）： 位元向高位移動，數值上等同於乘以 2^n
+     * 右移（Right Shift）： 位元向低位移動，數值上等同於除以 2^n（自動向下取整）
+
+   * 補位規則的對稱性：
+     * 左移（<< / <<<）： 補位行為完全對稱且一致，無論是邏輯還是算術，右側（LSB）空出來的位置一律補 0
+     * 右移（>> / >>>）： 是算術與邏輯差異最顯著之處。邏輯右移左側永遠補 0；算術右移（且變數為 signed）左側會補最高有效位（MSB，即正數補 0、負數補 1），用以保持負數的數值正確性
+  
+   * 邊界溢位與精度損失：
+     * 左移容易造成高位溢位（Overflow），若接收變數的位元寬度不夠，最左側的位元將會被丟棄
+     * 右移則會造成低位精度的捨棄（Truncation），最右側移出的位元會直接丟失（相當於整數除法捨去餘數）。
+
+2. 邏輯移位 vs 算術移位比較表
+
+| 比較項目 | 邏輯移位 (Logical Shift) | 算術移位 (Arithmetic Shift) |
+| :--- | :--- | :--- |
+| **語法運算子** | `<<`（左移）、`>>`（右移） | `<<<`（左移）、`>>>`（右移） |
+| **符號屬性 (Signedness)** | 強制作為 **Unsigned（無符號）** 處理 | 保留 **Signed（有符號）** 屬性<br>*(須宣告為 `signed` 變數)* |
+| **左移補位行為** | 右側永遠**補 0** | 右側永遠**補 0**（與邏輯左移相同） |
+| **右移補位行為** | 左側（MSB）永遠**補 0** | 若變數為 signed 則**補符號位 (MSB)**<br>若變數為 unsigned 則**補 0** |
+| **位元擴展行為<br>(Sign Extension)** | 賦值給較長位元時，高位直接**補 0** | 賦值給較長位元時，依據符號位進行**符號擴展** |
+| **主要應用場景** | 資料封包拆解、Mask 遮罩、純位元操作 | 有符號數的數學快速乘除法（2 的次方的乘除） |
+
+### 桶型移位器 (Barrel Shifter) 
+1. 簡介：是一種純組合邏輯電路，其最大特點為「可以在單一時脈週期內將資料向左或向右移動任意位數」
+
+2. 運作原理：內部通常由多級 Multiplexer（MUX）對角線式連接而成。以 8-bit Barrel Shifter 為例，內部設計為 3 級 MUX：
+   * 第 1 級決定是否移位 1 位 (2^0)
+   * 第 2 級決定是否移位 2 位 (2^1)
+   * 第 3 級決定是否移位 4 位 (2^2)
+   * 藉由這些 2 的次方組合，即可在極短的組合邏輯延遲（O(\log N)）內完成 0~7 位的任意移位。
+
+3. 適用情境：廣泛應用於現代 CPU 的 ALU（算術邏輯單元）與 DSP 中，用來支援單指令週期的位移操作。
+
+### 一般移位暫存器 (Standard Shift Register)
+1. 簡介：是一種時序邏輯電路，由多個 Flip-Flop（觸發器）串聯而成。
+
+2. 運作原理：在每一個時脈邊緣（Clock Edge）到來時，資料會從前一級 Flip-Flop 傳遞到下一級，實現「每次 Clock 只移動 1 位元」的行為。
+   * 優缺點： 雖然若要移位 N 位元需要花費 N 個時脈週期（吞吐量較低），但其電路結構非常簡潔、佔用晶片面積小，且沒有複雜的組合邏輯延遲問題。
+
+3. 適用情境：適合用於串列通訊資料轉換（如 SPI、UART、I2C 的 SIPO / PISO 轉換）或暫存佇列（Shift Register FIFO）。
+
+### Barrel Shifter vs 一般移位暫存器比較表
+
+| 比較項目 | Barrel Shifter（桶型移位器） | 一般移位暫存器 (Standard Shift Register) |
+| :--- | :--- | :--- |
+| **核心架構** | 多級多工器（Multiplexer Array）組合邏輯 | 觸發器（D Flip-Flop）級聯串列時序電路 |
+| **電路類型** | **純組合邏輯 (Combinational Logic)** | **時序邏輯 (Sequential Logic)** |
+| **移位時間 (延遲)** | **1 個時脈週期內 (1 Clock Cycle)** 完成任意 $N$ 位元移位（延遲為 $O(\log N)$） | 需要 **$N$ 個時脈週期 (N Clock Cycles)** 才能移位 $N$ 位元（延遲為 $O(N)$） |
+| **硬體資源 (面積)** | 較高，隨位元數成 $O(N \log N)$ 成長（大量 MUX） | 較低，隨位元數成 $O(N)$ 成長（僅需 DFF 與少許邏輯） |
+| **關鍵路徑/延遲** | 組合邏輯線路較長（Gate Delay 較大），容易成為 Critical Path | 每個 Cycle 延遲極小（僅 DFF 的 $T_{co}$），易於達成高 Clock Frequency |
+| **移位位數彈性** | 任意位數可單一週期直接指定（如直接移 5 位） | 逐位移位，移幾位就需要幾個 Clock 觸發 |
+| **主要應用場景** | ALU、浮點數運算單元 (FPU)、DSP 算術運算、處理器指令集 (ARM Shifter) | 串列/並列轉換 (SIPO/PISO)、通訊介面 (SPI/UART)、資料緩衝佇列 |
+
+* Trade-off when using Barrel Shifter：需要更多的邏輯電路（例如，a tree of multiplexers），從而換取更高的速度。當需要在一個週期內進行變速時，這種方法是值得的。
 ---------------------------------------------
