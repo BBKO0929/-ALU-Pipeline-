@@ -3070,9 +3070,37 @@ endmodule
 
 * Simulation sources
 ```verilog
+module alu_v1_tt();
+
+    reg [31:0]a, b;
+    reg [2:0]op_code;
+    wire [31:0]res;
+    wire [3:0]flag;
+    integer i;
+    
+    alu_v1 tt(
+    .a(a),
+    .b(b),
+    .op_code(op_code),
+    .res(res),
+    .flag(flag)
+    );
+    
+    initial begin
+    $monitor("time=%0t op_code=%b a=%h b=%h res=%h flag=%b", $time, op_code, a, b, res, flag);
+    a = 32'hF150A1B8;
+    b = 32'h5F58258;
+    for (i = 0; i < 8; i = i + 1) begin
+        op_code = i[2:0];   // 對應 000~111
+        #10;
+    end
+    $finish;   
+    end   
+endmodule
 ```
 
 * 模擬結果
+<img width="745" height="377" alt="image" src="https://github.com/user-attachments/assets/28336d72-38ed-4462-ac23-e0a8f90fb22c" />
 
 ## 遇到的困難與解決方案：
 ### 問題1：SLT 比較負數時判斷結果錯誤
