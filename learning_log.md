@@ -2983,3 +2983,133 @@ end
 
 * Trade-off when using Barrel Shifter：需要更多的邏輯電路（例如，a tree of multiplexers），從而換取更高的速度。當需要在一個週期內進行變速時，這種方法是值得的。
 ---------------------------------------------
+# 2026 年 7 月 28 日
+## 今日進度：
+### 資料：
+1. [Verilog code for Arithmetic Logic Unit (ALU)](https://www.fpga4student.com/2017/06/Verilog-code-for-ALU.html)
+2. [ALU design in Verilog using MIPS Instruction Set](https://electrobinary.blogspot.com/2021/02/alu-design-in-verilog-using-mips.html)
+
+## 今日成果探討：
+### ALU 設計：完成 32-bit ALU baseline 版本與 debug 
+
+### 32bit_ALU_V1
+* Design sources
+```verilog
+module alu_v1(
+    input [31:0]a,
+    input [31:0]b,
+    input [2:0]op_code,
+    output reg[31:0]res,
+    output [3:0]flag
+);
+    //構建4個 32bit 暫存器用於 barrel shifter
+    //Shamt 選用 b[4:0] 判斷移動幾個 bit
+    reg [31:0]t1, t2, t3, t4;
+    
+    // 構建共用的 33-bit 加減法邏輯（在 case 外面算）
+    wire sub;
+    wire [31:0]b_op;
+    wire [32:0]add_sub;
+    wire carry;
+    wire overflow;
+
+    assign sub = (op_code == 3'b001);// op_code == 3'b001，執行減法
+    assign b_op = b ^ {32{sub}}; // 將 b 逐位元反相
+    assign add_sub = {1'b0, a} + {1'b0, b_op} + sub; // ADD: a+b；SUB: a + ~b + 1（2補數，+1 由 sub 提供）
+    assign carry = add_sub[32]; //進位判斷 
+    assign overflow = (~(a[31] ^ b_op[31])) && (a[31] ^ add_sub[31]);//溢位判斷
+
+// 判斷 ALU 行為
+always@(*)begin
+    case(op_code)
+        3'b000 : // a+b
+            res = add_sub[31:0]; 
+        3'b001 : // a-b 
+            res = add_sub[31:0];
+        3'b010 : 
+            res = a & b;
+        3'b011 : 
+            res = a | b;
+        3'b100 : 
+            res = a ^ b;
+        3'b101 : begin // 邏輯左移(<<)，缺項補0
+            t1 = (b[0]) ? {a[30:0], 1'b0} : a;
+            t2 = (b[1]) ? {t1[29:0], 2'b00} : t1;
+            t3 = (b[2]) ? {t2[27:0], 4'b0000} : t2;
+            t4 = (b[3]) ? {t3[23:0], 8'b00000000} : t3;
+            res = (b[4]) ? {t4[15:0], 16'b00000000} : t4;
+        end 
+        3'b110 : begin // 算術右移(>>>)，補 signed bit a[31]
+            t1 = (b[0]) ? {a[31], a[31:1]} : a;
+            t2 = (b[1]) ? {{2{a[31]}}, t1[31:2]} : t1;
+            t3 = (b[2]) ? {{4{a[31]}}, t2[31:4]} : t2;
+            t4 = (b[3]) ? {{8{a[31]}}, t3[31:8]} : t3;
+            res = (b[4]) ? {{16{a[31]}}, t4[31:16]} : t4; 
+        end
+        3'b111 : res = ($signed(a) < $signed(b)) ? 32'd1 : 32'd0; // 有號數比較
+        default : res = 32'd0;
+    endcase
+end
+
+// 構建 flag
+wire a_s;
+wire Z, N, C, V;
+
+// flag 只在 ADD/SUB 時才有意義
+assign a_s = (op_code == 3'b000) || (op_code == 3'b001);
+
+assign Z = (res == 32'd0) ? 1 : 0; // 零旗標判斷
+assign N = (res[31]) ? 1 : 0; // 負旗標判斷
+assign C = (a_s) ? carry : 0; // 進位旗標判斷
+assign V = (a_s) ? overflow : 0; // 溢位旗標判斷
+    
+assign flag = {Z, N, C, V}; // flag[3]=Z, flag[2]=N, flag[1]=C, flag[0]=V
+
+endmodule
+```
+
+* Simulation sources
+```verilog
+```
+
+* 模擬結果
+
+## 遇到的困難與解決方案：
+### 問題1：SLT 比較負數時判斷結果錯誤
+* 原因：Verilog 的 wire/reg 預設是 unsigned，`a < b` 這種比較不會考慮 2 補數的符號位，導致負數被當成很大的正數去比大小
+* 解法：用 `$signed()` 這個系統函式，把 `a`、`b` 重新解讀成有號數再比較
+* 程式碼：
+  ```verilog
+	res = ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;
+  ```
+
+### 問題2：一開始搞混了 signed() 跟 ~b+1 的用途，以為 a + $signed(b) 可以拿來做減法
+* 原因：誤以為 `$signed()` 會「改變」訊號的數值
+* 釐清後的觀念：
+  * `$signed()` 是**重新解讀（reinterpretation）**：不會動任何一個 bit，只是告訴後面的運算子「把最高位當符號位去解讀」，本質上像加一個濾鏡去看同一份資料
+  * `~b + 1` 是**數值轉換（value transformation）**：把每個 bit 反相再加 1，算出一個新的數值（2 補數的 -b）
+  * 減法需要的是「真的把 b 變成 -b」，屬於數值轉換，`$signed()` 做不到這件事
+* 另外發現：想共用加法器做減法、還要順便算 carry/overflow 時，要把 `a`、`b` 都多補一位變成 33-bit 再相加，「多留一個 bit 裝進位」的動作，`$signed()` 也做不到
+* 程式碼：
+  ```verilog
+	// 構建共用的 33-bit 加減法邏輯（在 case 外面算）
+    wire sub;
+    wire [31:0]b_op;
+    wire [32:0]add_sub;
+    wire carry;
+    wire overflow;
+
+    assign sub = (op_code == 3'b001);// op_code == 3'b001，執行減法
+    assign b_op = b ^ {32{sub}}; // 將 b 逐位元反相
+    assign add_sub = {1'b0, a} + {1'b0, b_op} + sub; // ADD: a+b；SUB: a + ~b + 1（2補數，+1 由 sub 提供）
+    assign carry = add_sub[32]; //進位判斷 
+    assign overflow = (~(a[31] ^ b_op[31])) && (a[31] ^ add_sub[31]);//溢位判斷
+  ```
+
+## 關鍵知識/詞彙：
+### $signed()
+* Verilog 系統函式，將訊號重新解讀為 2 補數表示的有號數，只改變「詮釋方式」，不改變原始 bit pattern
+* 只在該次運算當下生效，不影響同一訊號在其他運算中的解讀方式
+
+
+---------------------------------------------
