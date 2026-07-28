@@ -2881,11 +2881,11 @@ module Logical_Left_Barrel_Shifter(
     
     wire [7:0] t1, t2;
     
-    // Shift by 1 bit if shift_amt[0] == 1
+    // Shift by 1 bit if shamt第 0 位 == 1
     assign t1 = shamt[0] ? {d_in[6:0], 1'b0} : d_in;
-    // Shift by 2 bit if shift_amt[1] == 1
+    // Shift by 2 bit if shamt第 1 位 == 1
     assign t2 = shamt[1] ? {t1[5:0], 2'b00} : t1;
-    // Shift by 4 bit if shift_amt[2] == 1
+    // Shift by 4 bit if shamt第 2 位 == 1
     assign d_out = shamt[2] ? {t2[3:0], 4'b0000} : t2;
     
 endmodule
