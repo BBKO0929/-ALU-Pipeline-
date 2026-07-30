@@ -3161,3 +3161,46 @@ reg [7:0] data;
 data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
 ```
 ---------------------------------------------
+# 2026 年 7 月 30 日
+## 今日進度：
+### 刷題：複習 HDLBits 7/3 - 7/17 進度。
+### 影片：
+1. [A Practical Introduction to Edge AI](https://youtu.be/ibm6ZRi6Sm4?si=yXesCNbBqkw3CrrX)
+2. [FPGA 是怎麼被發明的? 一口氣了解 Xilinx 跟 Altera 的 FPGA 爭霸史](https://www.youtube.com/watch?v=kRSLnkOKpPY)
+3. [CACM September 2018 - A Domain Specific Architecture for Deep Neural Networks](https://www.youtube.com/watch?v=MbO_pIQLP34)
+4. [A Practical Introduction to Edge AI](https://youtu.be/ibm6ZRi6Sm4?si=yXesCNbBqkw3CrrX)
+
+## 關鍵知識/詞彙：
+### DSA（Domain Specific Architecture，特定領域架構）
+1. 定義：不追求「什麼都能做」的通用處理器（CPU），而是**針對特定任務**（例如矩陣運算、訊號處理、AI 推論）設計專用硬體電路，**犧牲通用性換取效能與能耗效率**。
+
+2. 背景：
+	* 摩爾定律放緩，單靠製程微縮已難以大幅提升效能
+	* 通用 CPU 為了「什麼都能做」，硬體資源花在指令解碼、分支預測等通用邏輯上，效率不高
+	* 特定應用（尤其是深度學習）的運算模式很固定（大量矩陣乘加），適合客製化硬體加速
+
+3. 代表性例子：
+	* Google TPU（針對深度學習矩陣運算設計）
+	* GPU（針對平行運算優化，通用性介於 CPU 與 DSA 之間）
+	* 各種 AI 加速器 IP（NPU）
+
+4. 效能/彈性光譜：
+	* CPU（通用）-> GPU（平行）-> DSA/ASIC（專用）
+	* 客製化程度越高，效能/能耗比越好，但彈性越差、開發成本越高。
+
+### Edge AI（邊緣運算 AI）
+1. 定義：把 AI 推論（inference）放在終端裝置（手機、IoT 裝置、感測器）上執行，而不是把資料傳到雲端伺服器算完再傳回來。
+   
+2. 優點：
+	* 延遲：**本地運算完成**，不需等待網路來回
+	* 隱私：資料**不需上傳雲端**
+	* 頻寬/成本：不需持續傳輸大量資料
+	* 可靠性：**無網路連線**時仍可運作
+
+3. 與 IC 設計的關聯：
+	* Edge 裝置多為電池供電、體積受限，因此需要**低功耗、小面積**的 AI 加速器，而非雲端伺服器那種高功耗換高效能的做法
+	* 邊緣裝置上的 AI 晶片，是 DSA 概念的實際應用之一：為推論任務特化，同時兼顧功耗與面積
+	* 常見技術方向：
+  		* 模型量化（以 INT8 甚至更低位元取代浮點運算，節省功耗與面積）
+  		* 記憶體存取優化（AI 運算瓶頸常在資料搬移而非運算本身，因此有 In-memory computing 等討論方向）
+---------------------------------------------
