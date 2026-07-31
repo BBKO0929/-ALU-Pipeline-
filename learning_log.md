@@ -2,7 +2,7 @@
 
 # 2026 年 7 月 3 日
 ## 今日進度：
-### 影片：看 TT 小教室第 1~5 課。
+### 影片：TT 小教室第 1~5 課。
 ### 刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
 
 ## 遇到的困難與解決方案：
@@ -49,19 +49,19 @@ end
 ### 正反器（Flip-Flop）
 * 又稱暫存器，同步數位電路最重要組成元件。與clock同步（上沿 0->1 positive edge, 下沿 1->0 negative edge）。邏輯深度決定電路速度
 * 分清楚reset訊號跟clock是同步/非同步
-* 同步reset（reset隨clock動作）：例always@(posedge clk)begin
-* 非同步reset（reset一來就動作）：例always@(posedge clk or negedge rst_n)begin //低電位非同步reset
+* 同步reset（reset隨clock動作）：例`always@(posedge clk)begin`
+* 非同步reset（reset一來就動作）：例`always@(posedge clk or negedge rst_n)begin`//低電位非同步reset
   
 ### 震盪器（Oscillator）
-* always #<一半的週期時間> clk=~clk（通常用在Testbench產生clk，一般數位電路不會這樣寫）
+* `always #<一半的週期時間> clk=~clk`（通常用在Testbench產生clk，一般數位電路不會這樣寫）
 ---------------------------------------------
 # 2026 年 7 月 4 日
 ## 今日進度：
-### 影片：看 TT 小教室第 6~7 課。
+### 影片：TT 小教室第 6~7 課。
 ### 刷題：複習 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
 
 ## 遇到的困難與解決方案：
-### 問題：在Connecting Signals to Module Ports的時候，搞錯"by position"與"by name"這兩種方法，by position與順序有關。
+### 問題：在Connecting Signals to Module Ports的時候，搞錯"by position"與"by name"這兩種方法，by position與宣告順序有關。
 ### 解法：複習兩種觀念，並搞懂兩者順序關聯，by position與順序有關，by name與順序無關。
 ```verilog
  //mod_a要求：module mod_a ( output, output, input, input, input, input );
@@ -99,7 +99,7 @@ endmodule
  | ＆＆ | Logic AND |
  | ｜｜ | Logic OR |
 
-**判斷T/F，output為1bit**
+**判斷 T/F，output 為 1bit**
 
 ### Reduction運算元：
   
@@ -109,7 +109,7 @@ endmodule
  | ｜ | Reduction OR |
  | ︿ | Reduction XOR |
 
-**將運算元右邊陣列中的每一位元做運算，output為1bit**
+**將運算元右邊陣列中的每一位元做運算，output 為 1bit**
 * EX. a = 4'b0110, &a = 0 & 1 & 1 & 0 = 1'b0
   
 ### 關係運算元：
@@ -135,8 +135,8 @@ endmodule
   * `wire signed [7:0] a;`
   * `wire signed [3:0] b;`
   * `a[7]`和`b[3]`就分別是`a`和`b`的正負號
-  * `assign a = 8'b1000_0011;` $\rightarrow$ `a= -125 (2's complementary)`
-  * `assign b = 4'b0010;` $\rightarrow$ `b= +2`
+  * `assign a = 8'b1000_0011; -> a= -125 (2's complementary)`
+  * `assign b = 4'b0010; -> b= +2`
 
 ### 數學運算元
 
@@ -185,7 +185,7 @@ endmodule
 ---------------------------------------------
 # 2026 年 7 月 5 日
 ## 今日進度：
-### 影片：看 TT 小教室第 8~11 課。
+### 影片：TT 小教室第 8~11 課。
 ### 刷題：完成 HDLBits 的 "Adder1" 到 "Adder2"。
 
 ## 遇到的困難與解決方案：
@@ -313,7 +313,7 @@ end
 ### case
 * 只能寫在always block裡（循序、組合邏輯皆可）
 * 當多選擇成立，則執行第一個成立的logic
-* case、casez較常用，casez可用"?"表don't care
+* case、casez較常用，casez可用"?"、"z"表don't care
 * 最後加default避免Latch，除非條件都寫滿
 ```verilog
 case(狀態選擇)
@@ -474,7 +474,7 @@ endmodule
 
 | 特性 |  `define` (全球巨集) | `parameter` (局部參數) |
 | --- | --- | --- |
-| **語法關鍵字** | 開頭帶有反單引號，如 ``define DATA_WIDTH 8` | 正常宣告，如 `parameter DATA_WIDTH = 8;` |
+| **語法關鍵字** | 開頭帶有反單引號，如 `'define DATA_WIDTH 8` | 正常宣告，如 `parameter DATA_WIDTH = 8;` |
 | **作用範圍** | **全域（Global）**。只要在編譯順序中被讀取，其後所有的 `.v` 檔案、所有 Module 都能直接使用。 | **區域（Local）**。只在宣告它的該個 `module` 內部有效。 |
 | **使用方式** | 呼叫時前面一定要加一撇： |  |
 
@@ -512,8 +512,8 @@ endmodule
 * 語法2
 ```verilog
 module m_name #(
-    parameter 名称1 = 值1,
-    parameter 名称2 = 值2
+    parameter 名稱1 = 值1,
+    parameter 名稱2 = 值2
 )(
     input/output宣告
 );
@@ -1933,7 +1933,7 @@ endmodule
 ---------------------------------------------
 # 2026 年 7 月 16 日
 ## 今日進度：
-### 影片：看 TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】
+### 影片：TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】
 ### 刷題：完成 HDLBits - counters 的 Four-bit binary counter  到 slow decade counter。
 
 ## 遇到的困難與解決方案：
@@ -2078,7 +2078,7 @@ endmodule
 ---------------------------------------------
 # 2026 年 7 月 17 日
 ## 今日進度：
-### 影片：看 TT 小教室 Verilog RTL design 進階教學【Memory】
+### 影片：TT 小教室 Verilog RTL design 進階教學【Memory】
 ### 刷題：完成 HDLBits 的 "counter 1-12" 到 "4-digit BCD counter (Countbcd)"；待完成 "12-hour clock"。
 
 ## 遇到的困難與解決方案：
@@ -2571,7 +2571,6 @@ wire [7:0] data_out;// 接收主電路的輸出
 ```
 
 4. 實例化主電路 (Instantiation)
-* 放在檔案最開頭，用來指定 # 代表多少時間
 ```verilog
 // 格式：主電路名稱 實體名稱 (.主電路腳位(Testbench訊號))
 my_design uut (
@@ -2763,10 +2762,10 @@ end
 # 2026 年 7 月 25 日
 ## 今日進度：
 ### 影片：
-1. 第1講 Vivado設計流程及使用模式
-2. "How to use Vivado® Design Suite Part-5 Timing Summary Report"
-3. 63 - Vivado's Timing Reports
-4. Xilinx Vivado Tutorial: Timing Analysis and Critical Path Optimization
+1. [第1講 Vivado設計流程及使用模式](https://www.youtube.com/watch?v=9pylHMr0yfE&t=1s)
+2. [How to use Vivado® Design Suite Part-5 Timing Summary Report](https://www.youtube.com/watch?v=zLs8P_PbAV4)
+3. [63 - Vivado's Timing Reports](https://www.youtube.com/watch?v=Gdt5IBKGQos&t=254s)
+4. [Xilinx Vivado Tutorial: Timing Analysis and Critical Path Optimization](https://www.youtube.com/watch?v=sc8LOViD0Jg&t=317s)
 
 ## 關鍵知識/詞彙：
 ### Vivado 完整流程概念
@@ -2830,7 +2829,7 @@ end
 2. 報告中最重要的地方
    * 最核心的就是查看電路有沒有 Timing Violation（時序違規），也就是訊號會不會「來不及跑完」。
    * 標準就是 Slack（時序裕量）：
-     * Slack > 0（綠色）： 訊號傳輸時間绰绰有餘，電路可以在預期頻率下完美運作。
+     * Slack > 0（綠色）： 訊號傳輸時間綽綽有餘，電路可以在預期頻率下完美運作。
      * Slack < 0（紅色）： 訊號傳輸太慢了（Setup Time Violation）或太快了（Hold Time Violation），電路在實體晶片上會出錯（爆 Bug）。
 
 3. WNS（Worst Negative Slack 最壞負裕量）
@@ -2860,8 +2859,8 @@ end
 # 2026 年 7 月 27 日
 ## 今日進度：
 ### 資料：
-1. Barrel Shifters in Verilog: A Beginner’s Guide to Fast Multi-Bit Shifting
-2. How to Design an Efficient Barrel Shifter in Verilog: Step-by-Step Guide
+1. [Barrel Shifters in Verilog: A Beginner’s Guide to Fast Multi-Bit Shifting](https://medium.com/@ahe24mobile/barrel-shifters-in-verilog-a-beginners-guide-to-fast-multi-bit-shifting-121d1c5a2b62)
+2. [How to Design an Efficient Barrel Shifter in Verilog: Step-by-Step Guide](https://vlsifacts.com/how-to-design-an-efficient-barrel-shifter-in-verilog-step-by-step-guide/)
 
 ## 今日成果探討：
 ### 設計初步 32-bit 構造、模型以及所支援的運算
@@ -3203,4 +3202,14 @@ data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
 	* 常見技術方向：
   		* 模型量化（以 INT8 甚至更低位元取代浮點運算，節省功耗與面積）
   		* 記憶體存取優化（AI 運算瓶頸常在資料搬移而非運算本身，因此有 In-memory computing 等討論方向）
+---------------------------------------------
+# 2026 年 7 月 31 日
+## 今日進度：
+### 資料：
+1. 複習 7/3 - 7/30 進度
+2. [MIT 6.111 課程講義 Lecture 9《Pipelining & Verilog》(PDF)](https://web.mit.edu/6.111/www/f2016/handouts/L09.pdf)
+
+### 影片：
+
+## 關鍵知識/詞彙：
 ---------------------------------------------
