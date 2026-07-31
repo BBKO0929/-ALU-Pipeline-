@@ -3209,7 +3209,26 @@ data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
 1. 複習 7/3 - 7/30 進度
 2. [MIT 6.111 課程講義 Lecture 9《Pipelining & Verilog》(PDF)](https://web.mit.edu/6.111/www/f2016/handouts/L09.pdf)
 
-### 影片：
-
 ## 關鍵知識/詞彙：
+### Pipeline（管線化 / 流水線）
+* 一種資料路徑設計技巧，把一段長的組合邏輯切成幾個較短的階段，中間插入暫存器，讓每個階段各自在一個 clock cycle 內完成
+* 核心目的：**不是縮短單一筆資料的處理時間，而是提升整體吞吐量（throughput）**，因為每個階段變短了，可以用更高的 clock frequency 運作，而且每個 clock cycle 都能開始處理新的一筆資料
+
+### Latency vs Throughput
+* **Latency（延遲）**：一筆資料從輸入到輸出總共花的時間。切了 pipeline 之後，因為多了暫存器，latency 通常會「增加」
+* **Throughput（吞吐量）**：單位時間內能處理完幾筆資料。切了 pipeline 之後，滿水位後可以每個 cycle 就出一筆結果，throughput 會明顯提升
+* pipeline 設計的核心 **trade-off**：**犧牲一點 latency，換取大幅提升的 throughput**
+
+### 為什麼切 Pipeline 能讓頻率變高
+* 電路能跑多快，取決於整條電路裡最長的那條路徑（critical path）
+* 例如一個 32-bit RCA 加法器的 critical path 是進位一路傳到最高位的延遲；如果從中間插一個暫存器切成兩段（低16/高16），critical path 就變成只需要走完「半段」的延遲，自然能撐更高的 clock frequency
+* 換句話說：pipeline 是用「空間換時間」——多花面積（暫存器）去換取更短的每級延遲
+
+### Balanced Pipeline（平衡管線）
+* 切 pipeline 時，如果某條路徑（例如邏輯運算）本身延遲很短，也要跟著切同樣深度的暫存器級數，確保所有分支的資料在「同一拍」到齊
+* 常見的錯誤：只把最長的那條路徑（如加法器）切了暫存器，其他較短的路徑忘記跟著切，導致 MUX 選出來的資料其實不是同一時間點的結果，造成功能錯誤
+
+### Pipeline 在單顆 ALU（無資料相依）跟 CPU pipeline 的差別
+* 單獨一顆 ALU 電路本身是無狀態（stateless）的組合功能單元，插入 pipeline 不會有 data hazard 問題
+* CPU 的五級 pipeline（IF/ID/EX/MEM/WB）裡，hazard 問題來自「指令之間」的相依性（例如下一條指令要用到上一條還沒算完的結果），跟切 ALU 內部的 pipeline 是完全不同層次的問題
 ---------------------------------------------
