@@ -3232,3 +3232,183 @@ data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
 * 單獨一顆 ALU 電路本身是無狀態（stateless）的組合功能單元，插入 pipeline 不會有 data hazard 問題
 * CPU 的五級 pipeline（IF/ID/EX/MEM/WB）裡，hazard 問題來自「指令之間」的相依性（例如下一條指令要用到上一條還沒算完的結果），跟切 ALU 內部的 pipeline 是完全不同層次的問題
 ---------------------------------------------
+# 2026 年 8 月 1 日
+## 今日進度：
+
+## 今日成果探討：
+### ALU 設計：改寫 32-bit ALU baseline 版本 testbench
+* 這次測試設計採用 corner case（邊界案例）驗證思路，針對電路裡最容易出錯的幾個地方各自設計專門的測資，而不是隨機測試。
+* golden value（預期結果）全部自己手動用二進位/2補數算過，沒有拿 RTL 邏輯反推，避免用同一套可能有 bug 的邏輯驗證自己。
+
+**1. ADD / SUB 基本功能**
+```verilog
+check(32'h0000_00F0, 32'h0000_000F, 3'b000, 32'h0000_00FF, 0,0,0,0); // ADD
+check(32'h0000_00F0, 32'h0000_000F, 3'b001, 32'h0000_00E1, 0,0,1,0); // SUB
+```
+* 用意：先確認共用的 33-bit 加減法邏輯（`add_sub`）在正常數值下功能正確，這是後面所有 flag 判斷的基礎，要先確保這塊沒問題
+* SUB 那組刻意讓 `a > b`，驗證正常減法沒有借位時 carry 應該是 1（`C=1`）
+
+**2. AND / OR / XOR 邏輯運算覆蓋率**
+```verilog
+check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b010, 32'h0F00_0F00, 0,0,0,0); // AND
+check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b011, 32'hFF0F_FF0F, 0,1,0,0); // OR
+check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b100, 32'hF00F_F00F, 0,1,0,0); // XOR
+```
+* 用意：一開始這 3 個運算完全沒被測到，屬於覆蓋率破洞，補上確保 8 個 opcode 全部至少測過一次
+* 選用 `FF00FF00` / `0F0F0F0F` 這種棋盤式 bit pattern，方便手動驗算每個 bit 的邏輯結果，也能同時檢查出每組結果的正負號（N flag）算得對不對
+
+**3. SRA 符號延伸（sign extension）**
+```verilog
+check(32'hF123_4567, 32'h0000_0004, 3'b110, 32'hFF12_3456, 0,1,0,0); // SRA
+```
+* 用意：驗證算術右移補的是「符號位」而不是固定補 0。刻意選 `a` 最高位是 1（負數）的數值，因為如果 `a` 是正數，SRA 補符號位跟 SRL 補0結果會一樣，根本測不出補位邏輯有沒有寫對
+* `shamt = b[4:0] = 4`，也順便驗證了移位量不是固定值、而是真的照 `b` 的低5位在算
+
+**4. ADD Overflow 邊界**
+```verilog
+check(32'h7FFF_FFFF, 32'h0000_0001, 3'b000, 32'h8000_0000, 0,1,0,1); // ADD overflow
+```
+* 用意：`0x7FFFFFFF` 是 32-bit 有號數能表示的最大正數，加 1 之後理論上會變成 `0x80000000`（有號數解讀下是最負的數），這是刻意設計來觸發 overflow 的邊界案例
+* 專門驗證 overflow 判斷式 `(~(a^b_op)) && (a^add_sub)`（兩運算元同號、結果卻異號）有沒有正確抓到這種情況，一般隨便挑的數值很難自然踩到這個邊界
+
+**5. SLT 有號數比較**
+```verilog
+check(32'hFFFF_FFFF, 32'h0000_0005, 3'b111, 32'h0000_0001, 0,0,0,0); // SLT
+```
+* 用意：`0xFFFFFFFF` 當 unsigned 看是一個很大的正數，當 signed 看則是 -1。這組刻意用這個數值，就是要驗證 `$signed(a) < $signed(b)` 有沒有真的把它當成負數處理
+* 如果沒加 `$signed`，這組測試會判斷成「4294967295 < 5 為假」，跟正確答案（-1 < 5 為真）相反，是專門抓「忘記處理 signed」這種 bug 的案例
+
+**6. Shamt 邊界值（0 與 31）**
+```verilog
+check(32'h0000_0001, 32'h0000_0000, 3'b101, 32'h0000_0001, 0,0,0,0); // shamt=0
+check(32'h0000_0001, 32'h0000_001F, 3'b101, 32'h8000_0000, 0,1,0,0); // shamt=31
+```
+* 用意：移位量的合法範圍是 0~31，這是兩端的極值，最容易被忽略（很多人只測中間值）
+* `shamt=0`：驗證「不移位」的情況下，barrel shifter 每一級的 mux 都要正確選到「不動」那個分支，結果應該跟輸入完全一樣
+* `shamt=31`：驗證移到底的情況，5 級 mux 全部要選到「移」的那個分支，結果應該只剩最低位的 1 被推到最高位
+
+### 32bit_ALU_V1
+* Simulation sources
+```verilog
+module alu_v1_tt();
+
+    reg [31:0]a, b;
+    reg [2:0]op_code;
+    wire [31:0]res;
+    wire [3:0]flag;
+    integer i;
+    
+    integer error_count; // 用於計算"error"次數
+    integer test_count; // 用於計算"test"次數
+    
+    alu_v1 tt(
+    .a(a),
+    .b(b),
+    .op_code(op_code),
+    .res(res),
+    .flag(flag)
+    );
+    
+    task automatic check(
+        input [31:0]t_a, // a的測試變數
+        input [31:0]t_b, // b的測試變數
+        input [2:0]t_op, // op_code的測試變數
+        input [31:0]t_res, // res的測試變數
+        input t_z, t_n, t_c, t_v // flag的測試變數
+    );
+        begin
+            a = t_a; b = t_b; op_code = t_op;
+            #10;
+            test_count = test_count + 1; // 每次開始測試 test_count 次數 +1
+            if(res !== t_res || flag !== {t_z, t_n, t_c, t_v})begin // res 結果或 flag 結果不符
+                error_count = error_count + 1; // 錯誤就把 error_count 次數 +1
+                $display("[FAIL]：%0d, op_code = %b, a = %h, b = %h | got res = %h, flag = %b | t_res = %h, flag = %b",
+                test_count, t_op, t_a, t_b, res, flag, t_res, {t_z, t_n, t_c, t_v});
+            end
+            else begin
+                $display("[PASS]：%0d, op_code = %b", test_count, t_op);
+            end
+        end
+    endtask
+    
+    initial begin
+        error_count = 0;
+        test_count = 0;
+        
+        // 基本功能：ADD / SUB 
+        check(32'h0000_00F0, 32'h0000_000F, 3'b000, 32'h0000_00FF, 0,0,0,0); // ADD
+        check(32'h0000_00F0, 32'h0000_000F, 3'b001, 32'h0000_00E1, 0,0,1,0); // SUB
+        
+        // 邏輯運算：AND / OR / XOR
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b010, 32'h0F00_0F00, 0,0,0,0); // AND
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b011, 32'hFF0F_FF0F, 0,1,0,0); // OR
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b100, 32'hF00F_F00F, 0,1,0,0); // XOR
+        
+        // 針對電路容易出錯的地方各自設計測資
+        check(32'hF123_4567, 32'h0000_0004, 3'b110, 32'hFF12_3456, 0,1,0,0); // SRA 符號延伸
+        check(32'h7FFF_FFFF, 32'h0000_0001, 3'b000, 32'h8000_0000, 0,1,0,1); // ADD overflow
+        check(32'hFFFF_FFFF, 32'h0000_0005, 3'b111, 32'h0000_0001, 0,0,0,0); // SLT：-1 < 5
+        check(32'h0000_0001, 32'h0000_0000, 3'b101, 32'h0000_0001, 0,0,0,0); // shamt=0
+        check(32'h0000_0001, 32'h0000_001F, 3'b101, 32'h8000_0000, 0,1,0,0); // shamt=31
+        
+        $display("\n測試完成：共 %0d 組，失敗 %0d 組", test_count, error_count);
+        if(error_count == 0)begin
+            $display("ALL TESTS PASSED");
+        end
+        $finish;       
+    end  
+endmodule
+```
+
+* 模擬結果
+<img width="214" height="251" alt="image" src="https://github.com/user-attachments/assets/806079cd-4cc0-4a13-b4b7-5297b3a1180a" />
+
+## 遇到的困難與解決方案：
+### 問題：跑 alu_tt 模擬沒有跑出結果
+* 原因：task 內少寫 `#10`，比對時機在 DUT 組合邏輯還沒重新算完前就執行，導致比對到殘留的舊值（race condition）
+* 解法：修法是每次改完輸入後一定要留一段延遲再比對
+
+## 關鍵知識/詞彙：
+### task
+* 用來把一段重複會用到的程序邏輯包裝起來的語法，概念類似其他語言的"函式（function）"，但更專門用於 procedural/testbench 情境
+* 語法結構：
+```verilog
+task automatic 任務名稱(
+    input  型別 參數1,
+    input  型別 參數2,
+    output 型別 參數3   // 也可以有輸出參數
+);
+    begin
+        // 任務內容
+    end
+endtask
+```
+* 呼叫方式跟函式一樣：`任務名稱(引數1, 引數2, ...);`
+
+### task vs function 的差別
+* `function` 一定要回傳一個值（像數學函式 y=f(x)），且**不能用延遲語法（#10 這種）**
+* `task` 不用回傳值，**可以在裡面使用延遲語法**，因為驗證流程常需要「設定輸入 -> 等待一段時間 -> 再比對結果」，所以 testbench 裡通常用 task 而不是 function
+
+### automatic 關鍵字
+* 代表這個 task 每次被呼叫時，會重新配置一份獨立的變數空間（可重入 re-entrant）
+* 如果不加（預設是 static），task 裡的變數是全域共用同一份，多處同時呼叫同一個 task 時容易互相干擾出錯
+* 寫 testbench 時養成習慣加 automatic 比較保險
+
+### task 裡的 input 跟 module port 的 input 不是同一件事
+* module 的 input 是硬體接腳
+* task 的 input 是「呼叫這個 task 時要傳進來的參數」，性質比較接近程式語言裡函式的參數列表
+
+### task / function 參數為什麼不用寫 reg
+* module 的 port 跟 task/function 的參數，是兩套不同的規則：
+  * module 的 port 是在描述「電路怎麼接」：input 預設是 wire（外部持續驅動），output 若要在 always/case 裡程序式賦值，必須額外宣告成 reg
+  * task/function 的參數本質上是「呼叫時把值複製一份進來、用完就結束」，比較像程式語言裡函式的區域變數，不涉及電路接線的概念
+* 因為 task/function 是 procedural（程序式）區塊，Verilog 語法規則直接讓它的 input/output/inout 參數天生具備變數（reg-like）性質，不需要另外寫 reg 宣告
+
+### 呼叫 task 時是「傳值」，不是「型別繼承」
+* task 的參數型別（變數）是宣告時就固定的，不會因為呼叫者傳進來的是 wire、reg 還是常數而改變
+* 呼叫當下，Verilog 做的是把呼叫者傳進來的「值」複製一份到 task 內部的參數變數裡（類似傳值 pass-by-value），型別本身完全不受呼叫者影響
+* 如果傳進去的值位寬跟參數宣告的不一樣，Verilog 會照一般賦值規則自動調整位寬（不夠補0、多的截斷），這跟型別是否為 reg 是兩件獨立的事，位寬調整的規則與 part select 提過的隱含截斷是同一套
+
+### 實際應用：把重複的測試流程包成一個 check task
+* 把「設定輸入 -> 等待 -> 比對結果 -> 印出 PASS/FAIL」這套固定流程包成一個 task，之後每測一組資料只要呼叫一次 `check(...)`，不用每次都手動複製貼上重複的程式碼
+---------------------------------------------
