@@ -3233,8 +3233,6 @@ data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
 * CPU 的五級 pipeline（IF/ID/EX/MEM/WB）裡，hazard 問題來自「指令之間」的相依性（例如下一條指令要用到上一條還沒算完的結果），跟切 ALU 內部的 pipeline 是完全不同層次的問題
 ---------------------------------------------
 # 2026 年 8 月 1 日
-## 今日進度：
-
 ## 今日成果探討：
 ### ALU 設計：改寫 32-bit ALU baseline 版本 testbench
 * 這次測試設計採用 corner case（邊界案例）驗證思路，針對電路裡最容易出錯的幾個地方各自設計專門的測資，而不是隨機測試。
@@ -3411,4 +3409,96 @@ endtask
 
 ### 實際應用：把重複的測試流程包成一個 check task
 * 把「設定輸入 -> 等待 -> 比對結果 -> 印出 PASS/FAIL」這套固定流程包成一個 task，之後每測一組資料只要呼叫一次 `check(...)`，不用每次都手動複製貼上重複的程式碼
+---------------------------------------------
+# 2026 年 8 月 2 日
+## 今日成果探討：
+### ALU 設計：Baseline ALU 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
+
+### 32bit_ALU_V1
+* Constraints sources - 1st
+```
+create_clock -period 20 -name clk [get_ports clk]
+```
+
+* Constraints sources - 2nd
+```
+create_clock -period 10 -name clk [get_ports clk]
+```
+
+* Design sources（wrapper）
+```verilog
+module alu_v1_wrapper(
+    input clk,
+    input [31:0]a_in,
+    input [31:0]b_in,
+    input [2:0]op_in,
+    output reg [31:0]res_out,
+    output reg  [3:0]flag_out
+);
+    
+    reg [31:0] a_r; // 鎖住輸入的暫存器，posedge clk 時取樣 a_in/b_in
+    reg [31:0] b_r;
+    reg [2:0] op_r; // 鎖住輸入的暫存器，posedge clk 時取樣 op_in
+    wire [31:0] res_w; // alu_v1 算出的組合邏輯結果（尚未鎖存）
+    wire [3:0] flag_w; // alu_v1 算出的組合邏輯 flag（尚未鎖存）
+    
+    always@(posedge clk)begin
+        /*
+        輸入暫存器：把當下的 a_in/b_in/op_in 取樣鎖住，讓 alu_v1 core 拿到的是穩定值
+        ，而不是隨時可能變動的外部輸入
+        */
+        a_r <= a_in; 
+        b_r <= b_in;
+        op_r <= op_in;
+        // 輸出暫存器：把 alu_v1 算好的組合邏輯結果取樣鎖住，才能輸出穩定的 res_out/flag_out
+        res_out <= res_w;
+        flag_out <= flag_w;
+    end
+    
+    // alu_v1：純組合邏輯核心，接的是已經被鎖住的 a_r/b_r/op_r（不是原始輸入a_in、b_in、op_in）
+    alu_v1 core(
+    .a(a_r),
+    .b(b_r),
+    .op_code(op_r),
+    .res(res_w),
+    .flag(flag_w) 
+    );
+
+endmodule
+```
+
+* 模擬結果
+1. period 20：
+   * 反推 Fmax：`(20 - 10.789) = 9.211ns -> Fmax ≈ 1000 / 9.211 ≈ 108.6MHz`
+<img width="1327" height="91" alt="image" src="https://github.com/user-attachments/assets/5a9e0bad-958f-477c-8a87-4f3f2e02cb07" />
+
+2. period 8：
+   * 反推 Fmax：`(8 − 0.970) = 7.030ns -> Fmax ≈ 1000 / 7.030 ≈ 142.2 MHz`
+<img width="1326" height="88" alt="image" src="https://github.com/user-attachments/assets/abf51b0f-e8e4-490c-9b74-2e08b15c379e" />
+
+3. period 7.2：
+   * 反推 Fmax：`(7.2 − 0.516) = 6.684ns -> Fmax ≈ 1000 / 6.684 ≈ 149.6 MHz`
+<img width="1327" height="99" alt="image" src="https://github.com/user-attachments/assets/a5696367-fd6b-4b48-9b5b-79145aaacbf5" />
+
+### ALU_V1（Baseline）最終基準線數據
+* Period = 7.2ns, WNS = 0.516ns
+* Fmax ≈ 149.6 MHz
+* LUT = 327, FF = 103
+
+## 遇到的困難與解決方案：
+### 問題：
+### 為什麼純組合邏輯的 ALU 需要包一層 wrapper 才能做 STA
+* `alu_v1` 沒有 clk，無法建立合法的「暫存器→暫存器」timing path
+* Wrapper 額外做輸入暫存器（鎖住 a_in/b_in/op_in）與輸出暫存器（鎖住 res/flag），中間接純組合邏輯的 alu_v1，形成合法同步結構
+* alu_v1 core 接的是已鎖存的 a_r/b_r/op_r，不是原始輸入 a_in/b_in/op_in，確保組合邏輯的輸入來源穩定，才能被 STA 正確分析
+* clk 需要同時接到輸入暫存器與輸出暫存器兩邊
+
+## 關鍵知識/詞彙：
+### Synthesis/STA 路徑 vs 功能模擬路徑
+* STA：RTL + XDC → Synthesis/Implementation → Timing Report（WNS/Fmax），input 只是被當成晶片接腳，不需要任何東西驅動，也不需要 testbench
+* 模擬：RTL + Testbench（用 reg 主動驅動 input）→ Simulator → 波形/PASS-FAIL，目的是驗證邏輯對不對
+* 兩條路徑完全獨立，互不需要
+
+### WNS 與 Fmax 的關係
+* Timing Report 不會直接列出 Fmax，只給 WNS，需要自己反推
 ---------------------------------------------
