@@ -3412,8 +3412,7 @@ endtask
 ---------------------------------------------
 # 2026 年 8 月 2 日
 ## 今日成果探討：
-### ALU 設計：Baseline ALU 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
-
+### ALU 設計一：Baseline ALU 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
 ### 32bit_ALU_V1
 * Constraints sources - 1st
 ```
@@ -3422,7 +3421,12 @@ create_clock -period 20 -name clk [get_ports clk]
 
 * Constraints sources - 2nd
 ```
-create_clock -period 10 -name clk [get_ports clk]
+create_clock -period 8 -name clk [get_ports clk]
+```
+
+* Constraints sources - 3rd
+```
+create_clock -period 7.2 -name clk [get_ports clk]
 ```
 
 * Design sources（wrapper）
@@ -3485,6 +3489,45 @@ endmodule
 * Fmax ≈ 149.6 MHz
 * LUT = 327, FF = 103
 
+### ALU 設計二： pipeline ALU 設計規劃
+1. 在 alu_v1 中的 critical path
+   * Barrel Shifter（桶型移位器）：最主要的 Critical Path
+     * 邏輯結構： 採用 5 階串聯的條件選擇器（`b[0]` ~ `b[4]` 對應 1, 2, 4, 8, 16 bits 移位）。
+	 * 延遲原因： 訊號必須**連續穿過 5 個 32-bit MUX**。每一個 MUX 的 Gate Delay 會**線性累加**，形成全模組最長的邏輯鏈（Logic Chain）。
+
+   * 33-bit Add/Sub（加減法器）：次要瓶頸
+	 * 邏輯結構： `assign add_sub = {1'b0, a} + {1 me0, b_op} + sub;`
+	 * 延遲原因： 高位元（MSB）必須等待低位元（LSB）一路傳遞上來的**進位訊號（Carry Chain）**，需等待 32 個 Full Adder 的傳遞延遲。
+
+   * 位元邏輯運算（AND / OR / XOR）：非瓶頸
+	 * 邏輯結構： 32-bit 平行運算。
+	 * 延遲原因： 僅需經過 **1 階邏輯門**，無位元間的依賴關係，延遲極短。
+
+2. 流水線（Pipelining）切割策略
+   * 為什麼不採用 16-bit / 16-bit 高低位拆分？
+   	 * **加法器 Carry 依賴：** 高 16-bit 必須等待低 16-bit 的 Carry Out，橫向拆分無法打破時間依賴。
+     * **移位器位元跨界：** 桶型移位器的資料會在 32-bit 空間內跨界移動，拆成高低 16-bit 會破壞移位邏輯。
+
+   * 2-Stage Pipeline 切割方案 (縱向階段切割)
+     * Stage 1：Shifter 前 3 階 (b[0]~b[2]: 1, 2, 4 bits 移位) ； 33-bit 加減法運算 (ADD / SUB / SLT 準備)
+     * Stage 2：Shifter 後 2 階 (b[3]~b[4]: 8, 16 bits 移位)；SLT 邏輯與 Flag 生成 (Z, N, C, V)
+
+   * 2-Stage Pipeline 切割方案原因
+     * 時間延遲的「均等平分」（Timing Balance）
+       * 桶型移位器總共有 5 階 MUX 選擇器
+       * Stage 1 切前 3 階（1, 2, 4 bits）： 穿過 3 個 MUX。
+       * Stage 2 切後 2 階（8, 16 bits）： 穿過 2 個 MUX ＋ 1 個最終輸出的 MUX（多路選擇 case）。
+       * 讓 Stage 1 與 Stage 2 的邏輯門延遲（Gate Delay）平分
+    
+	 * 邏輯跨度與加法器同步
+      * 加法器的延遲： 32-bit 的進位鏈（Carry Chain）傳播時間，大約剛好等於 2 ~ 3 個 MUX 的延遲。
+      * 在 Stage 1：當移位器做完前 3 階（1, 2, 4 bits）時，33-bit 加法器也剛好算完！
+      * 兩大運算單元可以在同一個時脈邊緣（Clock Edge） 一起將結果鎖進 Stage 1 暫存器。
+    
+	* 簡化 Stage 2 的 SLT 與 Flag 計算
+	  * 因為加法器在 Stage 1 已經算完了 add_sub
+      * Stage 2 就可以直接利用 Stage 1 留下來的 add / sub 結果來判斷溢位（Overflow）與產生 Flag，不會擠壓到 Stage 2 的時序。  
+
 ## 遇到的困難與解決方案：
 ### 問題：
 ### 為什麼純組合邏輯的 ALU 需要包一層 wrapper 才能做 STA
@@ -3501,4 +3544,27 @@ endmodule
 
 ### WNS 與 Fmax 的關係
 * Timing Report 不會直接列出 Fmax，只給 WNS，需要自己反推
+
+### FPGA 底層架構：桶型移位器 vs. 加法器延遲觀念
+1. 桶型移位器（Barrel Shifter）的延遲觀念
+* 底層實現機制： 採用 FPGA 內部的 LUT（Look-Up Table, 查找表） 來實現多路選擇器（MUX）。
+* 延遲特性：
+	* 串聯加成 (Cascaded)： 32-bit 桶型移位器需要做 5 階判斷（1, 2, 4, 8, 16 bits），等於資料必須連續穿過 5 個 MUX。
+ 	* 佈線開銷 (Routing Delay)： 每次經過一個 MUX，資料都要走出 LUT、經過 FPGA 的通用內部連線，再進入下一個 MUX。
+
+2. 加法器（32-bit Adder）的延遲觀念
+* 底層實現機制： 使用 FPGA 晶片內部硬體預先刻好的「專用高速進位鏈」（Dedicated Carry Chain，如 CARRY4 / CARRY8 模組）。
+* 延遲特性：
+	* 免走通用佈線： 進位訊號（Carry bit）從 Bit 0 傳到 Bit 31 時，使用的是硬體矽晶圓上專屬的硬化線路，不佔用通用的 LUT 佈線資源。
+	* 傳播速度極快： 專用進位鏈傳遞 1 bit 的延遲非常小（僅數十皮秒, picoseconds）。
+
+3. 以常見的 FPGA 製程（如 Xilinx 7-Series）為例，兩者的邏輯延遲量級比較
+
+| 比較項目 | 桶型移位器 (Barrel Shifter) | 32-bit 加法器 (Adder) |
+| --- | --- | --- |
+| **底層硬體資源** | 通用 LUT (Look-Up Table) + 通用連線 | **專用硬體進位鏈 (Dedicated Carry Chain)** |
+| **訊號傳遞路徑** | 5 階 MUX 串聯鏈 (Cascade Chain) | 1 階 LUT 輸入 + 32-bit 硬體進位傳遞 |
+| **實體佈線開銷** | 高 (每次跨 MUX 皆需走通用佈線) | 低 (走晶片預先刻好的專用高速通道) |
+| **估算延遲時間** | 約 **2.0 ~ 2.5 ns** *(最慢)* | 約 **1.0 ~ 1.2 ns** |
+| **相對延遲比例** | **100% (基準 Critical Path)** | **約為移位器的 50% (相當於 2~3 個 MUX)** |
 ---------------------------------------------
