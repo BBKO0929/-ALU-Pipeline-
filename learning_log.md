@@ -3567,3 +3567,182 @@ endmodule
 | **估算延遲時間** | 約 **2.0 ~ 2.5 ns** *(最慢)* | 約 **1.0 ~ 1.2 ns** |
 | **相對延遲比例** | **100% (基準 Critical Path)** | **約為移位器的 50% (相當於 2~3 個 MUX)** |
 ---------------------------------------------
+# 2026 年 8 月 3 日
+## 今日進度：
+### ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確
+* Design sources
+```verilog
+module alu_v2(
+    input clk,
+    input rst_n,
+    input [31:0]a,
+    input [31:0]b,
+    input [2:0]op_code,
+    output reg[31:0]res,
+    output reg[3:0]flag
+);
+
+// --- stag1：前半段運算　＋　暫存器（stag1 registers）---
+
+    //構建3個 32bit 暫存器用於 barrel shifter
+    //Shamt 選用 b[0] ~ b[2] 判斷移動幾個 bit
+    wire [31:0]s1_l, s2_l, s3_l; 
+    wire [31:0]s1_r, s2_r, s3_r;
+    
+    // 構建共用的 33-bit 加減法邏輯（在 case 外面算）
+    wire sub;
+    wire [31:0]b_op;
+    wire [32:0]add_sub;
+
+    assign sub = (op_code == 3'b001); // op_code == 3'b001，執行減法
+    assign b_op = b ^ {32{sub}}; // 將 b 逐位元反相
+    assign add_sub = {1'b0, a} + {1'b0, b_op} + sub; // ADD: a+b；SUB: a + ~b + 1（2補數，+1 由 sub 提供）
+    
+    // b[0] ~ b[2] 的 logic_shift_left
+    assign s1_l = (b[0]) ? {a[30:0], 1'b0} : a;
+    assign s2_l = (b[1]) ? {s1_l[29:0], 2'b00} : s1_l;
+    assign s3_l = (b[2]) ? {s2_l[27:0], 4'b0000} : s2_l;
+    
+    // b[0] ~ b[2] 的 arithmetic_shift_right
+    assign s1_r = (b[0]) ? {a[31], a[31:1]} : a;
+    assign s2_r = (b[1]) ? {{2{a[31]}}, s1_r[31:2]} : s1_r;
+    assign s3_r = (b[2]) ? {{4{a[31]}}, s2_r[31:4]} : s2_r;
+    
+    // 構建 stage1 -> stage2 中間暫存器
+    reg [31:0]a_stg1, b_stg1;
+    reg [2:0]op_code_stg1;
+    reg [32:0]add_sub_stg1;
+    reg [31:0]b_op_stg1;
+    reg [31:0]shift_stg_l;
+    reg [31:0]shift_stg_r;
+    reg [31:0]res_stg1;
+    
+// 前半段資料 -> stage 1
+always@(posedge clk)begin
+    if(~rst_n)begin
+        a_stg1 <= 0;
+        b_stg1 <= 0;
+        b_op_stg1 <= 0;
+        op_code_stg1 <= 0;
+        add_sub_stg1 <= 0;
+        shift_stg_l <= 0;
+        shift_stg_r <= 0;
+        res_stg1 <= 0;
+    end
+    else begin
+        a_stg1 <= a;
+        b_stg1 <= b;
+        b_op_stg1 <= b_op;
+        op_code_stg1 <= op_code;
+        
+        // Stage 1 行為
+        case(op_code)
+            3'b000 : add_sub_stg1 <= add_sub; // +、- 法運算結果存儲
+            3'b001 : add_sub_stg1 <= add_sub; // +、- 法運算結果存儲
+            3'b010 : res_stg1 <= a & b;
+            3'b011 : res_stg1 <= a | b;
+            3'b100 : res_stg1 <= a ^ b;
+            3'b101 : shift_stg_l <= s3_l; // b[0] ~ b[3] 移位結果存儲
+            3'b110 : shift_stg_r <= s3_r; // b[0] ~ b[3] 移位結果存儲
+            3'b111 : res_stg1 <= ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;
+            default : res_stg1 <= 0;
+        endcase      
+    end   
+end
+// --- stag1：前半段運算　＋　暫存器（stag1 registers）結束---
+
+// --- stag2：後半段運算　＋　暫存器（stag2 registers）---
+    
+    //構建2個 32bit 暫存器用於 barrel shifter
+    //Shamt 選用 b_stg1[3] ~ b_stg1[4] 判斷移動幾個 bit
+    wire [31:0]s4_l, shift_l_res;
+    wire [31:0]s4_r, shift_r_res;
+    
+    // b_stg1[3] ~ b_stg1[4] 的 logic_shift_left
+    assign s4_l = (b_stg1[3]) ? {shift_stg_l[23:0], 8'b00000000} : shift_stg_l;
+    assign shift_l_res = (b_stg1[4]) ? {s4_l[15:0], 16'b0000000000000000} : s4_l;
+    // b_stg1[3] ~ b_stg1[4] 的 arithmetic_shift_right
+    assign s4_r = (b_stg1[3]) ? {{8{a_stg1[31]}}, shift_stg_r[31:8]} : shift_stg_r;
+    assign shift_r_res = (b_stg1[4]) ? {{16{a_stg1[31]}}, s4_r[31:16]} : s4_r;
+    
+    // 構建進位與溢位判斷
+    wire carry_stg1;
+    wire overflow_stg1;
+    assign carry_stg1 = add_sub_stg1[32]; //進位判斷 
+    assign overflow_stg1 = (~(a_stg1[31] ^ b_op_stg1[31])) && (a_stg1[31] ^ add_sub_stg1[31]); //溢位判斷
+    
+    // stage 1 -> stage 2（final_res）
+    reg [31:0] final_res;
+    always @(*) begin
+        case(op_code_stg1)
+            3'b000 : final_res = add_sub_stg1[31:0];
+            3'b001 : final_res = add_sub_stg1[31:0];
+            3'b010 : final_res = res_stg1;
+            3'b011 : final_res = res_stg1;
+            3'b100 : final_res = res_stg1;
+            3'b101: final_res = shift_l_res;
+            3'b110: final_res = shift_r_res;
+            3'b111 : final_res = res_stg1;
+            default: final_res = 0;
+        endcase
+    end
+    
+// stage 2 -> resault
+always@(posedge clk)begin
+    if(~rst_n)begin
+        res <= 0;
+        flag <= 0;
+    end
+    else begin
+        res <= final_res; // 直接用統一選好的值，case 不用重複寫兩次
+        // Z/N 對每種運算都更新，C/V 只在 ADD/SUB 才有意義
+        flag <= {(final_res == 32'd0), final_res[31],
+         ((op_code_stg1==3'b000)||(op_code_stg1==3'b001)) ? carry_stg1    : 1'b0,
+         ((op_code_stg1==3'b000)||(op_code_stg1==3'b001)) ? overflow_stg1 : 1'b0};
+    end   
+end
+// --- stag2：後半段運算　＋　暫存器（stag2 registers）結束---   
+endmodule
+```
+
+## 遇到的困難與解決方案：
+### 問題1：Stage1/Stage2 之間資料流沒有真的接起來
+* 原因：Stage2 算移位結果時，用的是原始未鎖存的 `b`、`s3_l`、`s3_r`，跟 Stage1 鎖存的 `op_code_stg1`（已延遲一拍）時間點對不上，等於移位運算完全沒被 pipeline 到
+* 解法：Stage1 額外做 `shift_stg_l`/`shift_stg_r` 兩個暫存器，把中間移位結果鎖存起來，Stage2 改用鎖存後的值繼續算
+
+### 問題2：overflow 判斷式用錯訊號
+* 原因：`b_op_stg1` 只取了 `b_stg1[31]` 一個 bit 去 XOR，應該是整個 `b_stg1`
+* 解法：改成 `b_op_stg1 = b_stg1 ^ {32{sub_stg1}}`
+
+### 問題3：case/if 判斷式寫在 always block 的 if(reset)/else 外面，導致 reset 沒有真正生效
+* 原因：同一個訊號在 reset 分支跟外層又被賦值一次，最後執行到的那次才生效，蓋掉 reset 設定的值
+* 解法：把 case/if 都搬進對應的 else begin...end 裡面
+
+### 問題4：flag 讀到「舊」的 Z/N/C/V 中繼暫存器（非阻塞賦值特性）
+* 原因：`<=` 賦值右邊讀到的是這次賦值前的舊值，`flag <= {Z,N,C,V}` 會慢一拍
+* 解法：改成直接用當下算出的訊號組合，不繞經中繼暫存器
+
+### 問題5：Stage2 移位控制訊號（b[3]/b[4]）用的仍是原始未鎖存的 b
+* 原因：`shift_stg_l`/`shift_stg_r` 是上一拍鎖存的資料，但判斷要不要繼續移的 `b[3]`/`b[4]` 卻是這一拍當下最新的 b，資料跟控制時間點不一致
+* 解法：改成 `b_stg1[3]`/`b_stg1[4]`
+
+### 問題6：sub_stg1 沒有被鎖存，b_op_stg1 用當下的 sub 去配鎖存過的 b_stg1
+* 原因：控制訊號跟資料時間點不一致，跟問題5是同一類問題
+* 解法：Stage1 額外鎖存 `sub_stg1`，Stage2 改用 `b_op_stg1 = b_stg1 ^ {32{sub_stg1}}`
+
+### 問題7：ADD/SUB 的 flag 讀錯來源（反覆出現在第1、2版，第3版才真正解決）
+* 原因：ADD/SUB 的真正結果存在 `add_sub_stg1`，但 flag 判斷 Z/N 時卻讀取 `res_stg1`（該次 case 沒有對應分支，值是殘留的舊值），導致 ADD/SUB 的 Z/N flag 完全錯誤
+* 解法：在 Stage2 用組合邏輯統一算出 `final_res`（依 op_code_stg1 選出這一拍真正的最終結果，ADD/SUB 選 add_sub_stg1，其餘選對應暫存器），res 跟 flag 的 Z/N 都從 final_res 取值，不再各自各的
+
+### 問題8：flag 只有 ADD/SUB 才更新，其他運算 flag 維持舊值不動
+* 原因：整個 flag（含 Z/N）都包在 `if(ADD||SUB)` 裡面才更新，跟 baseline 行為（Z/N 每種運算都要算，只有 C/V 限定 ADD/SUB）不一致
+* 解法：拿掉 Z/N 的 if 限制，改成永遠算 Z/N，只有 C/V 用三元運算子限定 ADD/SUB 才給實際值、否則補 0
+
+## 關鍵知識/詞彙：
+### Pipeline 設計中「控制訊號要跟資料同一拍」的原則
+* 切 pipeline 時，Stage2 用來判斷「怎麼處理某個資料」的控制訊號（例如 op_code、b 的某幾個 bit、sub 這種旗標），一定要用「跟該筆資料同一拍被鎖存」的版本，不能混用「這一拍最新的」控制訊號去配「上一拍鎖存」的資料
+* 這是這次 debug 過程中最常出現、也最關鍵的一種錯誤模式，移位邏輯（b[3]/b[4]）跟 overflow 判斷（sub）都各踩到一次
+
+### 非阻塞賦值（<=）讀值的時機
+* `<=` 賦值時，右邊讀到的是這次賦值前的舊值，賦值本身要等整個 block 結束才真的生效
+* 如果讓 flag 這種輸出訊號繞經中繼暫存器（如 Z/N/C/V）再組合，容易讀到「慢一拍」的舊值，建議直接用當下算出的訊號組合，避免多繞一層
