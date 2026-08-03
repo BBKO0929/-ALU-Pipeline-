@@ -2863,7 +2863,7 @@ end
 2. [How to Design an Efficient Barrel Shifter in Verilog: Step-by-Step Guide](https://vlsifacts.com/how-to-design-an-efficient-barrel-shifter-in-verilog-step-by-step-guide/)
 
 ## 今日成果探討：
-### 設計初步 32-bit 構造、模型以及所支援的運算
+### 32bit_ALU_V1（Baseline）- 設計初步 32-bit 構造、模型以及所支援的運算
 <img width="544" height="316" alt="image" src="https://github.com/user-attachments/assets/edfdfcaf-8039-4a88-8e76-640d7a6a100d" />
 <img width="923" height="507" alt="image" src="https://github.com/user-attachments/assets/24a57abe-c425-42a0-8ac1-af8253aafec1" />
 
@@ -2989,9 +2989,8 @@ end
 2. [ALU design in Verilog using MIPS Instruction Set](https://electrobinary.blogspot.com/2021/02/alu-design-in-verilog-using-mips.html)
 
 ## 今日成果探討：
-### ALU 設計：完成 32-bit ALU baseline 版本與 debug 
-
-### 32bit_ALU_V1
+### ALU 設計：
+### 32bit_ALU_V1（Baseline）- 完成 32-bit ALU baseline 版本與 debug 
 * Design sources
 ```verilog
 module alu_v1(
@@ -3234,11 +3233,12 @@ data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
 ---------------------------------------------
 # 2026 年 8 月 1 日
 ## 今日成果探討：
-### ALU 設計：改寫 32-bit ALU baseline 版本 testbench
+### ALU 設計：
+### 32bit_ALU_V1（Baseline） - 改寫 32-bit ALU baseline 版本 testbench
 * 這次測試設計採用 corner case（邊界案例）驗證思路，針對電路裡最容易出錯的幾個地方各自設計專門的測資，而不是隨機測試。
 * golden value（預期結果）全部自己手動用二進位/2補數算過，沒有拿 RTL 邏輯反推，避免用同一套可能有 bug 的邏輯驗證自己。
 
-**1. ADD / SUB 基本功能**
+1. ADD / SUB 基本功能
 ```verilog
 check(32'h0000_00F0, 32'h0000_000F, 3'b000, 32'h0000_00FF, 0,0,0,0); // ADD
 check(32'h0000_00F0, 32'h0000_000F, 3'b001, 32'h0000_00E1, 0,0,1,0); // SUB
@@ -3246,7 +3246,7 @@ check(32'h0000_00F0, 32'h0000_000F, 3'b001, 32'h0000_00E1, 0,0,1,0); // SUB
 * 用意：先確認共用的 33-bit 加減法邏輯（`add_sub`）在正常數值下功能正確，這是後面所有 flag 判斷的基礎，要先確保這塊沒問題
 * SUB 那組刻意讓 `a > b`，驗證正常減法沒有借位時 carry 應該是 1（`C=1`）
 
-**2. AND / OR / XOR 邏輯運算覆蓋率**
+2. AND / OR / XOR 邏輯運算覆蓋率
 ```verilog
 check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b010, 32'h0F00_0F00, 0,0,0,0); // AND
 check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b011, 32'hFF0F_FF0F, 0,1,0,0); // OR
@@ -3255,28 +3255,28 @@ check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b100, 32'hF00F_F00F, 0,1,0,0); // XOR
 * 用意：一開始這 3 個運算完全沒被測到，屬於覆蓋率破洞，補上確保 8 個 opcode 全部至少測過一次
 * 選用 `FF00FF00` / `0F0F0F0F` 這種棋盤式 bit pattern，方便手動驗算每個 bit 的邏輯結果，也能同時檢查出每組結果的正負號（N flag）算得對不對
 
-**3. SRA 符號延伸（sign extension）**
+3. SRA 符號延伸（sign extension）
 ```verilog
 check(32'hF123_4567, 32'h0000_0004, 3'b110, 32'hFF12_3456, 0,1,0,0); // SRA
 ```
 * 用意：驗證算術右移補的是「符號位」而不是固定補 0。刻意選 `a` 最高位是 1（負數）的數值，因為如果 `a` 是正數，SRA 補符號位跟 SRL 補0結果會一樣，根本測不出補位邏輯有沒有寫對
 * `shamt = b[4:0] = 4`，也順便驗證了移位量不是固定值、而是真的照 `b` 的低5位在算
 
-**4. ADD Overflow 邊界**
+4. ADD Overflow 邊界
 ```verilog
 check(32'h7FFF_FFFF, 32'h0000_0001, 3'b000, 32'h8000_0000, 0,1,0,1); // ADD overflow
 ```
 * 用意：`0x7FFFFFFF` 是 32-bit 有號數能表示的最大正數，加 1 之後理論上會變成 `0x80000000`（有號數解讀下是最負的數），這是刻意設計來觸發 overflow 的邊界案例
 * 專門驗證 overflow 判斷式 `(~(a^b_op)) && (a^add_sub)`（兩運算元同號、結果卻異號）有沒有正確抓到這種情況，一般隨便挑的數值很難自然踩到這個邊界
 
-**5. SLT 有號數比較**
+5. SLT 有號數比較
 ```verilog
 check(32'hFFFF_FFFF, 32'h0000_0005, 3'b111, 32'h0000_0001, 0,0,0,0); // SLT
 ```
 * 用意：`0xFFFFFFFF` 當 unsigned 看是一個很大的正數，當 signed 看則是 -1。這組刻意用這個數值，就是要驗證 `$signed(a) < $signed(b)` 有沒有真的把它當成負數處理
 * 如果沒加 `$signed`，這組測試會判斷成「4294967295 < 5 為假」，跟正確答案（-1 < 5 為真）相反，是專門抓「忘記處理 signed」這種 bug 的案例
 
-**6. Shamt 邊界值（0 與 31）**
+6. Shamt 邊界值（0 與 31）
 ```verilog
 check(32'h0000_0001, 32'h0000_0000, 3'b101, 32'h0000_0001, 0,0,0,0); // shamt=0
 check(32'h0000_0001, 32'h0000_001F, 3'b101, 32'h8000_0000, 0,1,0,0); // shamt=31
@@ -3285,7 +3285,6 @@ check(32'h0000_0001, 32'h0000_001F, 3'b101, 32'h8000_0000, 0,1,0,0); // shamt=31
 * `shamt=0`：驗證「不移位」的情況下，barrel shifter 每一級的 mux 都要正確選到「不動」那個分支，結果應該跟輸入完全一樣
 * `shamt=31`：驗證移到底的情況，5 級 mux 全部要選到「移」的那個分支，結果應該只剩最低位的 1 被推到最高位
 
-### 32bit_ALU_V1
 * Simulation sources
 ```verilog
 module alu_v1_tt();
@@ -3412,8 +3411,8 @@ endtask
 ---------------------------------------------
 # 2026 年 8 月 2 日
 ## 今日成果探討：
-### ALU 設計一：Baseline ALU 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
-### 32bit_ALU_V1
+### ALU 設計：
+### 32bit_ALU_V1（Baseline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
 * Constraints sources - 1st
 ```
 create_clock -period 20 -name clk [get_ports clk]
@@ -3489,7 +3488,7 @@ endmodule
 * Fmax ≈ 149.6 MHz
 * LUT = 327, FF = 103
 
-### ALU 設計二： pipeline ALU 設計規劃
+### ALU_V2（pipeline） - pipeline ALU 設計規劃
 1. 在 alu_v1 中的 critical path
    * Barrel Shifter（桶型移位器）：最主要的 Critical Path
      * 邏輯結構： 採用 5 階串聯的條件選擇器（`b[0]` ~ `b[4]` 對應 1, 2, 4, 8, 16 bits 移位）。
