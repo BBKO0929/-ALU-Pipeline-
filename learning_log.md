@@ -3710,31 +3710,27 @@ endmodule
 * 原因：Stage2 算移位結果時，用的是原始未鎖存的 `b`、`s3_l`、`s3_r`，跟 Stage1 鎖存的 `op_code_stg1`（已延遲一拍）時間點對不上，等於移位運算完全沒被 pipeline 到
 * 解法：Stage1 額外做 `shift_stg_l`/`shift_stg_r` 兩個暫存器，把中間移位結果鎖存起來，Stage2 改用鎖存後的值繼續算
 
-### 問題2：overflow 判斷式用錯訊號
-* 原因：`b_op_stg1` 只取了 `b_stg1[31]` 一個 bit 去 XOR，應該是整個 `b_stg1`
-* 解法：改成 `b_op_stg1 = b_stg1 ^ {32{sub_stg1}}`
-
-### 問題3：case/if 判斷式寫在 always block 的 if(reset)/else 外面，導致 reset 沒有真正生效
+### 問題2：case/if 判斷式寫在 always block 的 if(reset)/else 外面，導致 reset 沒有真正生效
 * 原因：同一個訊號在 reset 分支跟外層又被賦值一次，最後執行到的那次才生效，蓋掉 reset 設定的值
 * 解法：把 case/if 都搬進對應的 else begin...end 裡面
 
-### 問題4：flag 讀到「舊」的 Z/N/C/V 中繼暫存器（非阻塞賦值特性）
+### 問題3：flag 讀到「舊」的 Z/N/C/V 中繼暫存器（非阻塞賦值特性）
 * 原因：`<=` 賦值右邊讀到的是這次賦值前的舊值，`flag <= {Z,N,C,V}` 會慢一拍
 * 解法：改成直接用當下算出的訊號組合，不繞經中繼暫存器
 
-### 問題5：Stage2 移位控制訊號（b[3]/b[4]）用的仍是原始未鎖存的 b
+### 問題4：Stage2 移位控制訊號（b[3] / b[4]）用的仍是原始未鎖存的 b
 * 原因：`shift_stg_l`/`shift_stg_r` 是上一拍鎖存的資料，但判斷要不要繼續移的 `b[3]`/`b[4]` 卻是這一拍當下最新的 b，資料跟控制時間點不一致
 * 解法：改成 `b_stg1[3]`/`b_stg1[4]`
 
-### 問題6：sub_stg1 沒有被鎖存，b_op_stg1 用當下的 sub 去配鎖存過的 b_stg1
+### 問題5：sub_stg1 沒有被鎖存，b_op_stg1 用當下的 sub 去配鎖存過的 b_stg1
 * 原因：控制訊號跟資料時間點不一致，跟問題5是同一類問題
 * 解法：Stage1 額外鎖存 `sub_stg1`，Stage2 改用 `b_op_stg1 = b_stg1 ^ {32{sub_stg1}}`
 
-### 問題7：ADD/SUB 的 flag 讀錯來源（反覆出現在第1、2版，第3版才真正解決）
+### 問題6：ADD / SUB 的 flag 讀錯來源（反覆出現在第1、2版，第3版才真正解決）
 * 原因：ADD/SUB 的真正結果存在 `add_sub_stg1`，但 flag 判斷 Z/N 時卻讀取 `res_stg1`（該次 case 沒有對應分支，值是殘留的舊值），導致 ADD/SUB 的 Z/N flag 完全錯誤
 * 解法：在 Stage2 用組合邏輯統一算出 `final_res`（依 op_code_stg1 選出這一拍真正的最終結果，ADD/SUB 選 add_sub_stg1，其餘選對應暫存器），res 跟 flag 的 Z/N 都從 final_res 取值，不再各自各的
 
-### 問題8：flag 只有 ADD/SUB 才更新，其他運算 flag 維持舊值不動
+### 問題7：flag 只有 ADD / SUB 才更新，其他運算 flag 維持舊值不動
 * 原因：整個 flag（含 Z/N）都包在 `if(ADD||SUB)` 裡面才更新，跟 baseline 行為（Z/N 每種運算都要算，只有 C/V 限定 ADD/SUB）不一致
 * 解法：拿掉 Z/N 的 if 限制，改成永遠算 Z/N，只有 C/V 用三元運算子限定 ADD/SUB 才給實際值、否則補 0
 
