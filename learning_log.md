@@ -3568,7 +3568,7 @@ endmodule
 | **相對延遲比例** | **100% (基準 Critical Path)** | **約為移位器的 50% (相當於 2~3 個 MUX)** |
 ---------------------------------------------
 # 2026 年 8 月 3 日
-## 今日進度：
+## 今日成果探討：
 ### ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確
 * Design sources
 ```verilog
@@ -3742,3 +3742,127 @@ endmodule
 ### 非阻塞賦值（<=）讀值的時機
 * `<=` 賦值時，右邊讀到的是這次賦值前的舊值，賦值本身要等整個 block 結束才真的生效
 * 如果讓 flag 這種輸出訊號繞經中繼暫存器（如 Z/N/C/V）再組合，容易讀到「慢一拍」的舊值，建議直接用當下算出的訊號組合，避免多繞一層
+---------------------------------------------
+# 2026 年 8 月 4 日
+## 今日成果探討：
+### ALU_V2（pipeline）設計：
+1. 完成 Testbench - alu_v2_tt，驗證 pipeline 版本功能，經多輪除錯後全數 PASS
+2. 確認延遲精確為 2 個 clock cycle，跟設計預期的 2-stage pipeline 一致，功能上與 baseline（alu_v1）等價
+
+* Simulation sources
+  ```verilog
+  module alu_v2_tt();
+    
+    reg clk;
+    reg rst_n;
+    reg [31:0]a, b;
+    reg [2:0]op_code;
+    wire [31:0]res;
+    wire [3:0]flag;
+    integer i;
+    
+    integer error_count; // 用於計算"error"次數
+    integer test_count; // 用於計算"test"次數
+    
+    alu_v2 tt(
+    .clk(clk),
+    .rst_n(rst_n),
+    .a(a),
+    .b(b),
+    .op_code(op_code),
+    .res(res),
+    .flag(flag)
+    );
+    
+    task automatic check(
+        input [31:0]t_a, // a的測試變數
+        input [31:0]t_b, // b的測試變數
+        input [2:0]t_op, // op_code的測試變數
+        input [31:0]t_res, // res的測試變數
+        input t_z, t_n, t_c, t_v // flag的測試變數
+    );
+        begin
+            a = t_a; b = t_b; op_code = t_op;
+            
+            @(posedge clk); // 第1拍：鎖進 Stage1
+            @(posedge clk); // 第2拍：鎖進 Stage2
+            #1; // 確保讀值時 NBA（非阻塞賦值） 已經真正落地
+            
+            test_count = test_count + 1; // 每次開始測試 test_count 次數 +1
+            if(res !== t_res || flag !== {t_z, t_n, t_c, t_v})begin // res 結果或 flag 結果不符
+                error_count = error_count + 1; // 錯誤就把 error_count 次數 +1
+                $display("[FAIL]：%0d, op_code = %b, a = %h, b = %h | got res = %h, flag = %b | t_res = %h, flag = %b",
+                test_count, t_op, t_a, t_b, res, flag, t_res, {t_z, t_n, t_c, t_v});
+            end
+            else begin
+                $display("[PASS]：%0d, op_code = %b", test_count, t_op);
+            end
+        end
+    endtask
+    
+    initial clk = 0;
+    always #5 clk = ~clk;   // 每5ns翻轉一次，週期10ns
+
+    initial begin
+        rst_n = 0;
+        repeat (2) @(posedge clk);   // 讓 reset 訊號至少過2個clock edge
+        rst_n = 1;
+        @(posedge clk); // 多留一拍緩衝，讓 reset 解除跟第一筆資料錯開
+        
+        error_count = 0;
+        test_count = 0;
+        
+        // 基本功能：ADD / SUB 
+        check(32'h0000_00F0, 32'h0000_000F, 3'b000, 32'h0000_00FF, 0,0,0,0); // ADD
+        check(32'h0000_00F0, 32'h0000_000F, 3'b001, 32'h0000_00E1, 0,0,1,0); // SUB
+        
+        // 邏輯運算：AND / OR / XOR
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b010, 32'h0F00_0F00, 0,0,0,0); // AND
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b011, 32'hFF0F_FF0F, 0,1,0,0); // OR
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b100, 32'hF00F_F00F, 0,1,0,0); // XOR
+        
+        // 針對電路容易出錯的地方各自設計測資
+        check(32'hF123_4567, 32'h0000_0004, 3'b110, 32'hFF12_3456, 0,1,0,0); // SRA 符號延伸
+        check(32'h7FFF_FFFF, 32'h0000_0001, 3'b000, 32'h8000_0000, 0,1,0,1); // ADD overflow
+        check(32'hFFFF_FFFF, 32'h0000_0005, 3'b111, 32'h0000_0001, 0,0,0,0); // SLT：-1 < 5
+        check(32'h0000_0001, 32'h0000_0000, 3'b101, 32'h0000_0001, 0,0,0,0); // shamt=0
+        check(32'h0000_0001, 32'h0000_001F, 3'b101, 32'h8000_0000, 0,1,0,0); // shamt=31
+        
+        $display("\n測試完成：共 %0d 組，失敗 %0d 組", test_count, error_count);
+        if(error_count == 0)begin
+            $display("ALL TESTS PASSED");
+        end
+        $finish;       
+    end  
+  ```
+
+* 模擬結果
+<img width="213" height="257" alt="image" src="https://github.com/user-attachments/assets/e6e79d99-8720-451a-ae4d-08f9bbb5e3b7" />
+
+## 遇到的困難與解決方案：
+### 問題1：clk 沒有持續產生方波
+* 原因：只寫了 `#10 clk = ~clk;` 一次，之後沒有任何機制讓 clk 持續振盪，DUT 完全不會觸發
+* 解法：改成 `initial clk = 0; always #5 clk = ~clk;` 持續產生週期性方波
+
+### 問題2：check() 沒有等待 clock edge，也沒處理 pipeline 延遲
+* 原因：賦值後立刻比對，沒有等任何 posedge clk；alu_v2 是 2-stage pipeline，結果要 2 拍後才會反映到 res/flag
+* 解法：在賦值與比對之間加上 `@(posedge clk)` 兩次
+
+### 問題3：reset 沒有撐過完整 clock cycle 就結束
+* 原因：`rst_n = 0` 之後沒有等待任何 clock edge 就直接動作
+* 解法：用 `repeat(2) @(posedge clk);` 讓 reset 訊號至少過 2 個 clock edge 再解除
+
+### 問題5（花最多輪才找到原因）：加了正確拍數還是持續 FAIL，且結果連續多輪完全相同
+* 排查過程：一開始懷疑是 Vivado 沒有重新編譯到最新程式碼（用 Relaunch、Reset Output Products、甚至手動清除 xsim 編譯產物都懷疑過），但檢查 RTL 、改了多次 testbench，數值依然完全相同
+* 真正原因：**NBA（非阻塞賦值）取樣時機的競爭條件（race condition）**—— 在 RTL 的 DUT 內 `res <= final_res;` 是非阻塞賦值，實際生效發生在該次 posedge 的 NBA 更新區；但 testbench 裡 `@(posedge clk);` 恢復執行後緊接著的 blocking 讀值敘述，發生時機比 NBA 真正生效還早，讀到的是「這次更新前」的舊值
+* 解法：在最後一次 `@(posedge clk);` 之後加上 `#1;`，確保讀值時 NBA 已經真正落地，加上後全數 PASS
+
+## 關鍵知識/詞彙：
+### NBA（非阻塞賦值）與讀值時機的競爭條件
+* `<=` 賦值在硬體上代表暫存器行為，模擬時的生效時機是在該次事件的 NBA 更新區，晚於同一時間點的 blocking 敘述
+* 如果 testbench 在 `@(posedge clk)` 恢復執行後，立刻用 blocking 敘述去讀 DUT 的輸出訊號，有可能讀到「這次 edge 更新前」的舊值，因為讀值時機比 NBA 真正生效還早
+* 標準解法：在讀值前多留一個極小延遲（如 `#1`），或改成在 `@(negedge clk)` 讀值，確保 NBA 已經真正落地
+
+### Debug 過程的啟示
+* 「結果不對」不一定代表「設計邏輯錯了」，也可能是「觀察／取樣的時機不對」，兩者要分開排查，不要一路只往 RTL 邏輯或環境快取的方向找
+---------------------------------------------
