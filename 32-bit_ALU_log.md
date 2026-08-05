@@ -430,6 +430,8 @@ endmodule
 * LUT = 327, FF = 103
 
 ### ALU_V2（pipeline） - pipeline ALU 設計規劃
+<img width="581" height="648" alt="image" src="https://github.com/user-attachments/assets/084ded80-5b4e-479d-ac07-4312b5f50bf4" />
+
 1. 在 alu_v1 中的 critical path
    * Barrel Shifter（桶型移位器）：最主要的 Critical Path
      * 邏輯結構： 採用 5 階串聯的條件選擇器（`b[0]` ~ `b[4]` 對應 1, 2, 4, 8, 16 bits 移位）。
@@ -449,8 +451,8 @@ endmodule
      * **移位器位元跨界：** 桶型移位器的資料會在 32-bit 空間內跨界移動，拆成高低 16-bit 會破壞移位邏輯。
 
    * 2-Stage Pipeline 切割方案 (縱向階段切割)
-     * Stage 1：Shifter 前 3 階 (b[0]~b[2]: 1, 2, 4 bits 移位) ； 33-bit 加減法運算 (ADD / SUB / SLT 準備)
-     * Stage 2：Shifter 後 2 階 (b[3]~b[4]: 8, 16 bits 移位)；SLT 邏輯與 Flag 生成 (Z, N, C, V)
+     * Stage 1：Shifter 前 3 階 (b[0]~b[2]: 1, 2, 4 bits 移位) ； 33-bit 加減法運算 (ADD / SUB / SLT)
+     * Stage 2：Shifter 後 2 階 (b[3]~b[4]: 8, 16 bits 移位)；Flag 生成 (Z, N, C, V)
 
    * 2-Stage Pipeline 切割方案原因
      * 時間延遲的「均等平分」（Timing Balance）
