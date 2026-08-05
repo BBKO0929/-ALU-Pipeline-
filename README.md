@@ -70,6 +70,7 @@ end
 * 模擬結果
 <img width="536" height="377" alt="image" src="https://github.com/user-attachments/assets/3b93234d-1639-46c6-b798-0b28319c5f0f" />
 <img width="512" height="159" alt="image" src="https://github.com/user-attachments/assets/1bba3fc9-40d6-4fe6-8058-f67cada8dd00" />
+
 ---------------------------------------------
 # 2026 年 7 月 28 日
 ## 今日進度：
