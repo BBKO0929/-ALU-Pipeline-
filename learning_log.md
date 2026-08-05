@@ -3484,7 +3484,7 @@ endmodule
 <img width="1327" height="99" alt="image" src="https://github.com/user-attachments/assets/a5696367-fd6b-4b48-9b5b-79145aaacbf5" />
 
 ### ALU_V1（Baseline）最終基準線數據
-* Period = 7.2ns, WNS = 0.516ns
+* Period = 7.2 ns, WNS = 0.516 ns
 * Fmax ≈ 149.6 MHz
 * LUT = 327, FF = 103
 
@@ -3866,3 +3866,48 @@ endmodule
 ### Debug 過程的啟示
 * 「結果不對」不一定代表「設計邏輯錯了」，也可能是「觀察／取樣的時機不對」，兩者要分開排查，不要一路只往 RTL 邏輯或環境快取的方向找
 ---------------------------------------------
+# 2026 年 8 月 5 日
+## 今日成果探討：
+### ALU 設計：
+### 32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
+* Constraints sources - 1st
+```
+create_clock -period 20 -name clk [get_ports clk]
+```
+
+* Constraints sources - 2nd
+```
+create_clock -period 6 -name clk [get_ports clk]
+```
+
+* Constraints sources - 3rd
+```
+create_clock -period 5 -name clk [get_ports clk]
+```
+
+* Constraints sources - 4th
+```
+create_clock -period 4.5 -name clk [get_ports clk]
+```
+
+* 模擬結果
+1. period 20：
+   * 反推 Fmax：`(20 - 14.489) = 5.511ns -> Fmax ≈ 1000 / 5.511 ≈ 181.5 MHz`
+<img width="1336" height="89" alt="image" src="https://github.com/user-attachments/assets/9c8a5dec-93aa-4fea-8864-44167cd95726" />
+
+2. period 6：
+   * 反推 Fmax：`(6 − 1.327) = 4.673ns -> Fmax ≈ 1000 / 4.673 ≈ 214.0 MHz`
+<img width="1335" height="89" alt="image" src="https://github.com/user-attachments/assets/5c21149f-dcb8-46ba-be32-c51a4055ca4b" />
+
+3. period 5：
+   * 反推 Fmax：`(5 − 0.751) = 4.249ns -> Fmax ≈ 1000 / 4.249 ≈ 235.3 MHz`
+<img width="1334" height="88" alt="image" src="https://github.com/user-attachments/assets/a1f26036-345d-4680-9d55-7353304710fe" />
+
+4. period 4.5：
+   * 反推 Fmax：`(4.5 − 0.551) = 3.949ns -> Fmax ≈ 1000 / 3.949 ≈ 253.2 MHz`
+<img width="1334" height="90" alt="image" src="https://github.com/user-attachments/assets/2dbb2fc8-a190-44de-8fe9-cfb091fc207f" />
+
+### ALU_V2（Pipeline）最終基準線數據
+* Period = 4.5 ns, WNS = 0.551 ns
+* Fmax ≈ 253.2 MHz
+* LUT = 317, FF = 172
