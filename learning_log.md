@@ -3948,6 +3948,19 @@ create_clock -period 4.5 -name clk [get_ports clk]
 * 可以考慮的做法：
   * 在 Stage1 鎖存後，提早把 op_code_stg1 解碼成 one-hot 控制訊號，讓每條下游邏輯只接自己需要的那一條 select 線，而不是所有邏輯都共用同一組 3-bit bus，降低單一訊號的扇出數
   * 對高扇出訊號下 MAX_FANOUT 屬性限制，讓 Vivado 在 synthesis 階段主動做訊號複製（從 `res_reg[31]_lopt_replica` 這個命名可以看出，Vivado 已自動幫 res_reg[31] 做過一次複製優化，代表工具本身也判斷這是扇出問題，可以再手動加強）
-
-3. 關鍵重點
 * 優化不能只停留在架構設計，實際的 layout/繞線行為也會回頭影響該怎麼調整 RTL
+
+## 關鍵知識/詞彙：
+### 降低扇出的兩種做法
+1. **提早解碼成 one-hot**：把一個多用途、被到處讀取的訊號（例如 op_code），提前轉換成多條各自獨立、各自代表單一意義的線（is_add、is_sub...），讓下游邏輯各自只接自己需要的那一條，分散單一訊號的驅動負擔，屬於 RTL 設計面的優化
+2. **MAX_FANOUT 屬性**：透過 XDC 對特定訊號下扇出限制的約束，讓 Vivado 自動把超過門檻的訊號複製成多份分擔負擔，屬於工具層面的輔助手段，不需要更動 RTL 邏輯
+
+### 為何產生_replica 
+<img width="328" height="58" alt="image" src="https://github.com/user-attachments/assets/ce8cfae4-3dcd-429b-a2a8-a684708bfdd5" />
+
+* Vivado 有時會自動判斷扇出過大並主動做訊號複製，產生類似 `_replica` 命名的訊號，代表工具本身已經在處理這類問題，可以透過約束加強這個機制
+
+### Timing Report 的 Logic Delay vs Net Delay
+* Logic Delay：訊號經過邏輯閘本身運算所花的時間
+* Net Delay：訊號在實體接線上傳遞所花的時間（受扇出、繞線距離影響）
+* 兩者比例可以幫助判斷關鍵路徑慢的根本原因：Logic Delay 高代表邏輯層數太深，Net Delay 高代表扇出/繞線是瓶頸，優化方向會完全不同
