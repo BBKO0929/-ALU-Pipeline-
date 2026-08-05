@@ -3911,3 +3911,43 @@ create_clock -period 4.5 -name clk [get_ports clk]
 * Period = 4.5 ns, WNS = 0.551 ns
 * Fmax ≈ 253.2 MHz
 * LUT = 317, FF = 172
+
+### Baseline vs Pipeline 最終對照表
+
+| 項目 | Baseline（alu_v1） | Pipeline（alu_v2, 2-stage） |
+|---|---|---|
+| Period（收斂值） | 7.2 ns | 4.5 ns |
+| WNS | 0.516 ns | 0.551 ns |
+| Fmax | ≈ 149.6 MHz | ≈ 253.2 MHz |
+| LUT | 327 | 317 |
+| FF | 103 | 172 |
+| Latency | 1 cycle | 2 cycle |
+
+### 說明
+1. Baseline 版本是純組合邏輯，加法器用 Ripple Carry Adder，關鍵路徑是進位一路傳到最高位，限制了整體時脈上限，收斂後 Fmax 約 149.6MHz。
+   
+2. Pipeline 版本把資料路徑切成 2 個 stage，中間插入暫存器，把原本一次算完的長路徑拆成兩段較短的路徑，收斂後 Fmax 約 253.2MHz，相較 baseline 提升約 1.69 倍。
+   
+3. trade-off ：
+   * 用「面積換取速度」換來的：FF 用量從 103 增加到 172（多了約 69 顆暫存器，用於 Stage1/Stage2 之間鎖存中繼資料）
+   * LUT 用量反而略降（327→317），代表邏輯本身沒有變複雜，資源增加主要來自新增的暫存器，不是額外的運算邏輯。
+   * Latency 則從 1 cycle 增加為 2 cycle
+   * 犧牲單筆資料的延遲，換取整體吞吐量（throughput）與可運作頻率的提升。
+
+4. 兩個版本的功能都用同一組 testbench 驗證過，結果完全等價，確保這組時序數據的比較是建立在功能正確、公平的基準。
+
+## 未來優化方向（依 Timing Report 的 Net/Logic Delay 比例修正）
+1. Timing Report
+<img width="1062" height="387" alt="image" src="https://github.com/user-attachments/assets/6beb2c5e-173a-4285-907e-b0ef765f42f5" />
+
+* Worst Path 前幾名的 Net Delay 都明顯大於 Logic Delay（例如 Path1: Logic=1.202ns, Net=2.611ns），且 High Fanout 高達16~32
+* 代表瓶頸主要來自控制訊號（op_code_stg1、b_stg1[4]）扇出過大造成的繞線延遲
+
+2. 優化方向：降低高扇出控制訊號的負載，而非搬動運算邏輯
+* op_code_stg1 要同時驅動 Stage2 裡的移位選擇、final_res 的 8-way mux、flag 邏輯，扇出大
+* 可以考慮的做法：
+  * 在 Stage1 鎖存後，提早把 op_code_stg1 解碼成 one-hot 控制訊號，讓每條下游邏輯只接自己需要的那一條 select 線，而不是所有邏輯都共用同一組 3-bit bus，降低單一訊號的扇出數
+  * 對高扇出訊號下 MAX_FANOUT 屬性限制，讓 Vivado 在 synthesis 階段主動做訊號複製（從 `res_reg[31]_lopt_replica` 這個命名可以看出，Vivado 已自動幫 res_reg[31] 做過一次複製優化，代表工具本身也判斷這是扇出問題，可以再手動加強）
+
+3. 關鍵重點
+* 優化不能只停留在架構設計，實際的 layout/繞線行為也會回頭影響該怎麼調整 RTL
