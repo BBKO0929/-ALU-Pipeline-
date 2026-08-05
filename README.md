@@ -221,7 +221,7 @@ endmodule
     assign overflow = (~(a[31] ^ b_op[31])) && (a[31] ^ add_sub[31]);//溢位判斷
   ```
   ---------------------------------------------
-  # 2026 年 8 月 1 日
+# 2026 年 8 月 1 日
 ## 今日成果探討：
 ### ALU 設計：
 ### 32bit_ALU_V1（Baseline） - 改寫 32-bit ALU baseline 版本 testbench
