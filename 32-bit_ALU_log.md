@@ -759,3 +759,101 @@ endmodule
 * 真正原因：**NBA（非阻塞賦值）取樣時機的競爭條件（race condition）**—— 在 RTL 的 DUT 內 `res <= final_res;` 是非阻塞賦值，實際生效發生在該次 posedge 的 NBA 更新區；但 testbench 裡 `@(posedge clk);` 恢復執行後緊接著的 blocking 讀值敘述，發生時機比 NBA 真正生效還早，讀到的是「這次更新前」的舊值
 * 解法：在最後一次 `@(posedge clk);` 之後加上 `#1;`，確保讀值時 NBA 已經真正落地，加上後全數 PASS
 ---------------------------------------------
+# 2026 年 8 月 5 日
+## 今日成果探討：
+### ALU 設計：
+### 32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
+* Constraints sources - 1st
+```
+create_clock -period 20 -name clk [get_ports clk]
+```
+
+* Constraints sources - 2nd
+```
+create_clock -period 6 -name clk [get_ports clk]
+```
+
+* Constraints sources - 3rd
+```
+create_clock -period 5 -name clk [get_ports clk]
+```
+
+* Constraints sources - 4th
+```
+create_clock -period 4.5 -name clk [get_ports clk]
+```
+
+* 模擬結果
+1. period 20：
+   * 反推 Fmax：`(20 - 14.489) = 5.511ns -> Fmax ≈ 1000 / 5.511 ≈ 181.5 MHz`
+<img width="1336" height="89" alt="image" src="https://github.com/user-attachments/assets/9c8a5dec-93aa-4fea-8864-44167cd95726" />
+
+2. period 6：
+   * 反推 Fmax：`(6 − 1.327) = 4.673ns -> Fmax ≈ 1000 / 4.673 ≈ 214.0 MHz`
+<img width="1335" height="89" alt="image" src="https://github.com/user-attachments/assets/5c21149f-dcb8-46ba-be32-c51a4055ca4b" />
+
+3. period 5：
+   * 反推 Fmax：`(5 − 0.751) = 4.249ns -> Fmax ≈ 1000 / 4.249 ≈ 235.3 MHz`
+<img width="1334" height="88" alt="image" src="https://github.com/user-attachments/assets/a1f26036-345d-4680-9d55-7353304710fe" />
+
+4. period 4.5：
+   * 反推 Fmax：`(4.5 − 0.551) = 3.949ns -> Fmax ≈ 1000 / 3.949 ≈ 253.2 MHz`
+<img width="1334" height="90" alt="image" src="https://github.com/user-attachments/assets/2dbb2fc8-a190-44de-8fe9-cfb091fc207f" />
+
+### ALU_V2（Pipeline）最終基準線數據
+* Period = 4.5 ns, WNS = 0.551 ns
+* Fmax ≈ 253.2 MHz
+* LUT = 317, FF = 172
+
+### Baseline vs Pipeline 最終對照表
+
+| 項目 | Baseline（alu_v1） | Pipeline（alu_v2, 2-stage） |
+|---|---|---|
+| Period（收斂值） | 7.2 ns | 4.5 ns |
+| WNS | 0.516 ns | 0.551 ns |
+| Fmax | ≈ 149.6 MHz | ≈ 253.2 MHz |
+| LUT | 327 | 317 |
+| FF | 103 | 172 |
+| Latency | 1 cycle | 2 cycle |
+
+### 說明
+1. Baseline 版本是純組合邏輯，加法器用 Ripple Carry Adder，關鍵路徑是進位一路傳到最高位，限制了整體時脈上限，收斂後 Fmax 約 149.6MHz。
+   
+2. Pipeline 版本把資料路徑切成 2 個 stage，中間插入暫存器，把原本一次算完的長路徑拆成兩段較短的路徑，收斂後 Fmax 約 253.2MHz，相較 baseline 提升約 1.69 倍。
+   
+3. trade-off ：
+   * 用「面積換取速度」換來的：FF 用量從 103 增加到 172（多了約 69 顆暫存器，用於 Stage1/Stage2 之間鎖存中繼資料）
+   * LUT 用量反而略降（327→317），代表邏輯本身沒有變複雜，資源增加主要來自新增的暫存器，不是額外的運算邏輯。
+   * Latency 則從 1 cycle 增加為 2 cycle
+   * 犧牲單筆資料的延遲，換取整體吞吐量（throughput）與可運作頻率的提升。
+
+4. 兩個版本的功能都用同一組 testbench 驗證過，結果完全等價，確保這組時序數據的比較是建立在功能正確、公平的基準。
+
+## 未來優化方向（依 Timing Report 的 Net/Logic Delay 比例修正）
+1. Timing Report
+<img width="1062" height="387" alt="image" src="https://github.com/user-attachments/assets/6beb2c5e-173a-4285-907e-b0ef765f42f5" />
+
+* Worst Path 前幾名的 Net Delay 都明顯大於 Logic Delay（例如 Path1: Logic=1.202ns, Net=2.611ns），且 High Fanout 高達16~32
+* 代表瓶頸主要來自控制訊號（op_code_stg1、b_stg1[4]）扇出過大造成的繞線延遲
+
+2. 優化方向：降低高扇出控制訊號的負載，而非搬動運算邏輯
+* op_code_stg1 要同時驅動 Stage2 裡的移位選擇、final_res 的 8-way mux、flag 邏輯，扇出大
+* 可以考慮的做法：
+  * 在 Stage1 鎖存後，提早把 op_code_stg1 解碼成 one-hot 控制訊號，讓每條下游邏輯只接自己需要的那一條 select 線，而不是所有邏輯都共用同一組 3-bit bus，降低單一訊號的扇出數
+  * 對高扇出訊號下 MAX_FANOUT 屬性限制，讓 Vivado 在 synthesis 階段主動做訊號複製（從 `res_reg[31]_lopt_replica` 這個命名可以看出，Vivado 已自動幫 res_reg[31] 做過一次複製優化，代表工具本身也判斷這是扇出問題，可以再手動加強）
+* 優化不能只停留在架構設計，實際的 layout/繞線行為也會回頭影響該怎麼調整 RTL
+
+## 關鍵知識/詞彙：
+### 降低扇出的兩種做法
+1. **提早解碼成 one-hot**：把一個多用途、被到處讀取的訊號（例如 op_code），提前轉換成多條各自獨立、各自代表單一意義的線（is_add、is_sub...），讓下游邏輯各自只接自己需要的那一條，分散單一訊號的驅動負擔，屬於 RTL 設計面的優化
+2. **MAX_FANOUT 屬性**：透過 XDC 對特定訊號下扇出限制的約束，讓 Vivado 自動把超過門檻的訊號複製成多份分擔負擔，屬於工具層面的輔助手段，不需要更動 RTL 邏輯
+
+### 為何產生_replica 
+<img width="328" height="58" alt="image" src="https://github.com/user-attachments/assets/ce8cfae4-3dcd-429b-a2a8-a684708bfdd5" />
+
+* Vivado 有時會自動判斷扇出過大並主動做訊號複製，產生類似 `_replica` 命名的訊號，代表工具本身已經在處理這類問題，可以透過約束加強這個機制
+
+### Timing Report 的 Logic Delay vs Net Delay
+* Logic Delay：訊號經過邏輯閘本身運算所花的時間
+* Net Delay：訊號在實體接線上傳遞所花的時間（受扇出、繞線距離影響）
+* 兩者比例可以幫助判斷關鍵路徑慢的根本原因：Logic Delay 高代表邏輯層數太深，Net Delay 高代表扇出/繞線是瓶頸，優化方向會完全不同
