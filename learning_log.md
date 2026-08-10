@@ -1,6 +1,46 @@
 # 暑假自主研究與學習、Debug日誌
 
-# 2026 年 7 月 3 日
+
+<a id="toc"></a>
+
+## 目錄（點日期跳轉）
+
+| 日期 | 內容摘要 |
+|---|---|
+| [7/3](#m07d03) | 影片：TT 小教室第 1~5 課。 |
+| [7/4](#m07d04) | 影片：TT 小教室第 6~7 課。 |
+| [7/5](#m07d05) | 影片：TT 小教室第 8~11 課。 |
+| [7/6](#m07d06) | 刷題：完成 HDLBits 的 "carry-slect Adder" 到 "a priority encoder for 8-bit inputs"。 |
+| [7/7](#m07d07) | 影片：清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。 |
+| [7/8](#m07d08) | 資料：複習7/3 - 7/7進度。 |
+| [7/9](#m07d09) | 影片：看財經村長-數位IC設計面試1。 |
+| [7/10](#m07d10) | 資料：複習7/3 - 7/9內容。 |
+| [7/11](#m07d11) | 資料：複習7/3 - 7/10內容。 |
+| [7/13](#m07d13) | 資料：複習7/3 - 7/11內容。 |
+| [7/14](#m07d14) | 刷題：完成 HDLBits 的 D latch 到 Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）。 |
+| [7/15](#m07d15) | 資料：複習7/3 - 7/14內容。 |
+| [7/16](#m07d16) | 影片：TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】 |
+| [7/17](#m07d17) | 影片：TT 小教室 Verilog RTL design 進階教學【Memory】 |
+| [7/21](#m07d21) | 資料：複習7/3 - 7/17內容。 |
+| [7/23](#m07d23) | 資料：利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj |
+| [7/24](#m07d24) | 影片：財經村長 - 如何面試上一線數位IC公司 II |
+| [7/25](#m07d25) | 影片：第1講 Vivado設計流程及使用模式；How to use Vivado® Design Suite Part-5 Timing Summary Report |
+| [7/27](#m07d27) | 資料：Barrel Shifters in Verilog: A Beginner’s Guide to Fast Multi-Bit Shifting |
+| [7/28](#m07d28) | 資料：ALU design in Verilog using MIPS Instruction Set |
+| [7/30](#m07d30) | 刷題：複習 HDLBits 7/3 - 7/17 進度。 |
+| [7/31](#m07d31) | 資料：MIT 6.111 課程講義 Lecture 9《Pipelining & Verilog》(PDF) |
+| [8/1](#m08d01) | ALU 設計：32bit_ALU_V1（Baseline） - 改寫 32-bit ALU baseline 版本 testbench |
+| [8/2](#m08d02) | ALU 設計：32bit_ALU_V1（Baseline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
+| [8/3](#m08d03) | ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確 |
+| [8/4](#m08d04) | ALU_V2（pipeline）設計：完成 Testbench - alu_v2_tt，驗證 pipeline 版本功能 |
+| [8/5](#m08d05) | ALU 設計：32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
+
+---
+
+<a id="m07d03"></a>
+
+## 2026 年 7 月 3 日
+
 ## 今日進度：
 ### 影片：TT 小教室第 1~5 課。
 ### 刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
@@ -54,8 +94,15 @@ end
   
 ### 震盪器（Oscillator）
 * `always #<一半的週期時間> clk=~clk`（通常用在Testbench產生clk，一般數位電路不會這樣寫）
----------------------------------------------
-# 2026 年 7 月 4 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d04"></a>
+
+## 2026 年 7 月 4 日
+
 ## 今日進度：
 ### 影片：TT 小教室第 6~7 課。
 ### 刷題：複習 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
@@ -182,8 +229,15 @@ endmodule
 * wire [7:0] a;
 * wire [4:0] z3;
 * assign z3 = (a >> 3);
----------------------------------------------
-# 2026 年 7 月 5 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d05"></a>
+
+## 2026 年 7 月 5 日
+
 ## 今日進度：
 ### 影片：TT 小教室第 8~11 課。
 ### 刷題：完成 HDLBits 的 "Adder1" 到 "Adder2"。
@@ -563,8 +617,15 @@ endmodule
 | **語法關鍵字** | 開頭帶有反單引號，如 define DATA_WIDTH 8 | 正常宣告，如 parameter DATA_WIDTH = 8; |
 | **作用範圍** | **全域（Global）**。只要在編譯順序中被讀取，其後所有的 .v 檔案、所有 Module 都能直接使用。 | **區域（Local）**。只在宣告它的該個 module 內部有效。 |
 | **使用方式** | 呼叫時前面一定要加一撇 | |
----------------------------------------------
-# 2026 年 7 月 6 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d06"></a>
+
+## 2026 年 7 月 6 日
+
 ## 今日進度：
 ### 刷題：完成 HDLBits 的 "carry-slect Adder" 到 "a priority encoder for 8-bit inputs"。
 
@@ -687,8 +748,15 @@ endmodule
 
     endmodule
     ```
----------------------------------------------
-# 2026 年 7 月 7 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d07"></a>
+
+## 2026 年 7 月 7 日
+
 ## 今日進度：
 ### 影片：清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。
 ### 資料：複習7/3 - 7/6進度。
@@ -810,8 +878,15 @@ module add1(
 * 防範方式
     * 加入冗餘項 (Redundant Terms / Hazard Cover)：利用卡諾圖（Karnaugh Map）圈選相鄰群組時，在兩個群組的交界處額外多圈一個「冗餘乘積項」（卡諾圖上的圈圈重疊）。多出來的邏輯閘能確保當輸入訊號在兩組之間切換時，輸出不會因為延遲而掉下去。
     * 改用同步時序電路 (Design Synchronous Logic)：現代 IC 設計最核心的解法。不要直接使用組合邏輯的輸出作為下一個電路的觸發訊號。在組合邏輯後面接一個正反器（Flip-Flop），並由全域時脈（Clock）控制。因為**毛邊只會發生在時脈週期的中間**，只要我們確保在時脈邊緣（Setup Time / Hold Time）來臨時訊號已經穩定，正反器就不會鎖存到毛邊。
----------------------------------------------
-# 2026 年 7 月 8 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d08"></a>
+
+## 2026 年 7 月 8 日
+
 ## 今日進度：
 ### 資料：複習7/3 - 7/7進度。
 ### 刷題：複習7/3 - 7/7進度、完成 HDLBits 的 "100-digit BCD ripple-carry adder（100 位的 BCD 級聯加法器）"。
@@ -976,8 +1051,15 @@ module add1(
 
 	endmodule
   ```
----------------------------------------------
-# 2026 年 7 月 9 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d09"></a>
+
+## 2026 年 7 月 9 日
+
 ## 今日進度：
 ### 影片：看財經村長-數位IC設計面試1。
 ### 刷題：完成 HDLBits - "Combinational Logic" 中的 "Basic gates"。
@@ -1202,8 +1284,15 @@ module d_latch (
   * 現代P&R工具通常有自動的hold fixing功能,會在post-CTS或post-route階段自動插入所需的buffer/delay cell
   * Hold fix通常是最後的收尾工作，在setup timing基本達標後才進行大規模的hold fixing。
   * 設計者需要在設定P&R constraints時,給予工具足夠的buffer insertion彈性，並在chip finishing階段仔細檢查hold fix的結果，確保沒有過度修復(over-fixing)或遺漏關鍵路徑。
----------------------------------------------
-# 2026 年 7 月 10 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d10"></a>
+
+## 2026 年 7 月 10 日
+
 ## 今日進度：
 ### 資料：複習7/3 - 7/9內容。
 ### 刷題：複習 HDLBits 的 "Modules" 到 "Basic Gates"；完成 HDLBits - Arithmetic circuits 的 half adder 到 signed addition overflow。
@@ -1257,9 +1346,15 @@ endmodule
 
 	endmodule
   ```   
-  
----------------------------------------------
-# 2026 年 7 月 11 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d11"></a>
+
+## 2026 年 7 月 11 日
+
 ## 今日進度：
 ### 資料：複習7/3 - 7/10內容。
 ### 刷題：複習 HDLBits 的 "Modules" 到 "multiplexers"；完成 HDLBits - Arithmetic circuits。
@@ -1410,9 +1505,15 @@ endmodule
 
 	endmodule
   ```
-  
----------------------------------------------
-# 2026 年 7 月 13 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d13"></a>
+
+## 2026 年 7 月 13 日
+
 ## 今日進度：
 ### 資料：複習7/3 - 7/11內容。
 ### 刷題：完成 HDLBits 的 Karnaugh Map to Circuit 到 DFF with byte enable。
@@ -1600,8 +1701,15 @@ endmodule
 
 4. 業界標準規範（專業度的體現）
 * 在聯發科（MediaTek）或各大 IC 設計廠的 Coding Style Guide（程式碼規範原則） 中，為了防止上述的各種人類肉眼失誤，通常都是強迫一律加上 begin...end。
----------------------------------------------
-# 2026 年 7 月 14 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d14"></a>
+
+## 2026 年 7 月 14 日
+
 ## 今日進度：
 ### 刷題：完成 HDLBits 的 D latch 到 Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）。
 
@@ -1668,8 +1776,15 @@ endmodule
 
 ### 組合邏輯（純運算、不需記憶，只想即時得到結果）
 * 用 assign 搭配 wire 與 = （blocking）。
----------------------------------------------
-# 2026 年 7 月 15 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d15"></a>
+
+## 2026 年 7 月 15 日
+
 ## 今日進度：
 ### 資料：複習7/3 - 7/14內容。
 ### 刷題：複習 HDLBits 的 "Modules" 到 "Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）"；完成 HDLBits - sequential logic。
@@ -1930,8 +2045,15 @@ endmodule
 
    * 硬體成本與設計難度：
      * 標準的 FPGA 或標準元件庫（Standard Cell Library）裡，雙邊沿暫存器的電路結構比單邊沿複雜得多（面積大、放線難），因此只會用在記憶體、傳輸介面等「最需要衝極速、省功耗的刀口上」。
----------------------------------------------
-# 2026 年 7 月 16 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d16"></a>
+
+## 2026 年 7 月 16 日
+
 ## 今日進度：
 ### 影片：TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】
 ### 刷題：完成 HDLBits - counters 的 Four-bit binary counter  到 slow decade counter。
@@ -2075,8 +2197,15 @@ endmodule
    * 當一個DFF的 setup time 或 Hold time 不滿足時，它的Q將"不可預測"，稱為 Metastability 亞穩態。
    * 沒有辦法可以"完全"解決，只能大幅度降低產生的機率。
    * MTBF(mean time between failure)意思是發生兩次錯誤之間的間隔，這個指標常用來衡量CDC的情形，越大越好（代表隔了很長一段時間才發生下一次錯誤）。   
----------------------------------------------
-# 2026 年 7 月 17 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d17"></a>
+
+## 2026 年 7 月 17 日
+
 ## 今日進度：
 ### 影片：TT 小教室 Verilog RTL design 進階教學【Memory】
 ### 刷題：完成 HDLBits 的 "counter 1-12" 到 "4-digit BCD counter (Countbcd)"；待完成 "12-hour clock"。
@@ -2469,13 +2598,27 @@ module counter2(
     
 endmodule
 ```
----------------------------------------------
-# 2026 年 7 月 21 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d21"></a>
+
+## 2026 年 7 月 21 日
+
 ## 今日進度：
 ### 資料：複習7/3 - 7/17內容。
 ### 刷題：複習 HDLBits 7/3 - 7/17 進度。
----------------------------------------------
-# 2026 年 7 月 23 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d23"></a>
+
+## 2026 年 7 月 23 日
+
 ## 今日進度：
 ### 資料：利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj
 ### Vivado：嘗試在 Vivado 上寫簡單半加器模型並模擬測試
@@ -2645,8 +2788,15 @@ end else begin
     $display("正確！結果符合 57");
 end
 ```
----------------------------------------------
-# 2026 年 7 月 24 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d24"></a>
+
+## 2026 年 7 月 24 日
+
 ## 今日進度：
 ### 影片：財經村長 - 如何面試上一線數位IC公司 II
 
@@ -2758,8 +2908,15 @@ end
 1. 通常為晶片 Tape out 回來之後有些Pattern要打，確定晶片有無問題
 2. 測試概念：
    * 要偵測 Stuck-at 1，需要讓正常電路輸出 0，若輸出為 1 則表示有故障。要偵測 Stuck-at 0，則需讓正常輸出為 1。若電路結構上無法讓故障點呈現正確值，即為不可測故障。
----------------------------------------------
-# 2026 年 7 月 25 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d25"></a>
+
+## 2026 年 7 月 25 日
+
 ## 今日進度：
 ### 影片：
 1. [第1講 Vivado設計流程及使用模式](https://www.youtube.com/watch?v=9pylHMr0yfE&t=1s)
@@ -2855,8 +3012,15 @@ end
 ### 實際開發的連鎖反應
 1. Timing Report、Utilization兩個報告要「一起看」
    * 如果 Utilization 報告顯示 LUT / FF 用量超過 80%~90%，晶片裡面會變得非常擁擠。Vivado 在做 Implementation時，被迫要把相連的邏輯放到距離很遠的地方，繞很長的金屬線。會導致訊號傳輸延遲大幅增加，最後在 Timing Report 裡跳出紅色的 WNS < 0（時序違規）。
----------------------------------------------
-# 2026 年 7 月 27 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d27"></a>
+
+## 2026 年 7 月 27 日
+
 ## 今日進度：
 ### 資料：
 1. [Barrel Shifters in Verilog: A Beginner’s Guide to Fast Multi-Bit Shifting](https://medium.com/@ahe24mobile/barrel-shifters-in-verilog-a-beginners-guide-to-fast-multi-bit-shifting-121d1c5a2b62)
@@ -2981,8 +3145,15 @@ end
 | **主要應用場景** | ALU、浮點數運算單元 (FPU)、DSP 算術運算、處理器指令集 (ARM Shifter) | 串列/並列轉換 (SIPO/PISO)、通訊介面 (SPI/UART)、資料緩衝佇列 |
 
 * Trade-off when using Barrel Shifter：需要更多的邏輯電路（例如，a tree of multiplexers），從而換取更高的速度。當需要在一個週期內進行變速時，這種方法是值得的。
----------------------------------------------
-# 2026 年 7 月 28 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d28"></a>
+
+## 2026 年 7 月 28 日
+
 ## 今日進度：
 ### 資料：
 1. [Verilog code for Arithmetic Logic Unit (ALU)](https://www.fpga4student.com/2017/06/Verilog-code-for-ALU.html)
@@ -3158,8 +3329,15 @@ op_code = i[2:0];    // 明確取 i 的最低 3 位給 op_code
 reg [7:0] data;
 data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
 ```
----------------------------------------------
-# 2026 年 7 月 30 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d30"></a>
+
+## 2026 年 7 月 30 日
+
 ## 今日進度：
 ### 刷題：複習 HDLBits 7/3 - 7/17 進度。
 ### 影片：
@@ -3201,8 +3379,15 @@ data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
 	* 常見技術方向：
   		* 模型量化（以 INT8 甚至更低位元取代浮點運算，節省功耗與面積）
   		* 記憶體存取優化（AI 運算瓶頸常在資料搬移而非運算本身，因此有 In-memory computing 等討論方向）
----------------------------------------------
-# 2026 年 7 月 31 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d31"></a>
+
+## 2026 年 7 月 31 日
+
 ## 今日進度：
 ### 資料：
 1. 複習 7/3 - 7/30 進度
@@ -3230,8 +3415,15 @@ data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
 ### Pipeline 在單顆 ALU（無資料相依）跟 CPU pipeline 的差別
 * 單獨一顆 ALU 電路本身是無狀態（stateless）的組合功能單元，插入 pipeline 不會有 data hazard 問題
 * CPU 的五級 pipeline（IF/ID/EX/MEM/WB）裡，hazard 問題來自「指令之間」的相依性（例如下一條指令要用到上一條還沒算完的結果），跟切 ALU 內部的 pipeline 是完全不同層次的問題
----------------------------------------------
-# 2026 年 8 月 1 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d01"></a>
+
+## 2026 年 8 月 1 日
+
 ## 今日成果探討：
 ### ALU 設計：
 ### 32bit_ALU_V1（Baseline） - 改寫 32-bit ALU baseline 版本 testbench
@@ -3408,8 +3600,15 @@ endtask
 
 ### 實際應用：把重複的測試流程包成一個 check task
 * 把「設定輸入 -> 等待 -> 比對結果 -> 印出 PASS/FAIL」這套固定流程包成一個 task，之後每測一組資料只要呼叫一次 `check(...)`，不用每次都手動複製貼上重複的程式碼
----------------------------------------------
-# 2026 年 8 月 2 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d02"></a>
+
+## 2026 年 8 月 2 日
+
 ## 今日成果探討：
 ### ALU 設計：
 ### 32bit_ALU_V1（Baseline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
@@ -3566,8 +3765,15 @@ endmodule
 | **實體佈線開銷** | 高 (每次跨 MUX 皆需走通用佈線) | 低 (走晶片預先刻好的專用高速通道) |
 | **估算延遲時間** | 約 **2.0 ~ 2.5 ns** *(最慢)* | 約 **1.0 ~ 1.2 ns** |
 | **相對延遲比例** | **100% (基準 Critical Path)** | **約為移位器的 50% (相當於 2~3 個 MUX)** |
----------------------------------------------
-# 2026 年 8 月 3 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d03"></a>
+
+## 2026 年 8 月 3 日
+
 ## 今日成果探討：
 ### ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確
 * Design sources
@@ -3742,8 +3948,15 @@ endmodule
 ### 非阻塞賦值（<=）讀值的時機
 * `<=` 賦值時，右邊讀到的是這次賦值前的舊值，賦值本身要等整個 block 結束才真的生效
 * 如果讓 flag 這種輸出訊號繞經中繼暫存器（如 Z/N/C/V）再組合，容易讀到「慢一拍」的舊值，建議直接用當下算出的訊號組合，避免多繞一層
----------------------------------------------
-# 2026 年 8 月 4 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d04"></a>
+
+## 2026 年 8 月 4 日
+
 ## 今日成果探討：
 ### ALU_V2（pipeline）設計：
 1. 完成 Testbench - alu_v2_tt，驗證 pipeline 版本功能，經多輪除錯後全數 PASS
@@ -3865,8 +4078,15 @@ endmodule
 
 ### Debug 過程的啟示
 * 「結果不對」不一定代表「設計邏輯錯了」，也可能是「觀察／取樣的時機不對」，兩者要分開排查，不要一路只往 RTL 邏輯或環境快取的方向找
----------------------------------------------
-# 2026 年 8 月 5 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d05"></a>
+
+## 2026 年 8 月 5 日
+
 ## 今日成果探討：
 ### ALU 設計：
 ### 32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
@@ -3964,3 +4184,7 @@ create_clock -period 4.5 -name clk [get_ports clk]
 * Logic Delay：訊號經過邏輯閘本身運算所花的時間
 * Net Delay：訊號在實體接線上傳遞所花的時間（受扇出、繞線距離影響）
 * 兩者比例可以幫助判斷關鍵路徑慢的根本原因：Logic Delay 高代表邏輯層數太深，Net Delay 高代表扇出/繞線是瓶頸，優化方向會完全不同
+
+[回目錄](#toc)
+
+---
