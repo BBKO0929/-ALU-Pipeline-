@@ -1,4 +1,6 @@
 # 暑假自主研究與學習、Debug日誌
+- **[點我回「README.md」](./README.md)**
+
 
 
 <a id="toc"></a>
