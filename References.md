@@ -1,6 +1,7 @@
 # 硬體設計理論、Verilog 規範與 EDA 工具文獻依據 (Theoretical Foundations & References)
 
 本專案在 32-bit ALU 及 2-Stage Pipeline 運算單元之設計、靜態時序分析（STA）與硬體除錯過程中，所採用的關鍵技術與 Debug 判斷依據，皆遵循以下學術文獻、國際標準規範與工業界 EDA 官方指南。
+- **[點我回「README.md」](./README.md)**
 
 ---
 
