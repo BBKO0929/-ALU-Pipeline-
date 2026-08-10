@@ -1,4 +1,5 @@
 # 32-bit ALU 製作過程與Debug日誌
+- **[點我回「README.md」](./README.md)**
 
 
 <a id="toc"></a>
