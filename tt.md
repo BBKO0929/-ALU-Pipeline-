@@ -24,16 +24,16 @@
 | [7/21](#m07d21) | 資料：複習7/3 - 7/17內容。 |
 | [7/23](#m07d23) | 資料：利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj |
 | [7/24](#m07d24) | 影片：財經村長 - 如何面試上一線數位IC公司 II |
-| [7/25](#m07d25) | 影片： |
-| [7/27](#m07d27) | 資料： |
-| [7/28](#m07d28) | 資料： |
+| [7/25](#m07d25) | 影片：第1講 Vivado設計流程及使用模式；How to use Vivado® Design Suite Part-5 Timing Summary Report |
+| [7/27](#m07d27) | 資料：Barrel Shifters in Verilog: A Beginner’s Guide to Fast Multi-Bit Shifting |
+| [7/28](#m07d28) | 資料：ALU design in Verilog using MIPS Instruction Set |
 | [7/30](#m07d30) | 刷題：複習 HDLBits 7/3 - 7/17 進度。 |
-| [7/31](#m07d31) | 資料： |
-| [8/1](#m08d01) | ALU 設計： |
-| [8/2](#m08d02) | ALU 設計： |
+| [7/31](#m07d31) | 資料：MIT 6.111 課程講義 Lecture 9《Pipelining & Verilog》(PDF) |
+| [8/1](#m08d01) | ALU 設計：32bit_ALU_V1（Baseline） - 改寫 32-bit ALU baseline 版本 testbench |
+| [8/2](#m08d02) | ALU 設計：32bit_ALU_V1（Baseline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
 | [8/3](#m08d03) | ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確 |
-| [8/4](#m08d04) | ALU_V2（pipeline）設計： |
-| [8/5](#m08d05) | ALU 設計： |
+| [8/4](#m08d04) | ALU_V2（pipeline）設計：完成 Testbench - alu_v2_tt，驗證 pipeline 版本功能 |
+| [8/5](#m08d05) | ALU 設計：32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
 
 ---
 
