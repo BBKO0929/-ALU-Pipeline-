@@ -1,9 +1,30 @@
 # 32-bit ALU 製作過程與Debug日誌
 
-# 2026 年 7 月 27 日
+
+<a id="toc"></a>
+
+## 目錄（點日期跳轉）
+
+| 日期 | 內容摘要 |
+|---|---|
+| [7/27](#m07d27) | 32bit_ALU_V1（Baseline）- 設計初步 32-bit 構造、模型以及所支援的運算 |
+| [7/28](#m07d28) | 32bit_ALU_V1（Baseline）- 完成 32-bit ALU baseline 版本與 debug |
+| [8/1](#m08d01) | 32bit_ALU_V1（Baseline） - 改寫 32-bit ALU baseline 版本 testbench |
+| [8/2](#m08d02) | 32bit_ALU_V1（Baseline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
+| [8/3](#m08d03) | ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確 |
+| [8/4](#m08d04) | 完成 Testbench - alu_v2_tt，驗證 pipeline 版本功能，經多輪除錯後全數 PASS |
+| [8/5](#m08d05) | 32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
+
+---
+
+<a id="m07d27"></a>
+
+## 2026 年 7 月 27 日
+
+
 ## 今日進度：
 ### 資料：
-1. [Barrel Shifters in Verilog: A Beginner’s Guide to Fast Multi-Bit Shifting](https://medium.com/@ahe24mobile/barrel-shifters-in-verilog-a-beginners-guide-to-fast-multi-bit-shifting-121d1c5a2b62)
+1. [Barrel Shifters in Verilog: A Beginner's Guide to Fast Multi-Bit Shifting](https://medium.com/@ahe24mobile/barrel-shifters-in-verilog-a-beginners-guide-to-fast-multi-bit-shifting-121d1c5a2b62)
 2. [How to Design an Efficient Barrel Shifter in Verilog: Step-by-Step Guide](https://vlsifacts.com/how-to-design-an-efficient-barrel-shifter-in-verilog-step-by-step-guide/)
 
 ## 今日成果探討：
@@ -11,8 +32,15 @@
 <img width="544" height="316" alt="image" src="https://github.com/user-attachments/assets/edfdfcaf-8039-4a88-8e76-640d7a6a100d" />
 <img width="923" height="507" alt="image" src="https://github.com/user-attachments/assets/24a57abe-c425-42a0-8ac1-af8253aafec1" />
 
----------------------------------------------
-# 2026 年 7 月 28 日
+[回目錄](#toc)
+
+---
+
+<a id="m07d28"></a>
+
+## 2026 年 7 月 28 日
+
+
 ## 今日進度：
 ### 資料：
 1. [Verilog code for Arithmetic Logic Unit (ALU)](https://www.fpga4student.com/2017/06/Verilog-code-for-ALU.html)
@@ -161,8 +189,16 @@ endmodule
     assign carry = add_sub[32]; //進位判斷 
     assign overflow = (~(a[31] ^ b_op[31])) && (a[31] ^ add_sub[31]);//溢位判斷
   ```
-  ---------------------------------------------
-# 2026 年 8 月 1 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d01"></a>
+
+## 2026 年 8 月 1 日
+
+
 ## 今日成果探討：
 ### ALU 設計：
 ### 32bit_ALU_V1（Baseline） - 改寫 32-bit ALU baseline 版本 testbench
@@ -295,8 +331,16 @@ endmodule
 ### 問題：跑 alu_tt 模擬沒有跑出結果
 * 原因：task 內少寫 `#10`，比對時機在 DUT 組合邏輯還沒重新算完前就執行，導致比對到殘留的舊值（race condition）
 * 解法：修法是每次改完輸入後一定要留一段延遲再比對
----------------------------------------------
-# 2026 年 8 月 2 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d02"></a>
+
+## 2026 年 8 月 2 日
+
+
 ## 今日成果探討：
 ### ALU 設計：
 ### 32bit_ALU_V1（Baseline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
@@ -423,8 +467,16 @@ endmodule
 * Wrapper 額外做輸入暫存器（鎖住 a_in/b_in/op_in）與輸出暫存器（鎖住 res/flag），中間接純組合邏輯的 alu_v1，形成合法同步結構
 * alu_v1 core 接的是已鎖存的 a_r/b_r/op_r，不是原始輸入 a_in/b_in/op_in，確保組合邏輯的輸入來源穩定，才能被 STA 正確分析
 * clk 需要同時接到輸入暫存器與輸出暫存器兩邊
----------------------------------------------
-# 2026 年 8 月 3 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d03"></a>
+
+## 2026 年 8 月 3 日
+
+
 ## 今日成果探討：
 ### ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確
 * Design sources
@@ -590,8 +642,16 @@ endmodule
 ### 問題7：flag 只有 ADD / SUB 才更新，其他運算 flag 維持舊值不動
 * 原因：整個 flag（含 Z/N）都包在 `if(ADD||SUB)` 裡面才更新，跟 baseline 行為（Z/N 每種運算都要算，只有 C/V 限定 ADD/SUB）不一致
 * 解法：拿掉 Z/N 的 if 限制，改成永遠算 Z/N，只有 C/V 用三元運算子限定 ADD/SUB 才給實際值、否則補 0
----------------------------------------------
-# 2026 年 8 月 4 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d04"></a>
+
+## 2026 年 8 月 4 日
+
+
 ## 今日成果探討：
 ### ALU_V2（pipeline）設計：
 1. 完成 Testbench - alu_v2_tt，驗證 pipeline 版本功能，經多輪除錯後全數 PASS
@@ -704,8 +764,16 @@ endmodule
 * 排查過程：一開始懷疑是 Vivado 沒有重新編譯到最新程式碼（用 Relaunch、Reset Output Products、甚至手動清除 xsim 編譯產物都懷疑過），但檢查 RTL 、改了多次 testbench，數值依然完全相同
 * 真正原因：**NBA（非阻塞賦值）取樣時機的競爭條件（race condition）**—— 在 RTL 的 DUT 內 `res <= final_res;` 是非阻塞賦值，實際生效發生在該次 posedge 的 NBA 更新區；但 testbench 裡 `@(posedge clk);` 恢復執行後緊接著的 blocking 讀值敘述，發生時機比 NBA 真正生效還早，讀到的是「這次更新前」的舊值
 * 解法：在最後一次 `@(posedge clk);` 之後加上 `#1;`，確保讀值時 NBA 已經真正落地，加上後全數 PASS
----------------------------------------------
-# 2026 年 8 月 5 日
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d05"></a>
+
+## 2026 年 8 月 5 日
+
+
 ## 今日成果探討：
 ### ALU 設計：
 ### 32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
@@ -803,3 +871,7 @@ create_clock -period 4.5 -name clk [get_ports clk]
 * Logic Delay：訊號經過邏輯閘本身運算所花的時間
 * Net Delay：訊號在實體接線上傳遞所花的時間（受扇出、繞線距離影響）
 * 兩者比例可以幫助判斷關鍵路徑慢的根本原因：Logic Delay 高代表邏輯層數太深，Net Delay 高代表扇出/繞線是瓶頸，優化方向會完全不同
+
+[回目錄](#toc)
+
+---
