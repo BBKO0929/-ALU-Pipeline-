@@ -36,6 +36,7 @@
 | [8/3](#m08d03) | ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確 |
 | [8/4](#m08d04) | ALU_V2（pipeline）設計：完成 Testbench - alu_v2_tt，驗證 pipeline 版本功能 |
 | [8/5](#m08d05) | ALU 設計：32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
+| [8/10](#m08d10) | ALU 設計：32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
 
 ---
 
@@ -4186,6 +4187,70 @@ create_clock -period 4.5 -name clk [get_ports clk]
 * Logic Delay：訊號經過邏輯閘本身運算所花的時間
 * Net Delay：訊號在實體接線上傳遞所花的時間（受扇出、繞線距離影響）
 * 兩者比例可以幫助判斷關鍵路徑慢的根本原因：Logic Delay 高代表邏輯層數太深，Net Delay 高代表扇出/繞線是瓶頸，優化方向會完全不同
+
+[回目錄](#toc)
+
+---
+<a id="m08d10"></a>
+
+## 2026 年 8 月 10 日
+
+## 今日進度：
+### 資料：
+1. Digital Design and Computer Architecture (ARM / RISC-V Edition) - ALU 管道化（Pipelining）、組合邏輯收斂與資源共享（Resource Sharing）、One-Hot State/Decoder 編碼優化。
+2. Advanced ASIC Chip Synthesis: Using Synopsys® Design Compiler® Physical Compiler® and PrimeTime® - High Fanout 訊號對物理佈線（Routing）的寄生電容效應、Net Delay vs. Logic Delay 的消長關係、Timing Closure 調校策略。
+3. Verilog HDL: A Guide to Digital Design and Synthesis - always @(*) 組合邏輯與推導 Flip-Flop（Clock Enable / Latch 避免）的 RTL 最佳撰寫範本。
+4. AMD / Xilinx Vivado Design Suite User Guide: Design Analysis and Closure Techniques (UG906) - Section: High Fanout Net Optimization / Timing Report Analysis
+5. AMD / Xilinx Vivado Design Suite User Guide: Synthesis (UG901) - Synthesis Attributes: max_fanout & Resource Sharing
+6. Intel (Altera) Quartus Prime Standard Edition Handbook Volume 2: Design Implementation and Optimization - Section: Duplicate Registers for Fanout Control
+
+
+## 關鍵知識/詞彙：
+### FPGA/ASIC 硬體設計與 Timing Closure 優化指南
+
+### 扇出（Fanout）與其影響
+* **扇出 (Fanout)**：指單一輸出訊號（如暫存器 Q 端或邏輯閘輸出）所驅動的**下游輸入端（Loads）總數量**。
+* **物理影響**：
+  * **電容效應 (Capacitance)**：驅動的負載越多，金屬線路的總寄生電容越大，訊號充放電變慢（Slew Rate 惡化）。
+  * **長途佈線 (Routing Distance)**：訊號需要透過 FPGA 的 Interconnect 金屬線拉去晶片上多個分散的角落。
+* **現象**：Timing Report 中呈現 **$\text{Net Delay} \gg \text{Logic Delay}$**（佈線延遲遠大於邏輯延遲）。
+
+### 降低扇出（High Fanout）的核心做法
+
+* 解決高扇出問題通常從 **「RTL 架構設計面」** 與 **「EDA 工具約束面」** 兩大維度切入：
+
+1. 方案一：RTL 設計面 — 提早解碼 / 集中收斂 (Architecture Optimization)
+
+* **概念**：將原本多用途、多位元的編碼訊號（如 3-bit `op_code`），由「末端被動詢問」改為「源頭一次解完/集中收斂」。
+* **優化方式**：
+  1. **One-Hot 解碼**：在源頭將訊號轉換為獨立專線（`is_add`, `is_sub`），讓各子模組只接收專屬控制線，分散負載。
+  2. **組合邏輯收斂 (Multiplexing)**：在進入下一級 DFF 前，透過 `always @(*)` 的 MUX 先將各模組算好的結果收斂成單一匯流排（如 `final_res`）。
+* **優點**：
+  * **大幅降低扇出**：控制訊號負載從 $N$ 降至個位數。
+  * **資源共享 (Resource Sharing)**：避免 EDA 工具合成出多套重複的大型 MUX，顯著**節省 LUT 資源**。
+  * **消除 Enable 腳位**：避免合成出帶有 Clock Enable (CE) 的多餘 Flip-Flop 控制線。
+
+2. 方案二：工具約束面 — `MAX_FANOUT` 屬性 (Implementation Optimization)
+
+* **概念**：不更動 RTL 邏輯，透過 XDC 約束或 RTL 屬性指示合成工具（如 Vivado）自動進行 **暫存器複製（Register Duplication）**。
+* **運作機制**：
+  ```text
+  [原本] Reg_A ─────────────────► 負載 1 ~ 100 (Fanout = 100, Net Delay 爆表)
+
+  [複製後] Reg_A_1 ─────────────► 負載 1 ~ 50  (Fanout = 50)
+           Reg_A_2 (Replica) ───► 負載 51 ~ 100 (Fanout = 50)
+  ```
+* 範例程式：
+	* Verilog RTL 屬性
+ 	```
+  	(* max_fanout = 16 *) reg [2:0] op_code_stg1;
+  	``` 
+
+   * XDC 約束檔
+	```
+     set_property MAX_FANOUT 16 [get_nets op_code_stg1_reg[*]]
+    ```
+  
 
 [回目錄](#toc)
 
