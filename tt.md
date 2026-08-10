@@ -1,72 +1,50 @@
 # 暑假自主研究與學習、Debug日誌
 
 
-<a id="toc-date"></a>
+<a id="toc"></a>
 
-## 📅 目錄一：依日期（含當日重點）
+## 目錄（點日期跳轉）
 
-| 日期 | 影片 | 資料 |
-|---|---|---|
-| [7/3](#m07d03) | 看 TT 小教室第 1~5 課。 | — |
-| [7/4](#m07d04) | 看 TT 小教室第 6~7 課。 | — |
-| [7/5](#m07d05) | 看 TT 小教室第 8~11 課。 | — |
-| [7/6](#m07d06) | — | — |
-| [7/7](#m07d07) | 清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。 | 複習7/3 - 7/6進度。 |
-| [7/8](#m07d08) | — | 複習7/3 - 7/7進度。 |
-| [7/9](#m07d09) | 看財經村長-數位IC設計面試1。 | — |
-| [7/10](#m07d10) | — | 複習7/3 - 7/9內容。 |
-| [7/11](#m07d11) | — | 複習7/3 - 7/10內容。 |
-| [7/13](#m07d13) | — | 複習7/3 - 7/11內容。 |
-| [7/14](#m07d14) | — | — |
-| [7/15](#m07d15) | — | 複習7/3 - 7/14內容。 |
-| [7/16](#m07d16) | 看 TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】 | — |
-| [7/17](#m07d17) | 看 TT 小教室 Verilog RTL design 進階教學【Memory】 | — |
-| [7/21](#m07d21) | — | 複習7/3 - 7/17內容。 |
-| [7/23](#m07d23) | — | 利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj |
-| [7/24](#m07d24) | 財經村長 - 如何面試上一線數位IC公司 II | — |
-
----
-
-<a id="toc-issue"></a>
-
-## 🐛 目錄二：依「遇到的問題」快速跳轉
-
-| 日期 | 當天遇到的問題 |
+| 日期 | 內容摘要 |
 |---|---|
-| [7/3](#m07d03-issue) | 在寫always、case語法撰寫不完整，導致編譯錯誤。 |
-| [7/4](#m07d04-issue) | 在Connecting Signals to Module Ports的時候，搞錯"by position"與"by name"這兩種方法，by position與順序有關。 |
-| [7/5](#m07d05-issue) | Adder1（用兩個16位元加法器模塊合成出一個32位元加法器）；Adder2（Module fadd） |
-| [7/6](#m07d06-issue) | carry-slect Adder（選擇式加法器） |
-| [7/7](#m07d07-issue) | Create a 100-bit binary ripple-carry adder |
-| [7/8](#m07d08-issue) | Create a 100-digit BCD ripple-carry adder |
-| [7/9](#m07d09-issue) | Ringer |
-| [7/10](#m07d10-issue) | 誤解溢位判斷。 |
-| [7/11](#m07d11-issue) | create a 4-digit BCD ripple-carry adder |
-| [7/13](#m07d13-issue) | using one 4-to-1 multiplexer and as many 2-to-1 multiplexers as required |
-| [7/14](#m07d14-issue) | Exams/ece241 2014 q4 |
-| [7/15](#m07d15-issue) | Edgedetect（正邊緣偵測） |
-| [7/16](#m07d16-issue) | slow decade counter |
-| [7/17](#m07d17-issue) | 4-digit BCD counter (Countbcd) |
-
----
-
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+| [7/3](#m07d03) | 影片：TT 小教室第 1~5 課。 |
+| [7/4](#m07d04) | 影片：TT 小教室第 6~7 課。 |
+| [7/5](#m07d05) | 影片：TT 小教室第 8~11 課。 |
+| [7/6](#m07d06) | 刷題：完成 HDLBits 的 "carry-slect Adder" 到 "a priority encoder for 8-bit inputs"。 |
+| [7/7](#m07d07) | 影片：清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。 |
+| [7/8](#m07d08) | 資料：複習7/3 - 7/7進度。 |
+| [7/9](#m07d09) | 影片：看財經村長-數位IC設計面試1。 |
+| [7/10](#m07d10) | 資料：複習7/3 - 7/9內容。 |
+| [7/11](#m07d11) | 資料：複習7/3 - 7/10內容。 |
+| [7/13](#m07d13) | 資料：複習7/3 - 7/11內容。 |
+| [7/14](#m07d14) | 刷題：完成 HDLBits 的 D latch 到 Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）。 |
+| [7/15](#m07d15) | 資料：複習7/3 - 7/14內容。 |
+| [7/16](#m07d16) | 影片：TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】 |
+| [7/17](#m07d17) | 影片：TT 小教室 Verilog RTL design 進階教學【Memory】 |
+| [7/21](#m07d21) | 資料：複習7/3 - 7/17內容。 |
+| [7/23](#m07d23) | 資料：利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj |
+| [7/24](#m07d24) | 影片：財經村長 - 如何面試上一線數位IC公司 II |
+| [7/25](#m07d25) | 影片： |
+| [7/27](#m07d27) | 資料： |
+| [7/28](#m07d28) | 資料： |
+| [7/30](#m07d30) | 刷題：複習 HDLBits 7/3 - 7/17 進度。 |
+| [7/31](#m07d31) | 資料： |
+| [8/1](#m08d01) | ALU 設計： |
+| [8/2](#m08d02) | ALU 設計： |
+| [8/3](#m08d03) | ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確 |
+| [8/4](#m08d04) | ALU_V2（pipeline）設計： |
+| [8/5](#m08d05) | ALU 設計： |
 
 ---
 
 <a id="m07d03"></a>
 
-## 📌 2026 年 7 月 3 日
+## 2026 年 7 月 3 日
 
-### 今日進度
+## 今日進度：
+### 影片：TT 小教室第 1~5 課。
+### 刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
 
-**🎬 影片**
-- 看 TT 小教室第 1~5 課。
-
-**📝 刷題**
-- 完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
-
-<a id="m07d03-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：在寫always、case語法撰寫不完整，導致編譯錯誤。
 ### 解法：於程式後面加上end、endcase，成功編譯。
@@ -111,31 +89,26 @@ end
 ### 正反器（Flip-Flop）
 * 又稱暫存器，同步數位電路最重要組成元件。與clock同步（上沿 0->1 positive edge, 下沿 1->0 negative edge）。邏輯深度決定電路速度
 * 分清楚reset訊號跟clock是同步/非同步
-* 同步reset（reset隨clock動作）：例always@(posedge clk)begin
-* 非同步reset（reset一來就動作）：例always@(posedge clk or negedge rst_n)begin //低電位非同步reset
+* 同步reset（reset隨clock動作）：例`always@(posedge clk)begin`
+* 非同步reset（reset一來就動作）：例`always@(posedge clk or negedge rst_n)begin`//低電位非同步reset
   
 ### 震盪器（Oscillator）
-* always #<一半的週期時間> clk=~clk（通常用在Testbench產生clk，一般數位電路不會這樣寫）
+* `always #<一半的週期時間> clk=~clk`（通常用在Testbench產生clk，一般數位電路不會這樣寫）
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d04"></a>
 
-## 📌 2026 年 7 月 4 日
+## 2026 年 7 月 4 日
 
-### 今日進度
+## 今日進度：
+### 影片：TT 小教室第 6~7 課。
+### 刷題：複習 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
 
-**🎬 影片**
-- 看 TT 小教室第 6~7 課。
-
-**📝 刷題**
-- 複習 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
-
-<a id="m07d04-issue"></a>
 ## 遇到的困難與解決方案：
-### 問題：在Connecting Signals to Module Ports的時候，搞錯"by position"與"by name"這兩種方法，by position與順序有關。
+### 問題：在Connecting Signals to Module Ports的時候，搞錯"by position"與"by name"這兩種方法，by position與宣告順序有關。
 ### 解法：複習兩種觀念，並搞懂兩者順序關聯，by position與順序有關，by name與順序無關。
 ```verilog
  //mod_a要求：module mod_a ( output, output, input, input, input, input );
@@ -173,7 +146,7 @@ endmodule
  | ＆＆ | Logic AND |
  | ｜｜ | Logic OR |
 
-**判斷T/F，output為1bit**
+**判斷 T/F，output 為 1bit**
 
 ### Reduction運算元：
   
@@ -183,7 +156,7 @@ endmodule
  | ｜ | Reduction OR |
  | ︿ | Reduction XOR |
 
-**將運算元右邊陣列中的每一位元做運算，output為1bit**
+**將運算元右邊陣列中的每一位元做運算，output 為 1bit**
 * EX. a = 4'b0110, &a = 0 & 1 & 1 & 0 = 1'b0
   
 ### 關係運算元：
@@ -209,8 +182,8 @@ endmodule
   * `wire signed [7:0] a;`
   * `wire signed [3:0] b;`
   * `a[7]`和`b[3]`就分別是`a`和`b`的正負號
-  * `assign a = 8'b1000_0011;` $\rightarrow$ `a= -125 (2's complementary)`
-  * `assign b = 4'b0010;` $\rightarrow$ `b= +2`
+  * `assign a = 8'b1000_0011; -> a= -125 (2's complementary)`
+  * `assign b = 4'b0010; -> b= +2`
 
 ### 數學運算元
 
@@ -257,23 +230,18 @@ endmodule
 * wire [4:0] z3;
 * assign z3 = (a >> 3);
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d05"></a>
 
-## 📌 2026 年 7 月 5 日
+## 2026 年 7 月 5 日
 
-### 今日進度
+## 今日進度：
+### 影片：TT 小教室第 8~11 課。
+### 刷題：完成 HDLBits 的 "Adder1" 到 "Adder2"。
 
-**🎬 影片**
-- 看 TT 小教室第 8~11 課。
-
-**📝 刷題**
-- 完成 HDLBits 的 "Adder1" 到 "Adder2"。
-
-<a id="m07d05-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題1：
 * Adder1（用兩個16位元加法器模塊合成出一個32位元加法器）
@@ -399,7 +367,7 @@ end
 ### case
 * 只能寫在always block裡（循序、組合邏輯皆可）
 * 當多選擇成立，則執行第一個成立的logic
-* case、casez較常用，casez可用"?"表don't care
+* case、casez較常用，casez可用"?"、"z"表don't care
 * 最後加default避免Latch，除非條件都寫滿
 ```verilog
 case(狀態選擇)
@@ -560,7 +528,7 @@ endmodule
 
 | 特性 |  `define` (全球巨集) | `parameter` (局部參數) |
 | --- | --- | --- |
-| **語法關鍵字** | 開頭帶有反單引號，如 ``define DATA_WIDTH 8` | 正常宣告，如 `parameter DATA_WIDTH = 8;` |
+| **語法關鍵字** | 開頭帶有反單引號，如 `'define DATA_WIDTH 8` | 正常宣告，如 `parameter DATA_WIDTH = 8;` |
 | **作用範圍** | **全域（Global）**。只要在編譯順序中被讀取，其後所有的 `.v` 檔案、所有 Module 都能直接使用。 | **區域（Local）**。只在宣告它的該個 `module` 內部有效。 |
 | **使用方式** | 呼叫時前面一定要加一撇： |  |
 
@@ -598,8 +566,8 @@ endmodule
 * 語法2
 ```verilog
 module m_name #(
-    parameter 名称1 = 值1,
-    parameter 名称2 = 值2
+    parameter 名稱1 = 值1,
+    parameter 名稱2 = 值2
 )(
     input/output宣告
 );
@@ -650,20 +618,17 @@ endmodule
 | **作用範圍** | **全域（Global）**。只要在編譯順序中被讀取，其後所有的 .v 檔案、所有 Module 都能直接使用。 | **區域（Local）**。只在宣告它的該個 module 內部有效。 |
 | **使用方式** | 呼叫時前面一定要加一撇 | |
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d06"></a>
 
-## 📌 2026 年 7 月 6 日
+## 2026 年 7 月 6 日
 
-### 今日進度
+## 今日進度：
+### 刷題：完成 HDLBits 的 "carry-slect Adder" 到 "a priority encoder for 8-bit inputs"。
 
-**📝 刷題**
-- 完成 HDLBits 的 "carry-slect Adder" 到 "a priority encoder for 8-bit inputs"。
-
-<a id="m07d06-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 * carry-slect Adder（選擇式加法器）
@@ -784,26 +749,19 @@ endmodule
     endmodule
     ```
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d07"></a>
 
-## 📌 2026 年 7 月 7 日
+## 2026 年 7 月 7 日
 
-### 今日進度
+## 今日進度：
+### 影片：清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。
+### 資料：複習7/3 - 7/6進度。
+### 刷題：複習7/3 - 7/6進度、完成 HDLBits 的 "Always nolatches" 到 "Create a 100-bit binary ripple-carry adder"。
 
-**🎬 影片**
-- 清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。
-
-**📚 資料**
-- 複習7/3 - 7/6進度。
-
-**📝 刷題**
-- 複習7/3 - 7/6進度、完成 HDLBits 的 "Always nolatches" 到 "Create a 100-bit binary ripple-carry adder"。
-
-<a id="m07d07-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 * Create a 100-bit binary ripple-carry adder
@@ -921,23 +879,18 @@ module add1(
     * 加入冗餘項 (Redundant Terms / Hazard Cover)：利用卡諾圖（Karnaugh Map）圈選相鄰群組時，在兩個群組的交界處額外多圈一個「冗餘乘積項」（卡諾圖上的圈圈重疊）。多出來的邏輯閘能確保當輸入訊號在兩組之間切換時，輸出不會因為延遲而掉下去。
     * 改用同步時序電路 (Design Synchronous Logic)：現代 IC 設計最核心的解法。不要直接使用組合邏輯的輸出作為下一個電路的觸發訊號。在組合邏輯後面接一個正反器（Flip-Flop），並由全域時脈（Clock）控制。因為**毛邊只會發生在時脈週期的中間**，只要我們確保在時脈邊緣（Setup Time / Hold Time）來臨時訊號已經穩定，正反器就不會鎖存到毛邊。
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d08"></a>
 
-## 📌 2026 年 7 月 8 日
+## 2026 年 7 月 8 日
 
-### 今日進度
+## 今日進度：
+### 資料：複習7/3 - 7/7進度。
+### 刷題：複習7/3 - 7/7進度、完成 HDLBits 的 "100-digit BCD ripple-carry adder（100 位的 BCD 級聯加法器）"。
 
-**📚 資料**
-- 複習7/3 - 7/7進度。
-
-**📝 刷題**
-- 複習7/3 - 7/7進度、完成 HDLBits 的 "100-digit BCD ripple-carry adder（100 位的 BCD 級聯加法器）"。
-
-<a id="m07d08-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 * Create a 100-digit BCD ripple-carry adder
@@ -1099,23 +1052,18 @@ module add1(
 	endmodule
   ```
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d09"></a>
 
-## 📌 2026 年 7 月 9 日
+## 2026 年 7 月 9 日
 
-### 今日進度
+## 今日進度：
+### 影片：看財經村長-數位IC設計面試1。
+### 刷題：完成 HDLBits - "Combinational Logic" 中的 "Basic gates"。
 
-**🎬 影片**
-- 看財經村長-數位IC設計面試1。
-
-**📝 刷題**
-- 完成 HDLBits - "Combinational Logic" 中的 "Basic gates"。
-
-<a id="m07d09-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 * Ringer
@@ -1337,23 +1285,18 @@ module d_latch (
   * Hold fix通常是最後的收尾工作，在setup timing基本達標後才進行大規模的hold fixing。
   * 設計者需要在設定P&R constraints時,給予工具足夠的buffer insertion彈性，並在chip finishing階段仔細檢查hold fix的結果，確保沒有過度修復(over-fixing)或遺漏關鍵路徑。
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d10"></a>
 
-## 📌 2026 年 7 月 10 日
+## 2026 年 7 月 10 日
 
-### 今日進度
+## 今日進度：
+### 資料：複習7/3 - 7/9內容。
+### 刷題：複習 HDLBits 的 "Modules" 到 "Basic Gates"；完成 HDLBits - Arithmetic circuits 的 half adder 到 signed addition overflow。
 
-**📚 資料**
-- 複習7/3 - 7/9內容。
-
-**📝 刷題**
-- 複習 HDLBits 的 "Modules" 到 "Basic Gates"；完成 HDLBits - Arithmetic circuits 的 half adder 到 signed addition overflow。
-
-<a id="m07d10-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：誤解溢位判斷。
 ### 解法：
@@ -1404,23 +1347,18 @@ endmodule
 	endmodule
   ```   
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d11"></a>
 
-## 📌 2026 年 7 月 11 日
+## 2026 年 7 月 11 日
 
-### 今日進度
+## 今日進度：
+### 資料：複習7/3 - 7/10內容。
+### 刷題：複習 HDLBits 的 "Modules" 到 "multiplexers"；完成 HDLBits - Arithmetic circuits。
 
-**📚 資料**
-- 複習7/3 - 7/10內容。
-
-**📝 刷題**
-- 複習 HDLBits 的 "Modules" 到 "multiplexers"；完成 HDLBits - Arithmetic circuits。
-
-<a id="m07d11-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：create a 4-digit BCD ripple-carry adder
 * 在做賦值後出現寬度截斷警告（Truncation Warning）。
@@ -1568,23 +1506,18 @@ endmodule
 	endmodule
   ```
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d13"></a>
 
-## 📌 2026 年 7 月 13 日
+## 2026 年 7 月 13 日
 
-### 今日進度
+## 今日進度：
+### 資料：複習7/3 - 7/11內容。
+### 刷題：完成 HDLBits 的 Karnaugh Map to Circuit 到 DFF with byte enable。
 
-**📚 資料**
-- 複習7/3 - 7/11內容。
-
-**📝 刷題**
-- 完成 HDLBits 的 Karnaugh Map to Circuit 到 DFF with byte enable。
-
-<a id="m07d13-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### using one 4-to-1 multiplexer and as many 2-to-1 multiplexers as required
@@ -1769,20 +1702,17 @@ endmodule
 4. 業界標準規範（專業度的體現）
 * 在聯發科（MediaTek）或各大 IC 設計廠的 Coding Style Guide（程式碼規範原則） 中，為了防止上述的各種人類肉眼失誤，通常都是強迫一律加上 begin...end。
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d14"></a>
 
-## 📌 2026 年 7 月 14 日
+## 2026 年 7 月 14 日
 
-### 今日進度
+## 今日進度：
+### 刷題：完成 HDLBits 的 D latch 到 Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）。
 
-**📝 刷題**
-- 完成 HDLBits 的 D latch 到 Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）。
-
-<a id="m07d14-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### Exams/ece241 2014 q4
@@ -1847,23 +1777,18 @@ endmodule
 ### 組合邏輯（純運算、不需記憶，只想即時得到結果）
 * 用 assign 搭配 wire 與 = （blocking）。
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d15"></a>
 
-## 📌 2026 年 7 月 15 日
+## 2026 年 7 月 15 日
 
-### 今日進度
+## 今日進度：
+### 資料：複習7/3 - 7/14內容。
+### 刷題：複習 HDLBits 的 "Modules" 到 "Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）"；完成 HDLBits - sequential logic。
 
-**📚 資料**
-- 複習7/3 - 7/14內容。
-
-**📝 刷題**
-- 複習 HDLBits 的 "Modules" 到 "Implement a JK flip-flop with only a D-type flip-flop and gates（Exams/ece241 2013 q7）"；完成 HDLBits - sequential logic。
-
-<a id="m07d15-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### Edgedetect（正邊緣偵測）
@@ -2121,23 +2046,18 @@ endmodule
    * 硬體成本與設計難度：
      * 標準的 FPGA 或標準元件庫（Standard Cell Library）裡，雙邊沿暫存器的電路結構比單邊沿複雜得多（面積大、放線難），因此只會用在記憶體、傳輸介面等「最需要衝極速、省功耗的刀口上」。
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d16"></a>
 
-## 📌 2026 年 7 月 16 日
+## 2026 年 7 月 16 日
 
-### 今日進度
+## 今日進度：
+### 影片：TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】
+### 刷題：完成 HDLBits - counters 的 Four-bit binary counter  到 slow decade counter。
 
-**🎬 影片**
-- 看 TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】
-
-**📝 刷題**
-- 完成 HDLBits - counters 的 Four-bit binary counter  到 slow decade counter。
-
-<a id="m07d16-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### slow decade counter
@@ -2278,23 +2198,18 @@ endmodule
    * 沒有辦法可以"完全"解決，只能大幅度降低產生的機率。
    * MTBF(mean time between failure)意思是發生兩次錯誤之間的間隔，這個指標常用來衡量CDC的情形，越大越好（代表隔了很長一段時間才發生下一次錯誤）。   
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d17"></a>
 
-## 📌 2026 年 7 月 17 日
+## 2026 年 7 月 17 日
 
-### 今日進度
+## 今日進度：
+### 影片：TT 小教室 Verilog RTL design 進階教學【Memory】
+### 刷題：完成 HDLBits 的 "counter 1-12" 到 "4-digit BCD counter (Countbcd)"；待完成 "12-hour clock"。
 
-**🎬 影片**
-- 看 TT 小教室 Verilog RTL design 進階教學【Memory】
-
-**📝 刷題**
-- 完成 HDLBits 的 "counter 1-12" 到 "4-digit BCD counter (Countbcd)"；待完成 "12-hour clock"。
-
-<a id="m07d17-issue"></a>
 ## 遇到的困難與解決方案：
 ### 問題：
 ### 4-digit BCD counter (Countbcd)
@@ -2684,38 +2599,29 @@ module counter2(
 endmodule
 ```
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d21"></a>
 
-## 📌 2026 年 7 月 21 日
+## 2026 年 7 月 21 日
 
-### 今日進度
+## 今日進度：
+### 資料：複習7/3 - 7/17內容。
+### 刷題：複習 HDLBits 7/3 - 7/17 進度。
 
-**📚 資料**
-- 複習7/3 - 7/17內容。
-
-**📝 刷題**
-- 複習 HDLBits 7/3 - 7/17 進度。
-
-
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d23"></a>
 
-## 📌 2026 年 7 月 23 日
+## 2026 年 7 月 23 日
 
-### 今日進度
-
-**📚 資料**
-- 利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj
-
-**🔧 其他**
-- Vivado：嘗試在 Vivado 上寫簡單半加器模型並模擬測試
+## 今日進度：
+### 資料：利用網路資源學習Vivado - How to use vivado for Beginners by Anand Raj
+### Vivado：嘗試在 Vivado 上寫簡單半加器模型並模擬測試
 
 ## 今日成果探討：
 ### half-adder
@@ -2808,7 +2714,6 @@ wire [7:0] data_out;// 接收主電路的輸出
 ```
 
 4. 實例化主電路 (Instantiation)
-* 放在檔案最開頭，用來指定 # 代表多少時間
 ```verilog
 // 格式：主電路名稱 實體名稱 (.主電路腳位(Testbench訊號))
 my_design uut (
@@ -2884,18 +2789,16 @@ end else begin
 end
 ```
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
 
 ---
 
 <a id="m07d24"></a>
 
-## 📌 2026 年 7 月 24 日
+## 2026 年 7 月 24 日
 
-### 今日進度
-
-**🎬 影片**
-- 財經村長 - 如何面試上一線數位IC公司 II
+## 今日進度：
+### 影片：財經村長 - 如何面試上一線數位IC公司 II
 
 ## 關鍵知識/詞彙：
 ### 亞穩態深度解析
@@ -3006,6 +2909,1282 @@ end
 2. 測試概念：
    * 要偵測 Stuck-at 1，需要讓正常電路輸出 0，若輸出為 1 則表示有故障。要偵測 Stuck-at 0，則需讓正常輸出為 1。若電路結構上無法讓故障點呈現正確值，即為不可測故障。
 
-[⬆ 回目錄一](#toc-date) ｜ [⬆ 回目錄二](#toc-issue)
+[回目錄](#toc)
+
+---
+
+<a id="m07d25"></a>
+
+## 2026 年 7 月 25 日
+
+## 今日進度：
+### 影片：
+1. [第1講 Vivado設計流程及使用模式](https://www.youtube.com/watch?v=9pylHMr0yfE&t=1s)
+2. [How to use Vivado® Design Suite Part-5 Timing Summary Report](https://www.youtube.com/watch?v=zLs8P_PbAV4)
+3. [63 - Vivado's Timing Reports](https://www.youtube.com/watch?v=Gdt5IBKGQos&t=254s)
+4. [Xilinx Vivado Tutorial: Timing Analysis and Critical Path Optimization](https://www.youtube.com/watch?v=sc8LOViD0Jg&t=317s)
+
+## 關鍵知識/詞彙：
+### Vivado 完整流程概念
+<img width="264" height="230" alt="image" src="https://github.com/user-attachments/assets/78066304-e249-4fa9-b87c-ba7c289a82c7" />
+
+1. Simulation（模擬）
+   * 主要作用： 執行 Behavioral Simulation（行為級模擬）。
+   * 搭配你寫好的 Testbench 跑波形圖（Waveform）。在完全不需要連接任何硬體板子的情況下，先確認寫好的 Verilog/VHDL 邏輯功能是否正確。
+
+2. RTL Analysis（RTL 分析 / 電路結構檢視）
+   * 主要作用： 展開程式碼的 Schematic（電路原理圖） 與語法檢查。
+   * 軟體會初步解析你的程式碼，把它畫成邏輯閘、暫存器（Flip-Flops）與多工器（Mux）組成的架構圖。你可以用它來確認： Vivado 解讀出的電路結構，是否跟自己所想像的一模一樣。
+     
+3. Synthesis（邏輯綜合）
+   * 主要作用： 將文字程式碼轉換為門級網表（Gate-level Netlist）。
+   * 軟體會把你寫的抽象邏輯（如 +、 -、 if-else），翻譯成 FPGA 晶片內部實際存在的底層單元，例如 LUT (Look-Up Table)、Flip-Flop (FF) 和 Block RAM。
+     
+4. Implementation（布局與布線 - Place & Route）
+   * 主要作用： 將綜合後的電路實體化，並進行時序分析。
+   * Placement (布局)： 決定把 Synthesis 產生的 LUT 和 FF 放到 FPGA 晶片上的哪個具體物理位置。
+   * Routing (布線)： 將晶片內部的金屬導線接通。
+   * Timing Analysis (時序分析)： 檢查訊號傳輸速度是否太慢、會不會產生 Setup/Hold Time 違規（Timing Violation）。
+
+5. Program and Debug（燒錄與硬體除錯）
+   * 主要作用： 生成燒錄檔、連線 FPGA 開發板與在線除錯。
+   * Generate Bitstream： 將 Implementation 的結果打包成 .bit 燒錄檔。
+   * Hardware Manager： 透過 USB 線連接開發板，把 .bit 檔燒進 FPGA 晶片。
+   Logic Analyzer (ILA)： 當板子運作不正常時，可以在晶片內加入抓訊號的儀器，即時回傳晶片內部的波形到 Vivado 畫面上進行除錯。
+
+6. 標準開發流程順序：
+   * Simulation (先模擬) -> Synthesis (邏輯綜合) -> Implementation (布局布線) -> Program and Debug (產出 bit 檔並燒錄)
+
+### XDC 檔（Xilinx Design Constraints）
+1. 簡介
+   * Vivado 的約束檔（Constraint File），副檔名為 .xdc。
+   * XDC 檔就是指定「這個器官要連接到 FPGA 晶片的哪一個實體腳位」，以及「系統的時脈頻率是多少」。
+
+2. XDC 檔最常見的兩大功能：
+   * Pin Assignment（管腳約束 / 腳位綁定）：指定你的輸入輸出訊號對應到板子上的哪個按鈕或 LED 燈。
+     ```verilog
+     # 把 LED 訊號綁定到 FPGA 的 Y13 腳位，並設定電壓標準為 LVCMOS33
+		set_property PACKAGE_PIN Y13 [get_ports {led}]
+		set_property IOSTANDARD LVCMOS33 [get_ports {led}]
+     ```
+   * Clock Constraint（時脈約束）：告訴 Vivado 你的 Clock 頻率是多少（讓 Vivado 知道怎麼計算 WNS 報告）。
+     ```verilog
+     # 告訴 Vivado，sys_clk 這個腳位輸入的時脈週期是 10ns (也就是 100MHz)
+		create_clock -period 10.000 -name sys_clk [get_ports sys_clk]
+     ```
+   
+### Timing Report（時序報告）
+<img width="756" height="125" alt="image" src="https://github.com/user-attachments/assets/b2da2c7b-28ca-4346-b51f-6256f45d8d5e" />
+
+<img width="1358" height="725" alt="image" src="https://github.com/user-attachments/assets/18e836a5-0775-4527-a430-e66fdf442b1d" />
+
+
+1. 簡介
+   * 跑完 Implementation 後，Vivado 會幫你做全面嚴格的「時序檢查」。
+   * 就像是電路的「體檢報告」。它告訴你：你的電路傳輸速度，能不能跟上你設定的 Clock（時脈）頻率？
+
+2. 報告中最重要的地方
+   * 最核心的就是查看電路有沒有 Timing Violation（時序違規），也就是訊號會不會「來不及跑完」。
+   * 標準就是 Slack（時序裕量）：
+     * Slack > 0（綠色）： 訊號傳輸時間綽綽有餘，電路可以在預期頻率下完美運作。
+     * Slack < 0（紅色）： 訊號傳輸太慢了（Setup Time Violation）或太快了（Hold Time Violation），電路在實體晶片上會出錯（爆 Bug）。
+
+3. WNS（Worst Negative Slack 最壞負裕量）
+   * 定義： 全晶片所有路徑中，最嚴重的那條「延遲/卡頓」路徑缺了多少時間。
+   * 重點評估：
+     * 如果 WNS >= 0 ns：代表整張晶片的時序全部過關（Timing Met）。
+     * 如果 WNS = -1.2 ns：代表最慢的那條路徑，超出了規定的時脈週期 1.2 ns，須優化程式碼或降低 Clock 頻率。
+
+### Utilization 報告（資源使用率）
+<img width="380" height="205" alt="image" src="https://github.com/user-attachments/assets/3470d57f-b3f7-48f5-b4ce-1e9914a2fe44" />
+
+1. 定義： 你的程式碼佔用了這顆 FPGA 晶片百分之多少的硬體資源。
+   
+2. 重要性： 觀察晶片會不會「被塞爆」。如果 Utilization 超過 80% ~ 90%，Vivado 的 Implementation 會變得極度困難，甚至會導致時序爆發（WNS 變成負值）。
+   
+3. LUT / FF 用量
+
+| 資源名稱 | 全名 | 核心功能與作用 |
+| :--- | :--- | :--- |
+| LUT | Look-Up Table (查找表) | 實現**組合邏輯（Combinational Logic）**。例如加法、減法、`if-else`、`case` 判斷。 |
+| FF | Flip-Flop (觸發器/暫存器) | 實現**時序邏輯（Sequential Logic）**。用來儲存 1 bit 的資料，必須靠 Clock 驅動。 |
+
+### 實際開發的連鎖反應
+1. Timing Report、Utilization兩個報告要「一起看」
+   * 如果 Utilization 報告顯示 LUT / FF 用量超過 80%~90%，晶片裡面會變得非常擁擠。Vivado 在做 Implementation時，被迫要把相連的邏輯放到距離很遠的地方，繞很長的金屬線。會導致訊號傳輸延遲大幅增加，最後在 Timing Report 裡跳出紅色的 WNS < 0（時序違規）。
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d27"></a>
+
+## 2026 年 7 月 27 日
+
+## 今日進度：
+### 資料：
+1. [Barrel Shifters in Verilog: A Beginner’s Guide to Fast Multi-Bit Shifting](https://medium.com/@ahe24mobile/barrel-shifters-in-verilog-a-beginners-guide-to-fast-multi-bit-shifting-121d1c5a2b62)
+2. [How to Design an Efficient Barrel Shifter in Verilog: Step-by-Step Guide](https://vlsifacts.com/how-to-design-an-efficient-barrel-shifter-in-verilog-step-by-step-guide/)
+
+## 今日成果探討：
+### 32bit_ALU_V1（Baseline）- 設計初步 32-bit 構造、模型以及所支援的運算
+<img width="544" height="316" alt="image" src="https://github.com/user-attachments/assets/edfdfcaf-8039-4a88-8e76-640d7a6a100d" />
+<img width="923" height="507" alt="image" src="https://github.com/user-attachments/assets/24a57abe-c425-42a0-8ac1-af8253aafec1" />
+
+### 8-bit Logical Left Barrel Shifter
+* Design sources
+```verilog
+module Logical_Left_Barrel_Shifter(
+
+    input [7:0]d_in,
+    input [2:0]shamt,
+    output [7:0]d_out
+    
+ );
+    
+    wire [7:0] t1, t2;
+    
+    // Shift by 1 bit if shamt第 0 位 == 1
+    assign t1 = shamt[0] ? {d_in[6:0], 1'b0} : d_in;
+    // Shift by 2 bit if shamt第 1 位 == 1
+    assign t2 = shamt[1] ? {t1[5:0], 2'b00} : t1;
+    // Shift by 4 bit if shamt第 2 位 == 1
+    assign d_out = shamt[2] ? {t2[3:0], 4'b0000} : t2;
+    
+endmodule
+```
+
+* Simulation sources
+```verilog
+module barrel_shifter_tt();
+
+reg [7:0]d_in;
+reg [2:0]shamt;
+wire [7:0]d_out;
+
+Logical_Left_Barrel_Shifter tt(
+    .d_in(d_in),
+    .shamt(shamt),
+    .d_out(d_out)
+);
+
+initial begin
+    d_in = 8'b10110011; // Initialize input data 
+    // Test all shift amounts from 0 to 7
+    for(shamt=0; shamt<8; shamt=shamt+1)begin
+        #10;// Wait 10 time units for output to stabilize
+        $display("Time=%0t | shift_amt=%0d | data_in=%b | data_out=%b"
+        ,$time, shamt, d_in, d_out);
+    end
+    #10;
+    $finish;
+end
+```
+
+* 模擬結果
+<img width="536" height="377" alt="image" src="https://github.com/user-attachments/assets/3b93234d-1639-46c6-b798-0b28319c5f0f" />
+<img width="512" height="159" alt="image" src="https://github.com/user-attachments/assets/1bba3fc9-40d6-4fe6-8058-f67cada8dd00" />
+
+
+
+## 關鍵知識/詞彙：
+### 邏輯移位／算數移位
+1. 左移與右移的核心差別
+   * 數學語意上的不同（乘法 vs 除法）：
+     * 左移（Left Shift）： 位元向高位移動，數值上等同於乘以 2^n
+     * 右移（Right Shift）： 位元向低位移動，數值上等同於除以 2^n（自動向下取整）
+
+   * 補位規則的對稱性：
+     * 左移（<< / <<<）： 補位行為完全對稱且一致，無論是邏輯還是算術，右側（LSB）空出來的位置一律補 0
+     * 右移（>> / >>>）： 是算術與邏輯差異最顯著之處。邏輯右移左側永遠補 0；算術右移（且變數為 signed）左側會補最高有效位（MSB，即正數補 0、負數補 1），用以保持負數的數值正確性
+  
+   * 邊界溢位與精度損失：
+     * 左移容易造成高位溢位（Overflow），若接收變數的位元寬度不夠，最左側的位元將會被丟棄
+     * 右移則會造成低位精度的捨棄（Truncation），最右側移出的位元會直接丟失（相當於整數除法捨去餘數）。
+
+2. 邏輯移位 vs 算術移位比較表
+
+| 比較項目 | 邏輯移位 (Logical Shift) | 算術移位 (Arithmetic Shift) |
+| :--- | :--- | :--- |
+| **語法運算子** | `<<`（左移）、`>>`（右移） | `<<<`（左移）、`>>>`（右移） |
+| **符號屬性 (Signedness)** | 強制作為 **Unsigned（無符號）** 處理 | 保留 **Signed（有符號）** 屬性<br>*(須宣告為 `signed` 變數)* |
+| **左移補位行為** | 右側永遠**補 0** | 右側永遠**補 0**（與邏輯左移相同） |
+| **右移補位行為** | 左側（MSB）永遠**補 0** | 若變數為 signed 則**補符號位 (MSB)**<br>若變數為 unsigned 則**補 0** |
+| **位元擴展行為<br>(Sign Extension)** | 賦值給較長位元時，高位直接**補 0** | 賦值給較長位元時，依據符號位進行**符號擴展** |
+| **主要應用場景** | 資料封包拆解、Mask 遮罩、純位元操作 | 有符號數的數學快速乘除法（2 的次方的乘除） |
+
+### 桶型移位器 (Barrel Shifter) 
+1. 簡介：是一種純組合邏輯電路，其最大特點為「可以在單一時脈週期內將資料向左或向右移動任意位數」
+
+2. 運作原理：內部通常由多級 Multiplexer（MUX）對角線式連接而成。以 8-bit Barrel Shifter 為例，內部設計為 3 級 MUX：
+   * 第 1 級決定是否移位 1 位 (2^0)
+   * 第 2 級決定是否移位 2 位 (2^1)
+   * 第 3 級決定是否移位 4 位 (2^2)
+   * 藉由這些 2 的次方組合，即可在極短的組合邏輯延遲（O(\log N)）內完成 0~7 位的任意移位。
+
+3. 適用情境：廣泛應用於現代 CPU 的 ALU（算術邏輯單元）與 DSP 中，用來支援單指令週期的位移操作。
+
+### 一般移位暫存器 (Standard Shift Register)
+1. 簡介：是一種時序邏輯電路，由多個 Flip-Flop（觸發器）串聯而成。
+
+2. 運作原理：在每一個時脈邊緣（Clock Edge）到來時，資料會從前一級 Flip-Flop 傳遞到下一級，實現「每次 Clock 只移動 1 位元」的行為。
+   * 優缺點： 雖然若要移位 N 位元需要花費 N 個時脈週期（吞吐量較低），但其電路結構非常簡潔、佔用晶片面積小，且沒有複雜的組合邏輯延遲問題。
+
+3. 適用情境：適合用於串列通訊資料轉換（如 SPI、UART、I2C 的 SIPO / PISO 轉換）或暫存佇列（Shift Register FIFO）。
+
+### Barrel Shifter vs 一般移位暫存器比較表
+
+| 比較項目 | Barrel Shifter（桶型移位器） | 一般移位暫存器 (Standard Shift Register) |
+| :--- | :--- | :--- |
+| **核心架構** | 多級多工器（Multiplexer Array）組合邏輯 | 觸發器（D Flip-Flop）級聯串列時序電路 |
+| **電路類型** | **純組合邏輯 (Combinational Logic)** | **時序邏輯 (Sequential Logic)** |
+| **移位時間 (延遲)** | **1 個時脈週期內 (1 Clock Cycle)** 完成任意 $N$ 位元移位（延遲為 $O(\log N)$） | 需要 **$N$ 個時脈週期 (N Clock Cycles)** 才能移位 $N$ 位元（延遲為 $O(N)$） |
+| **硬體資源 (面積)** | 較高，隨位元數成 $O(N \log N)$ 成長（大量 MUX） | 較低，隨位元數成 $O(N)$ 成長（僅需 DFF 與少許邏輯） |
+| **關鍵路徑/延遲** | 組合邏輯線路較長（Gate Delay 較大），容易成為 Critical Path | 每個 Cycle 延遲極小（僅 DFF 的 $T_{co}$），易於達成高 Clock Frequency |
+| **移位位數彈性** | 任意位數可單一週期直接指定（如直接移 5 位） | 逐位移位，移幾位就需要幾個 Clock 觸發 |
+| **主要應用場景** | ALU、浮點數運算單元 (FPU)、DSP 算術運算、處理器指令集 (ARM Shifter) | 串列/並列轉換 (SIPO/PISO)、通訊介面 (SPI/UART)、資料緩衝佇列 |
+
+* Trade-off when using Barrel Shifter：需要更多的邏輯電路（例如，a tree of multiplexers），從而換取更高的速度。當需要在一個週期內進行變速時，這種方法是值得的。
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d28"></a>
+
+## 2026 年 7 月 28 日
+
+## 今日進度：
+### 資料：
+1. [Verilog code for Arithmetic Logic Unit (ALU)](https://www.fpga4student.com/2017/06/Verilog-code-for-ALU.html)
+2. [ALU design in Verilog using MIPS Instruction Set](https://electrobinary.blogspot.com/2021/02/alu-design-in-verilog-using-mips.html)
+
+## 今日成果探討：
+### ALU 設計：
+### 32bit_ALU_V1（Baseline）- 完成 32-bit ALU baseline 版本與 debug 
+* Design sources
+```verilog
+module alu_v1(
+    input [31:0]a,
+    input [31:0]b,
+    input [2:0]op_code,
+    output reg[31:0]res,
+    output [3:0]flag
+);
+    //構建4個 32bit 暫存器用於 barrel shifter
+    //Shamt 選用 b[4:0] 判斷移動幾個 bit
+    reg [31:0]t1, t2, t3, t4;
+    
+    // 構建共用的 33-bit 加減法邏輯（在 case 外面算）
+    wire sub;
+    wire [31:0]b_op;
+    wire [32:0]add_sub;
+    wire carry;
+    wire overflow;
+
+    assign sub = (op_code == 3'b001);// op_code == 3'b001，執行減法
+    assign b_op = b ^ {32{sub}}; // 將 b 逐位元反相
+    assign add_sub = {1'b0, a} + {1'b0, b_op} + sub; // ADD: a+b；SUB: a + ~b + 1（2補數，+1 由 sub 提供）
+    assign carry = add_sub[32]; //進位判斷 
+    assign overflow = (~(a[31] ^ b_op[31])) && (a[31] ^ add_sub[31]);//溢位判斷
+
+// 判斷 ALU 行為
+always@(*)begin
+    case(op_code)
+        3'b000 : // a+b
+            res = add_sub[31:0]; 
+        3'b001 : // a-b 
+            res = add_sub[31:0];
+        3'b010 : 
+            res = a & b;
+        3'b011 : 
+            res = a | b;
+        3'b100 : 
+            res = a ^ b;
+        3'b101 : begin // 邏輯左移(<<)，缺項補0
+            t1 = (b[0]) ? {a[30:0], 1'b0} : a;
+            t2 = (b[1]) ? {t1[29:0], 2'b00} : t1;
+            t3 = (b[2]) ? {t2[27:0], 4'b0000} : t2;
+            t4 = (b[3]) ? {t3[23:0], 8'b00000000} : t3;
+            res = (b[4]) ? {t4[15:0], 16'b00000000} : t4;
+        end 
+        3'b110 : begin // 算術右移(>>>)，補 signed bit a[31]
+            t1 = (b[0]) ? {a[31], a[31:1]} : a;
+            t2 = (b[1]) ? {{2{a[31]}}, t1[31:2]} : t1;
+            t3 = (b[2]) ? {{4{a[31]}}, t2[31:4]} : t2;
+            t4 = (b[3]) ? {{8{a[31]}}, t3[31:8]} : t3;
+            res = (b[4]) ? {{16{a[31]}}, t4[31:16]} : t4; 
+        end
+        3'b111 : res = ($signed(a) < $signed(b)) ? 32'd1 : 32'd0; // 有號數比較
+        default : res = 32'd0;
+    endcase
+end
+
+// 構建 flag
+wire a_s;
+wire Z, N, C, V;
+
+// flag 只在 ADD/SUB 時才有意義
+assign a_s = (op_code == 3'b000) || (op_code == 3'b001);
+
+assign Z = (res == 32'd0) ? 1 : 0; // 零旗標判斷
+assign N = (res[31]) ? 1 : 0; // 負旗標判斷
+assign C = (a_s) ? carry : 0; // 進位旗標判斷
+assign V = (a_s) ? overflow : 0; // 溢位旗標判斷
+    
+assign flag = {Z, N, C, V}; // flag[3]=Z, flag[2]=N, flag[1]=C, flag[0]=V
+
+endmodule
+```
+
+* Simulation sources
+```verilog
+module alu_v1_tt();
+
+    reg [31:0]a, b;
+    reg [2:0]op_code;
+    wire [31:0]res;
+    wire [3:0]flag;
+    integer i;
+    
+    alu_v1 tt(
+    .a(a),
+    .b(b),
+    .op_code(op_code),
+    .res(res),
+    .flag(flag)
+    );
+    
+    initial begin
+    $monitor("time=%0t op_code=%b a=%h b=%h res=%h flag=%b", $time, op_code, a, b, res, flag);
+    a = 32'hF150A1B8;
+    b = 32'h5F58258;
+    for (i = 0; i < 8; i = i + 1) begin
+        op_code = i[2:0];   // 對應 000~111
+        #10;
+    end
+    $finish;   
+    end   
+endmodule
+```
+
+* 模擬結果
+<img width="745" height="377" alt="image" src="https://github.com/user-attachments/assets/28336d72-38ed-4462-ac23-e0a8f90fb22c" />
+
+## 遇到的困難與解決方案：
+### 問題1：SLT 比較負數時判斷結果錯誤
+* 原因：Verilog 的 wire/reg 預設是 unsigned，`a < b` 這種比較不會考慮 2 補數的符號位，導致負數被當成很大的正數去比大小
+* 解法：用 `$signed()` 這個系統函式，把 `a`、`b` 重新解讀成有號數再比較
+* 程式碼：
+  ```verilog
+	res = ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;
+  ```
+
+### 問題2：一開始搞混了 signed() 跟 ~b+1 的用途，以為 a + $signed(b) 可以拿來做減法
+* 原因：誤以為 `$signed()` 會「改變」訊號的數值
+* 釐清後的觀念：
+  * `$signed()` 是**重新解讀（reinterpretation）**：不會動任何一個 bit，只是告訴後面的運算子「把最高位當符號位去解讀」，本質上像加一個濾鏡去看同一份資料
+  * `~b + 1` 是**數值轉換（value transformation）**：把每個 bit 反相再加 1，算出一個新的數值（2 補數的 -b）
+  * 減法需要的是「真的把 b 變成 -b」，屬於數值轉換，`$signed()` 做不到這件事
+* 另外發現：想共用加法器做減法、還要順便算 carry/overflow 時，要把 `a`、`b` 都多補一位變成 33-bit 再相加，「多留一個 bit 裝進位」的動作，`$signed()` 也做不到
+* 程式碼：
+  ```verilog
+	// 構建共用的 33-bit 加減法邏輯（在 case 外面算）
+    wire sub;
+    wire [31:0]b_op;
+    wire [32:0]add_sub;
+    wire carry;
+    wire overflow;
+
+    assign sub = (op_code == 3'b001);// op_code == 3'b001，執行減法
+    assign b_op = b ^ {32{sub}}; // 將 b 逐位元反相
+    assign add_sub = {1'b0, a} + {1'b0, b_op} + sub; // ADD: a+b；SUB: a + ~b + 1（2補數，+1 由 sub 提供）
+    assign carry = add_sub[32]; //進位判斷 
+    assign overflow = (~(a[31] ^ b_op[31])) && (a[31] ^ add_sub[31]);//溢位判斷
+  ```
+
+## 關鍵知識/詞彙：
+### $signed()
+* Verilog 系統函式，將訊號重新解讀為 2 補數表示的有號數，只改變「詮釋方式」，不改變原始 bit pattern
+* 只在該次運算當下生效，不影響同一訊號在其他運算中的解讀方式
+
+### Part Select（位元選取）
+* 語法：訊號[高位:低位]，從一個多位元的訊號裡，取出連續一段 bit
+* 範例：integer i 是 32-bit 有號數，i[2:0] 代表只取出 i 最低的 3 個 bit（第2、1、0位）
+* 用途：當來源訊號位寬比目標訊號寬時，可以用 part select 明確指定要取哪幾位，讓程式碼意圖更清楚
+
+```verilog
+integer i;          // 32-bit
+reg [2:0] op_code;   // 3-bit
+
+op_code = i[2:0];    // 明確取 i 的最低 3 位給 op_code
+```
+
+* 補充：如果直接寫 op_code = i;（不加 part select），Verilog 會自動做**隱含截斷（implicit truncation）**——把較寬的訊號指派給較窄的訊號時，自動只取最低的幾個 bit、捨棄多出來的高位，結果跟 i[2:0] 完全一樣
+* 那為什麼寫 i[2:0]：雖然結果一樣，但明寫出來能讓看程式碼的人清楚知道「這是刻意只取低位，不是漏寫」
+
+### 相關語法：Part select 也能用在賦值的左邊
+* 不只能「讀取」部分位元，也能只「賦值」給訊號的一部分，例如：
+```verilog
+reg [7:0] data;
+data[3:0] = 4'b1010;   // 只改 data 的低 4 位，高 4 位不受影響
+```
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d30"></a>
+
+## 2026 年 7 月 30 日
+
+## 今日進度：
+### 刷題：複習 HDLBits 7/3 - 7/17 進度。
+### 影片：
+1. [A Practical Introduction to Edge AI](https://youtu.be/ibm6ZRi6Sm4?si=yXesCNbBqkw3CrrX)
+2. [FPGA 是怎麼被發明的? 一口氣了解 Xilinx 跟 Altera 的 FPGA 爭霸史](https://www.youtube.com/watch?v=kRSLnkOKpPY)
+3. [CACM September 2018 - A Domain Specific Architecture for Deep Neural Networks](https://www.youtube.com/watch?v=MbO_pIQLP34)
+4. [A Practical Introduction to Edge AI](https://youtu.be/ibm6ZRi6Sm4?si=yXesCNbBqkw3CrrX)
+
+## 關鍵知識/詞彙：
+### DSA（Domain Specific Architecture，特定領域架構）
+1. 定義：不追求「什麼都能做」的通用處理器（CPU），而是**針對特定任務**（例如矩陣運算、訊號處理、AI 推論）設計專用硬體電路，**犧牲通用性換取效能與能耗效率**。
+
+2. 背景：
+	* 摩爾定律放緩，單靠製程微縮已難以大幅提升效能
+	* 通用 CPU 為了「什麼都能做」，硬體資源花在指令解碼、分支預測等通用邏輯上，效率不高
+	* 特定應用（尤其是深度學習）的運算模式很固定（大量矩陣乘加），適合客製化硬體加速
+
+3. 代表性例子：
+	* Google TPU（針對深度學習矩陣運算設計）
+	* GPU（針對平行運算優化，通用性介於 CPU 與 DSA 之間）
+	* 各種 AI 加速器 IP（NPU）
+
+4. 效能/彈性光譜：
+	* CPU（通用）-> GPU（平行）-> DSA/ASIC（專用）
+	* 客製化程度越高，效能/能耗比越好，但彈性越差、開發成本越高。
+
+### Edge AI（邊緣運算 AI）
+1. 定義：把 AI 推論（inference）放在終端裝置（手機、IoT 裝置、感測器）上執行，而不是把資料傳到雲端伺服器算完再傳回來。
+   
+2. 優點：
+	* 延遲：**本地運算完成**，不需等待網路來回
+	* 隱私：資料**不需上傳雲端**
+	* 頻寬/成本：不需持續傳輸大量資料
+	* 可靠性：**無網路連線**時仍可運作
+
+3. 與 IC 設計的關聯：
+	* Edge 裝置多為電池供電、體積受限，因此需要**低功耗、小面積**的 AI 加速器，而非雲端伺服器那種高功耗換高效能的做法
+	* 邊緣裝置上的 AI 晶片，是 DSA 概念的實際應用之一：為推論任務特化，同時兼顧功耗與面積
+	* 常見技術方向：
+  		* 模型量化（以 INT8 甚至更低位元取代浮點運算，節省功耗與面積）
+  		* 記憶體存取優化（AI 運算瓶頸常在資料搬移而非運算本身，因此有 In-memory computing 等討論方向）
+
+[回目錄](#toc)
+
+---
+
+<a id="m07d31"></a>
+
+## 2026 年 7 月 31 日
+
+## 今日進度：
+### 資料：
+1. 複習 7/3 - 7/30 進度
+2. [MIT 6.111 課程講義 Lecture 9《Pipelining & Verilog》(PDF)](https://web.mit.edu/6.111/www/f2016/handouts/L09.pdf)
+
+## 關鍵知識/詞彙：
+### Pipeline（管線化 / 流水線）
+* 一種資料路徑設計技巧，把一段長的組合邏輯切成幾個較短的階段，中間插入暫存器，讓每個階段各自在一個 clock cycle 內完成
+* 核心目的：**不是縮短單一筆資料的處理時間，而是提升整體吞吐量（throughput）**，因為每個階段變短了，可以用更高的 clock frequency 運作，而且每個 clock cycle 都能開始處理新的一筆資料
+
+### Latency vs Throughput
+* **Latency（延遲）**：一筆資料從輸入到輸出總共花的時間。切了 pipeline 之後，因為多了暫存器，latency 通常會「增加」
+* **Throughput（吞吐量）**：單位時間內能處理完幾筆資料。切了 pipeline 之後，滿水位後可以每個 cycle 就出一筆結果，throughput 會明顯提升
+* pipeline 設計的核心 **trade-off**：**犧牲一點 latency，換取大幅提升的 throughput**
+
+### 為什麼切 Pipeline 能讓頻率變高
+* 電路能跑多快，取決於整條電路裡最長的那條路徑（critical path）
+* 例如一個 32-bit RCA 加法器的 critical path 是進位一路傳到最高位的延遲；如果從中間插一個暫存器切成兩段（低16/高16），critical path 就變成只需要走完「半段」的延遲，自然能撐更高的 clock frequency
+* 換句話說：pipeline 是用「空間換時間」——多花面積（暫存器）去換取更短的每級延遲
+
+### Balanced Pipeline（平衡管線）
+* 切 pipeline 時，如果某條路徑（例如邏輯運算）本身延遲很短，也要跟著切同樣深度的暫存器級數，確保所有分支的資料在「同一拍」到齊
+* 常見的錯誤：只把最長的那條路徑（如加法器）切了暫存器，其他較短的路徑忘記跟著切，導致 MUX 選出來的資料其實不是同一時間點的結果，造成功能錯誤
+
+### Pipeline 在單顆 ALU（無資料相依）跟 CPU pipeline 的差別
+* 單獨一顆 ALU 電路本身是無狀態（stateless）的組合功能單元，插入 pipeline 不會有 data hazard 問題
+* CPU 的五級 pipeline（IF/ID/EX/MEM/WB）裡，hazard 問題來自「指令之間」的相依性（例如下一條指令要用到上一條還沒算完的結果），跟切 ALU 內部的 pipeline 是完全不同層次的問題
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d01"></a>
+
+## 2026 年 8 月 1 日
+
+## 今日成果探討：
+### ALU 設計：
+### 32bit_ALU_V1（Baseline） - 改寫 32-bit ALU baseline 版本 testbench
+* 這次測試設計採用 corner case（邊界案例）驗證思路，針對電路裡最容易出錯的幾個地方各自設計專門的測資，而不是隨機測試。
+* golden value（預期結果）全部自己手動用二進位/2補數算過，沒有拿 RTL 邏輯反推，避免用同一套可能有 bug 的邏輯驗證自己。
+
+1. ADD / SUB 基本功能
+```verilog
+check(32'h0000_00F0, 32'h0000_000F, 3'b000, 32'h0000_00FF, 0,0,0,0); // ADD
+check(32'h0000_00F0, 32'h0000_000F, 3'b001, 32'h0000_00E1, 0,0,1,0); // SUB
+```
+* 用意：先確認共用的 33-bit 加減法邏輯（`add_sub`）在正常數值下功能正確，這是後面所有 flag 判斷的基礎，要先確保這塊沒問題
+* SUB 那組刻意讓 `a > b`，驗證正常減法沒有借位時 carry 應該是 1（`C=1`）
+
+2. AND / OR / XOR 邏輯運算覆蓋率
+```verilog
+check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b010, 32'h0F00_0F00, 0,0,0,0); // AND
+check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b011, 32'hFF0F_FF0F, 0,1,0,0); // OR
+check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b100, 32'hF00F_F00F, 0,1,0,0); // XOR
+```
+* 用意：一開始這 3 個運算完全沒被測到，屬於覆蓋率破洞，補上確保 8 個 opcode 全部至少測過一次
+* 選用 `FF00FF00` / `0F0F0F0F` 這種棋盤式 bit pattern，方便手動驗算每個 bit 的邏輯結果，也能同時檢查出每組結果的正負號（N flag）算得對不對
+
+3. SRA 符號延伸（sign extension）
+```verilog
+check(32'hF123_4567, 32'h0000_0004, 3'b110, 32'hFF12_3456, 0,1,0,0); // SRA
+```
+* 用意：驗證算術右移補的是「符號位」而不是固定補 0。刻意選 `a` 最高位是 1（負數）的數值，因為如果 `a` 是正數，SRA 補符號位跟 SRL 補0結果會一樣，根本測不出補位邏輯有沒有寫對
+* `shamt = b[4:0] = 4`，也順便驗證了移位量不是固定值、而是真的照 `b` 的低5位在算
+
+4. ADD Overflow 邊界
+```verilog
+check(32'h7FFF_FFFF, 32'h0000_0001, 3'b000, 32'h8000_0000, 0,1,0,1); // ADD overflow
+```
+* 用意：`0x7FFFFFFF` 是 32-bit 有號數能表示的最大正數，加 1 之後理論上會變成 `0x80000000`（有號數解讀下是最負的數），這是刻意設計來觸發 overflow 的邊界案例
+* 專門驗證 overflow 判斷式 `(~(a^b_op)) && (a^add_sub)`（兩運算元同號、結果卻異號）有沒有正確抓到這種情況，一般隨便挑的數值很難自然踩到這個邊界
+
+5. SLT 有號數比較
+```verilog
+check(32'hFFFF_FFFF, 32'h0000_0005, 3'b111, 32'h0000_0001, 0,0,0,0); // SLT
+```
+* 用意：`0xFFFFFFFF` 當 unsigned 看是一個很大的正數，當 signed 看則是 -1。這組刻意用這個數值，就是要驗證 `$signed(a) < $signed(b)` 有沒有真的把它當成負數處理
+* 如果沒加 `$signed`，這組測試會判斷成「4294967295 < 5 為假」，跟正確答案（-1 < 5 為真）相反，是專門抓「忘記處理 signed」這種 bug 的案例
+
+6. Shamt 邊界值（0 與 31）
+```verilog
+check(32'h0000_0001, 32'h0000_0000, 3'b101, 32'h0000_0001, 0,0,0,0); // shamt=0
+check(32'h0000_0001, 32'h0000_001F, 3'b101, 32'h8000_0000, 0,1,0,0); // shamt=31
+```
+* 用意：移位量的合法範圍是 0~31，這是兩端的極值，最容易被忽略（很多人只測中間值）
+* `shamt=0`：驗證「不移位」的情況下，barrel shifter 每一級的 mux 都要正確選到「不動」那個分支，結果應該跟輸入完全一樣
+* `shamt=31`：驗證移到底的情況，5 級 mux 全部要選到「移」的那個分支，結果應該只剩最低位的 1 被推到最高位
+
+* Simulation sources
+```verilog
+module alu_v1_tt();
+
+    reg [31:0]a, b;
+    reg [2:0]op_code;
+    wire [31:0]res;
+    wire [3:0]flag;
+    integer i;
+    
+    integer error_count; // 用於計算"error"次數
+    integer test_count; // 用於計算"test"次數
+    
+    alu_v1 tt(
+    .a(a),
+    .b(b),
+    .op_code(op_code),
+    .res(res),
+    .flag(flag)
+    );
+    
+    task automatic check(
+        input [31:0]t_a, // a的測試變數
+        input [31:0]t_b, // b的測試變數
+        input [2:0]t_op, // op_code的測試變數
+        input [31:0]t_res, // res的測試變數
+        input t_z, t_n, t_c, t_v // flag的測試變數
+    );
+        begin
+            a = t_a; b = t_b; op_code = t_op;
+            #10;
+            test_count = test_count + 1; // 每次開始測試 test_count 次數 +1
+            if(res !== t_res || flag !== {t_z, t_n, t_c, t_v})begin // res 結果或 flag 結果不符
+                error_count = error_count + 1; // 錯誤就把 error_count 次數 +1
+                $display("[FAIL]：%0d, op_code = %b, a = %h, b = %h | got res = %h, flag = %b | t_res = %h, flag = %b",
+                test_count, t_op, t_a, t_b, res, flag, t_res, {t_z, t_n, t_c, t_v});
+            end
+            else begin
+                $display("[PASS]：%0d, op_code = %b", test_count, t_op);
+            end
+        end
+    endtask
+    
+    initial begin
+        error_count = 0;
+        test_count = 0;
+        
+        // 基本功能：ADD / SUB 
+        check(32'h0000_00F0, 32'h0000_000F, 3'b000, 32'h0000_00FF, 0,0,0,0); // ADD
+        check(32'h0000_00F0, 32'h0000_000F, 3'b001, 32'h0000_00E1, 0,0,1,0); // SUB
+        
+        // 邏輯運算：AND / OR / XOR
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b010, 32'h0F00_0F00, 0,0,0,0); // AND
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b011, 32'hFF0F_FF0F, 0,1,0,0); // OR
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b100, 32'hF00F_F00F, 0,1,0,0); // XOR
+        
+        // 針對電路容易出錯的地方各自設計測資
+        check(32'hF123_4567, 32'h0000_0004, 3'b110, 32'hFF12_3456, 0,1,0,0); // SRA 符號延伸
+        check(32'h7FFF_FFFF, 32'h0000_0001, 3'b000, 32'h8000_0000, 0,1,0,1); // ADD overflow
+        check(32'hFFFF_FFFF, 32'h0000_0005, 3'b111, 32'h0000_0001, 0,0,0,0); // SLT：-1 < 5
+        check(32'h0000_0001, 32'h0000_0000, 3'b101, 32'h0000_0001, 0,0,0,0); // shamt=0
+        check(32'h0000_0001, 32'h0000_001F, 3'b101, 32'h8000_0000, 0,1,0,0); // shamt=31
+        
+        $display("\n測試完成：共 %0d 組，失敗 %0d 組", test_count, error_count);
+        if(error_count == 0)begin
+            $display("ALL TESTS PASSED");
+        end
+        $finish;       
+    end  
+endmodule
+```
+
+* 模擬結果
+<img width="214" height="251" alt="image" src="https://github.com/user-attachments/assets/806079cd-4cc0-4a13-b4b7-5297b3a1180a" />
+
+## 遇到的困難與解決方案：
+### 問題：跑 alu_tt 模擬沒有跑出結果
+* 原因：task 內少寫 `#10`，比對時機在 DUT 組合邏輯還沒重新算完前就執行，導致比對到殘留的舊值（race condition）
+* 解法：修法是每次改完輸入後一定要留一段延遲再比對
+
+## 關鍵知識/詞彙：
+### task
+* 用來把一段重複會用到的程序邏輯包裝起來的語法，概念類似其他語言的"函式（function）"，但更專門用於 procedural/testbench 情境
+* 語法結構：
+```verilog
+task automatic 任務名稱(
+    input  型別 參數1,
+    input  型別 參數2,
+    output 型別 參數3   // 也可以有輸出參數
+);
+    begin
+        // 任務內容
+    end
+endtask
+```
+* 呼叫方式跟函式一樣：`任務名稱(引數1, 引數2, ...);`
+
+### task vs function 的差別
+* `function` 一定要回傳一個值（像數學函式 y=f(x)），且**不能用延遲語法（#10 這種）**
+* `task` 不用回傳值，**可以在裡面使用延遲語法**，因為驗證流程常需要「設定輸入 -> 等待一段時間 -> 再比對結果」，所以 testbench 裡通常用 task 而不是 function
+
+### automatic 關鍵字
+* 代表這個 task 每次被呼叫時，會重新配置一份獨立的變數空間（可重入 re-entrant）
+* 如果不加（預設是 static），task 裡的變數是全域共用同一份，多處同時呼叫同一個 task 時容易互相干擾出錯
+* 寫 testbench 時養成習慣加 automatic 比較保險
+
+### task 裡的 input 跟 module port 的 input 不是同一件事
+* module 的 input 是硬體接腳
+* task 的 input 是「呼叫這個 task 時要傳進來的參數」，性質比較接近程式語言裡函式的參數列表
+
+### task / function 參數為什麼不用寫 reg
+* module 的 port 跟 task/function 的參數，是兩套不同的規則：
+  * module 的 port 是在描述「電路怎麼接」：input 預設是 wire（外部持續驅動），output 若要在 always/case 裡程序式賦值，必須額外宣告成 reg
+  * task/function 的參數本質上是「呼叫時把值複製一份進來、用完就結束」，比較像程式語言裡函式的區域變數，不涉及電路接線的概念
+* 因為 task/function 是 procedural（程序式）區塊，Verilog 語法規則直接讓它的 input/output/inout 參數天生具備變數（reg-like）性質，不需要另外寫 reg 宣告
+
+### 呼叫 task 時是「傳值」，不是「型別繼承」
+* task 的參數型別（變數）是宣告時就固定的，不會因為呼叫者傳進來的是 wire、reg 還是常數而改變
+* 呼叫當下，Verilog 做的是把呼叫者傳進來的「值」複製一份到 task 內部的參數變數裡（類似傳值 pass-by-value），型別本身完全不受呼叫者影響
+* 如果傳進去的值位寬跟參數宣告的不一樣，Verilog 會照一般賦值規則自動調整位寬（不夠補0、多的截斷），這跟型別是否為 reg 是兩件獨立的事，位寬調整的規則與 part select 提過的隱含截斷是同一套
+
+### 實際應用：把重複的測試流程包成一個 check task
+* 把「設定輸入 -> 等待 -> 比對結果 -> 印出 PASS/FAIL」這套固定流程包成一個 task，之後每測一組資料只要呼叫一次 `check(...)`，不用每次都手動複製貼上重複的程式碼
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d02"></a>
+
+## 2026 年 8 月 2 日
+
+## 今日成果探討：
+### ALU 設計：
+### 32bit_ALU_V1（Baseline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
+* Constraints sources - 1st
+```
+create_clock -period 20 -name clk [get_ports clk]
+```
+
+* Constraints sources - 2nd
+```
+create_clock -period 8 -name clk [get_ports clk]
+```
+
+* Constraints sources - 3rd
+```
+create_clock -period 7.2 -name clk [get_ports clk]
+```
+
+* Design sources（wrapper）
+```verilog
+module alu_v1_wrapper(
+    input clk,
+    input [31:0]a_in,
+    input [31:0]b_in,
+    input [2:0]op_in,
+    output reg [31:0]res_out,
+    output reg  [3:0]flag_out
+);
+    
+    reg [31:0] a_r; // 鎖住輸入的暫存器，posedge clk 時取樣 a_in/b_in
+    reg [31:0] b_r;
+    reg [2:0] op_r; // 鎖住輸入的暫存器，posedge clk 時取樣 op_in
+    wire [31:0] res_w; // alu_v1 算出的組合邏輯結果（尚未鎖存）
+    wire [3:0] flag_w; // alu_v1 算出的組合邏輯 flag（尚未鎖存）
+    
+    always@(posedge clk)begin
+        /*
+        輸入暫存器：把當下的 a_in/b_in/op_in 取樣鎖住，讓 alu_v1 core 拿到的是穩定值
+        ，而不是隨時可能變動的外部輸入
+        */
+        a_r <= a_in; 
+        b_r <= b_in;
+        op_r <= op_in;
+        // 輸出暫存器：把 alu_v1 算好的組合邏輯結果取樣鎖住，才能輸出穩定的 res_out/flag_out
+        res_out <= res_w;
+        flag_out <= flag_w;
+    end
+    
+    // alu_v1：純組合邏輯核心，接的是已經被鎖住的 a_r/b_r/op_r（不是原始輸入a_in、b_in、op_in）
+    alu_v1 core(
+    .a(a_r),
+    .b(b_r),
+    .op_code(op_r),
+    .res(res_w),
+    .flag(flag_w) 
+    );
+
+endmodule
+```
+
+* 模擬結果
+1. period 20：
+   * 反推 Fmax：`(20 - 10.789) = 9.211ns -> Fmax ≈ 1000 / 9.211 ≈ 108.6MHz`
+<img width="1327" height="91" alt="image" src="https://github.com/user-attachments/assets/5a9e0bad-958f-477c-8a87-4f3f2e02cb07" />
+
+2. period 8：
+   * 反推 Fmax：`(8 − 0.970) = 7.030ns -> Fmax ≈ 1000 / 7.030 ≈ 142.2 MHz`
+<img width="1326" height="88" alt="image" src="https://github.com/user-attachments/assets/abf51b0f-e8e4-490c-9b74-2e08b15c379e" />
+
+3. period 7.2：
+   * 反推 Fmax：`(7.2 − 0.516) = 6.684ns -> Fmax ≈ 1000 / 6.684 ≈ 149.6 MHz`
+<img width="1327" height="99" alt="image" src="https://github.com/user-attachments/assets/a5696367-fd6b-4b48-9b5b-79145aaacbf5" />
+
+### ALU_V1（Baseline）最終基準線數據
+* Period = 7.2 ns, WNS = 0.516 ns
+* Fmax ≈ 149.6 MHz
+* LUT = 327, FF = 103
+
+### ALU_V2（pipeline） - pipeline ALU 設計規劃
+1. 在 alu_v1 中的 critical path
+   * Barrel Shifter（桶型移位器）：最主要的 Critical Path
+     * 邏輯結構： 採用 5 階串聯的條件選擇器（`b[0]` ~ `b[4]` 對應 1, 2, 4, 8, 16 bits 移位）。
+	 * 延遲原因： 訊號必須**連續穿過 5 個 32-bit MUX**。每一個 MUX 的 Gate Delay 會**線性累加**，形成全模組最長的邏輯鏈（Logic Chain）。
+
+   * 33-bit Add/Sub（加減法器）：次要瓶頸
+	 * 邏輯結構： `assign add_sub = {1'b0, a} + {1 me0, b_op} + sub;`
+	 * 延遲原因： 高位元（MSB）必須等待低位元（LSB）一路傳遞上來的**進位訊號（Carry Chain）**，需等待 32 個 Full Adder 的傳遞延遲。
+
+   * 位元邏輯運算（AND / OR / XOR）：非瓶頸
+	 * 邏輯結構： 32-bit 平行運算。
+	 * 延遲原因： 僅需經過 **1 階邏輯門**，無位元間的依賴關係，延遲極短。
+
+2. 流水線（Pipelining）切割策略
+   * 為什麼不採用 16-bit / 16-bit 高低位拆分？
+   	 * **加法器 Carry 依賴：** 高 16-bit 必須等待低 16-bit 的 Carry Out，橫向拆分無法打破時間依賴。
+     * **移位器位元跨界：** 桶型移位器的資料會在 32-bit 空間內跨界移動，拆成高低 16-bit 會破壞移位邏輯。
+
+   * 2-Stage Pipeline 切割方案 (縱向階段切割)
+     * Stage 1：Shifter 前 3 階 (b[0]~b[2]: 1, 2, 4 bits 移位) ； 33-bit 加減法運算 (ADD / SUB / SLT 準備)
+     * Stage 2：Shifter 後 2 階 (b[3]~b[4]: 8, 16 bits 移位)；SLT 邏輯與 Flag 生成 (Z, N, C, V)
+
+   * 2-Stage Pipeline 切割方案原因
+     * 時間延遲的「均等平分」（Timing Balance）
+       * 桶型移位器總共有 5 階 MUX 選擇器
+       * Stage 1 切前 3 階（1, 2, 4 bits）： 穿過 3 個 MUX。
+       * Stage 2 切後 2 階（8, 16 bits）： 穿過 2 個 MUX ＋ 1 個最終輸出的 MUX（多路選擇 case）。
+       * 讓 Stage 1 與 Stage 2 的邏輯門延遲（Gate Delay）平分
+    
+	 * 邏輯跨度與加法器同步
+      * 加法器的延遲： 32-bit 的進位鏈（Carry Chain）傳播時間，大約剛好等於 2 ~ 3 個 MUX 的延遲。
+      * 在 Stage 1：當移位器做完前 3 階（1, 2, 4 bits）時，33-bit 加法器也剛好算完！
+      * 兩大運算單元可以在同一個時脈邊緣（Clock Edge） 一起將結果鎖進 Stage 1 暫存器。
+    
+	* 簡化 Stage 2 的 SLT 與 Flag 計算
+	  * 因為加法器在 Stage 1 已經算完了 add_sub
+      * Stage 2 就可以直接利用 Stage 1 留下來的 add / sub 結果來判斷溢位（Overflow）與產生 Flag，不會擠壓到 Stage 2 的時序。  
+
+## 遇到的困難與解決方案：
+### 問題：
+### 為什麼純組合邏輯的 ALU 需要包一層 wrapper 才能做 STA
+* `alu_v1` 沒有 clk，無法建立合法的「暫存器→暫存器」timing path
+* Wrapper 額外做輸入暫存器（鎖住 a_in/b_in/op_in）與輸出暫存器（鎖住 res/flag），中間接純組合邏輯的 alu_v1，形成合法同步結構
+* alu_v1 core 接的是已鎖存的 a_r/b_r/op_r，不是原始輸入 a_in/b_in/op_in，確保組合邏輯的輸入來源穩定，才能被 STA 正確分析
+* clk 需要同時接到輸入暫存器與輸出暫存器兩邊
+
+## 關鍵知識/詞彙：
+### Synthesis/STA 路徑 vs 功能模擬路徑
+* STA：RTL + XDC → Synthesis/Implementation → Timing Report（WNS/Fmax），input 只是被當成晶片接腳，不需要任何東西驅動，也不需要 testbench
+* 模擬：RTL + Testbench（用 reg 主動驅動 input）→ Simulator → 波形/PASS-FAIL，目的是驗證邏輯對不對
+* 兩條路徑完全獨立，互不需要
+
+### WNS 與 Fmax 的關係
+* Timing Report 不會直接列出 Fmax，只給 WNS，需要自己反推
+
+### FPGA 底層架構：桶型移位器 vs. 加法器延遲觀念
+1. 桶型移位器（Barrel Shifter）的延遲觀念
+* 底層實現機制： 採用 FPGA 內部的 LUT（Look-Up Table, 查找表） 來實現多路選擇器（MUX）。
+* 延遲特性：
+	* 串聯加成 (Cascaded)： 32-bit 桶型移位器需要做 5 階判斷（1, 2, 4, 8, 16 bits），等於資料必須連續穿過 5 個 MUX。
+ 	* 佈線開銷 (Routing Delay)： 每次經過一個 MUX，資料都要走出 LUT、經過 FPGA 的通用內部連線，再進入下一個 MUX。
+
+2. 加法器（32-bit Adder）的延遲觀念
+* 底層實現機制： 使用 FPGA 晶片內部硬體預先刻好的「專用高速進位鏈」（Dedicated Carry Chain，如 CARRY4 / CARRY8 模組）。
+* 延遲特性：
+	* 免走通用佈線： 進位訊號（Carry bit）從 Bit 0 傳到 Bit 31 時，使用的是硬體矽晶圓上專屬的硬化線路，不佔用通用的 LUT 佈線資源。
+	* 傳播速度極快： 專用進位鏈傳遞 1 bit 的延遲非常小（僅數十皮秒, picoseconds）。
+
+3. 以常見的 FPGA 製程（如 Xilinx 7-Series）為例，兩者的邏輯延遲量級比較
+
+| 比較項目 | 桶型移位器 (Barrel Shifter) | 32-bit 加法器 (Adder) |
+| --- | --- | --- |
+| **底層硬體資源** | 通用 LUT (Look-Up Table) + 通用連線 | **專用硬體進位鏈 (Dedicated Carry Chain)** |
+| **訊號傳遞路徑** | 5 階 MUX 串聯鏈 (Cascade Chain) | 1 階 LUT 輸入 + 32-bit 硬體進位傳遞 |
+| **實體佈線開銷** | 高 (每次跨 MUX 皆需走通用佈線) | 低 (走晶片預先刻好的專用高速通道) |
+| **估算延遲時間** | 約 **2.0 ~ 2.5 ns** *(最慢)* | 約 **1.0 ~ 1.2 ns** |
+| **相對延遲比例** | **100% (基準 Critical Path)** | **約為移位器的 50% (相當於 2~3 個 MUX)** |
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d03"></a>
+
+## 2026 年 8 月 3 日
+
+## 今日成果探討：
+### ALU_V2（pipeline）設計：完成 RTL，共歷經 5 輪修正才達到邏輯正確
+* Design sources
+```verilog
+module alu_v2(
+    input clk,
+    input rst_n,
+    input [31:0]a,
+    input [31:0]b,
+    input [2:0]op_code,
+    output reg[31:0]res,
+    output reg[3:0]flag
+);
+
+// --- stag1：前半段運算　＋　暫存器（stag1 registers）---
+
+    //構建3個 32bit 暫存器用於 barrel shifter
+    //Shamt 選用 b[0] ~ b[2] 判斷移動幾個 bit
+    wire [31:0]s1_l, s2_l, s3_l; 
+    wire [31:0]s1_r, s2_r, s3_r;
+    
+    // 構建共用的 33-bit 加減法邏輯（在 case 外面算）
+    wire sub;
+    wire [31:0]b_op;
+    wire [32:0]add_sub;
+
+    assign sub = (op_code == 3'b001); // op_code == 3'b001，執行減法
+    assign b_op = b ^ {32{sub}}; // 將 b 逐位元反相
+    assign add_sub = {1'b0, a} + {1'b0, b_op} + sub; // ADD: a+b；SUB: a + ~b + 1（2補數，+1 由 sub 提供）
+    
+    // b[0] ~ b[2] 的 logic_shift_left
+    assign s1_l = (b[0]) ? {a[30:0], 1'b0} : a;
+    assign s2_l = (b[1]) ? {s1_l[29:0], 2'b00} : s1_l;
+    assign s3_l = (b[2]) ? {s2_l[27:0], 4'b0000} : s2_l;
+    
+    // b[0] ~ b[2] 的 arithmetic_shift_right
+    assign s1_r = (b[0]) ? {a[31], a[31:1]} : a;
+    assign s2_r = (b[1]) ? {{2{a[31]}}, s1_r[31:2]} : s1_r;
+    assign s3_r = (b[2]) ? {{4{a[31]}}, s2_r[31:4]} : s2_r;
+    
+    // 構建 stage1 -> stage2 中間暫存器
+    reg [31:0]a_stg1, b_stg1;
+    reg [2:0]op_code_stg1;
+    reg [32:0]add_sub_stg1;
+    reg [31:0]b_op_stg1;
+    reg [31:0]shift_stg_l;
+    reg [31:0]shift_stg_r;
+    reg [31:0]res_stg1;
+    
+// 前半段資料 -> stage 1
+always@(posedge clk)begin
+    if(~rst_n)begin
+        a_stg1 <= 0;
+        b_stg1 <= 0;
+        b_op_stg1 <= 0;
+        op_code_stg1 <= 0;
+        add_sub_stg1 <= 0;
+        shift_stg_l <= 0;
+        shift_stg_r <= 0;
+        res_stg1 <= 0;
+    end
+    else begin
+        a_stg1 <= a;
+        b_stg1 <= b;
+        b_op_stg1 <= b_op;
+        op_code_stg1 <= op_code;
+        
+        // Stage 1 行為
+        case(op_code)
+            3'b000 : add_sub_stg1 <= add_sub; // +、- 法運算結果存儲
+            3'b001 : add_sub_stg1 <= add_sub; // +、- 法運算結果存儲
+            3'b010 : res_stg1 <= a & b;
+            3'b011 : res_stg1 <= a | b;
+            3'b100 : res_stg1 <= a ^ b;
+            3'b101 : shift_stg_l <= s3_l; // b[0] ~ b[3] 移位結果存儲
+            3'b110 : shift_stg_r <= s3_r; // b[0] ~ b[3] 移位結果存儲
+            3'b111 : res_stg1 <= ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;
+            default : res_stg1 <= 0;
+        endcase      
+    end   
+end
+// --- stag1：前半段運算　＋　暫存器（stag1 registers）結束---
+
+// --- stag2：後半段運算　＋　暫存器（stag2 registers）---
+    
+    //構建2個 32bit 暫存器用於 barrel shifter
+    //Shamt 選用 b_stg1[3] ~ b_stg1[4] 判斷移動幾個 bit
+    wire [31:0]s4_l, shift_l_res;
+    wire [31:0]s4_r, shift_r_res;
+    
+    // b_stg1[3] ~ b_stg1[4] 的 logic_shift_left
+    assign s4_l = (b_stg1[3]) ? {shift_stg_l[23:0], 8'b00000000} : shift_stg_l;
+    assign shift_l_res = (b_stg1[4]) ? {s4_l[15:0], 16'b0000000000000000} : s4_l;
+    // b_stg1[3] ~ b_stg1[4] 的 arithmetic_shift_right
+    assign s4_r = (b_stg1[3]) ? {{8{a_stg1[31]}}, shift_stg_r[31:8]} : shift_stg_r;
+    assign shift_r_res = (b_stg1[4]) ? {{16{a_stg1[31]}}, s4_r[31:16]} : s4_r;
+    
+    // 構建進位與溢位判斷
+    wire carry_stg1;
+    wire overflow_stg1;
+    assign carry_stg1 = add_sub_stg1[32]; //進位判斷 
+    assign overflow_stg1 = (~(a_stg1[31] ^ b_op_stg1[31])) && (a_stg1[31] ^ add_sub_stg1[31]); //溢位判斷
+    
+    // stage 1 -> stage 2（final_res）
+    reg [31:0] final_res;
+    always @(*) begin
+        case(op_code_stg1)
+            3'b000 : final_res = add_sub_stg1[31:0];
+            3'b001 : final_res = add_sub_stg1[31:0];
+            3'b010 : final_res = res_stg1;
+            3'b011 : final_res = res_stg1;
+            3'b100 : final_res = res_stg1;
+            3'b101: final_res = shift_l_res;
+            3'b110: final_res = shift_r_res;
+            3'b111 : final_res = res_stg1;
+            default: final_res = 0;
+        endcase
+    end
+    
+// stage 2 -> resault
+always@(posedge clk)begin
+    if(~rst_n)begin
+        res <= 0;
+        flag <= 0;
+    end
+    else begin
+        res <= final_res; // 直接用統一選好的值，case 不用重複寫兩次
+        // Z/N 對每種運算都更新，C/V 只在 ADD/SUB 才有意義
+        flag <= {(final_res == 32'd0), final_res[31],
+         ((op_code_stg1==3'b000)||(op_code_stg1==3'b001)) ? carry_stg1    : 1'b0,
+         ((op_code_stg1==3'b000)||(op_code_stg1==3'b001)) ? overflow_stg1 : 1'b0};
+    end   
+end
+// --- stag2：後半段運算　＋　暫存器（stag2 registers）結束---   
+endmodule
+```
+
+## 遇到的困難與解決方案：
+### 問題1：Stage1/Stage2 之間資料流沒有真的接起來
+* 原因：Stage2 算移位結果時，用的是原始未鎖存的 `b`、`s3_l`、`s3_r`，跟 Stage1 鎖存的 `op_code_stg1`（已延遲一拍）時間點對不上，等於移位運算完全沒被 pipeline 到
+* 解法：Stage1 額外做 `shift_stg_l`/`shift_stg_r` 兩個暫存器，把中間移位結果鎖存起來，Stage2 改用鎖存後的值繼續算
+
+### 問題2：case/if 判斷式寫在 always block 的 if(reset)/else 外面，導致 reset 沒有真正生效
+* 原因：同一個訊號在 reset 分支跟外層又被賦值一次，最後執行到的那次才生效，蓋掉 reset 設定的值
+* 解法：把 case/if 都搬進對應的 else begin...end 裡面
+
+### 問題3：flag 讀到「舊」的 Z/N/C/V 中繼暫存器（非阻塞賦值特性）
+* 原因：`<=` 賦值右邊讀到的是這次賦值前的舊值，`flag <= {Z,N,C,V}` 會慢一拍
+* 解法：改成直接用當下算出的訊號組合，不繞經中繼暫存器
+
+### 問題4：Stage2 移位控制訊號（b[3] / b[4]）用的仍是原始未鎖存的 b
+* 原因：`shift_stg_l`/`shift_stg_r` 是上一拍鎖存的資料，但判斷要不要繼續移的 `b[3]`/`b[4]` 卻是這一拍當下最新的 b，資料跟控制時間點不一致
+* 解法：改成 `b_stg1[3]`/`b_stg1[4]`
+
+### 問題5：sub_stg1 沒有被鎖存，b_op_stg1 用當下的 sub 去配鎖存過的 b_stg1
+* 原因：控制訊號跟資料時間點不一致，跟問題5是同一類問題
+* 解法：Stage1 額外鎖存 `sub_stg1`，Stage2 改用 `b_op_stg1 = b_stg1 ^ {32{sub_stg1}}`
+
+### 問題6：ADD / SUB 的 flag 讀錯來源（反覆出現在第1、2版，第3版才真正解決）
+* 原因：ADD/SUB 的真正結果存在 `add_sub_stg1`，但 flag 判斷 Z/N 時卻讀取 `res_stg1`（該次 case 沒有對應分支，值是殘留的舊值），導致 ADD/SUB 的 Z/N flag 完全錯誤
+* 解法：在 Stage2 用組合邏輯統一算出 `final_res`（依 op_code_stg1 選出這一拍真正的最終結果，ADD/SUB 選 add_sub_stg1，其餘選對應暫存器），res 跟 flag 的 Z/N 都從 final_res 取值，不再各自各的
+
+### 問題7：flag 只有 ADD / SUB 才更新，其他運算 flag 維持舊值不動
+* 原因：整個 flag（含 Z/N）都包在 `if(ADD||SUB)` 裡面才更新，跟 baseline 行為（Z/N 每種運算都要算，只有 C/V 限定 ADD/SUB）不一致
+* 解法：拿掉 Z/N 的 if 限制，改成永遠算 Z/N，只有 C/V 用三元運算子限定 ADD/SUB 才給實際值、否則補 0
+
+## 關鍵知識/詞彙：
+### Pipeline 設計中「控制訊號要跟資料同一拍」的原則
+* 切 pipeline 時，Stage2 用來判斷「怎麼處理某個資料」的控制訊號（例如 op_code、b 的某幾個 bit、sub 這種旗標），一定要用「跟該筆資料同一拍被鎖存」的版本，不能混用「這一拍最新的」控制訊號去配「上一拍鎖存」的資料
+* 這是這次 debug 過程中最常出現、也最關鍵的一種錯誤模式，移位邏輯（b[3]/b[4]）跟 overflow 判斷（sub）都各踩到一次
+
+### 非阻塞賦值（<=）讀值的時機
+* `<=` 賦值時，右邊讀到的是這次賦值前的舊值，賦值本身要等整個 block 結束才真的生效
+* 如果讓 flag 這種輸出訊號繞經中繼暫存器（如 Z/N/C/V）再組合，容易讀到「慢一拍」的舊值，建議直接用當下算出的訊號組合，避免多繞一層
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d04"></a>
+
+## 2026 年 8 月 4 日
+
+## 今日成果探討：
+### ALU_V2（pipeline）設計：
+1. 完成 Testbench - alu_v2_tt，驗證 pipeline 版本功能，經多輪除錯後全數 PASS
+2. 確認延遲精確為 2 個 clock cycle，跟設計預期的 2-stage pipeline 一致，功能上與 baseline（alu_v1）等價
+
+* Simulation sources
+  ```verilog
+  module alu_v2_tt();
+    
+    reg clk;
+    reg rst_n;
+    reg [31:0]a, b;
+    reg [2:0]op_code;
+    wire [31:0]res;
+    wire [3:0]flag;
+    integer i;
+    
+    integer error_count; // 用於計算"error"次數
+    integer test_count; // 用於計算"test"次數
+    
+    alu_v2 tt(
+    .clk(clk),
+    .rst_n(rst_n),
+    .a(a),
+    .b(b),
+    .op_code(op_code),
+    .res(res),
+    .flag(flag)
+    );
+    
+    task automatic check(
+        input [31:0]t_a, // a的測試變數
+        input [31:0]t_b, // b的測試變數
+        input [2:0]t_op, // op_code的測試變數
+        input [31:0]t_res, // res的測試變數
+        input t_z, t_n, t_c, t_v // flag的測試變數
+    );
+        begin
+            a = t_a; b = t_b; op_code = t_op;
+            
+            @(posedge clk); // 第1拍：鎖進 Stage1
+            @(posedge clk); // 第2拍：鎖進 Stage2
+            #1; // 確保讀值時 NBA（非阻塞賦值） 已經真正落地
+            
+            test_count = test_count + 1; // 每次開始測試 test_count 次數 +1
+            if(res !== t_res || flag !== {t_z, t_n, t_c, t_v})begin // res 結果或 flag 結果不符
+                error_count = error_count + 1; // 錯誤就把 error_count 次數 +1
+                $display("[FAIL]：%0d, op_code = %b, a = %h, b = %h | got res = %h, flag = %b | t_res = %h, flag = %b",
+                test_count, t_op, t_a, t_b, res, flag, t_res, {t_z, t_n, t_c, t_v});
+            end
+            else begin
+                $display("[PASS]：%0d, op_code = %b", test_count, t_op);
+            end
+        end
+    endtask
+    
+    initial clk = 0;
+    always #5 clk = ~clk;   // 每5ns翻轉一次，週期10ns
+
+    initial begin
+        rst_n = 0;
+        repeat (2) @(posedge clk);   // 讓 reset 訊號至少過2個clock edge
+        rst_n = 1;
+        @(posedge clk); // 多留一拍緩衝，讓 reset 解除跟第一筆資料錯開
+        
+        error_count = 0;
+        test_count = 0;
+        
+        // 基本功能：ADD / SUB 
+        check(32'h0000_00F0, 32'h0000_000F, 3'b000, 32'h0000_00FF, 0,0,0,0); // ADD
+        check(32'h0000_00F0, 32'h0000_000F, 3'b001, 32'h0000_00E1, 0,0,1,0); // SUB
+        
+        // 邏輯運算：AND / OR / XOR
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b010, 32'h0F00_0F00, 0,0,0,0); // AND
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b011, 32'hFF0F_FF0F, 0,1,0,0); // OR
+        check(32'hFF00_FF00, 32'h0F0F_0F0F, 3'b100, 32'hF00F_F00F, 0,1,0,0); // XOR
+        
+        // 針對電路容易出錯的地方各自設計測資
+        check(32'hF123_4567, 32'h0000_0004, 3'b110, 32'hFF12_3456, 0,1,0,0); // SRA 符號延伸
+        check(32'h7FFF_FFFF, 32'h0000_0001, 3'b000, 32'h8000_0000, 0,1,0,1); // ADD overflow
+        check(32'hFFFF_FFFF, 32'h0000_0005, 3'b111, 32'h0000_0001, 0,0,0,0); // SLT：-1 < 5
+        check(32'h0000_0001, 32'h0000_0000, 3'b101, 32'h0000_0001, 0,0,0,0); // shamt=0
+        check(32'h0000_0001, 32'h0000_001F, 3'b101, 32'h8000_0000, 0,1,0,0); // shamt=31
+        
+        $display("\n測試完成：共 %0d 組，失敗 %0d 組", test_count, error_count);
+        if(error_count == 0)begin
+            $display("ALL TESTS PASSED");
+        end
+        $finish;       
+    end  
+  ```
+
+* 模擬結果
+<img width="213" height="257" alt="image" src="https://github.com/user-attachments/assets/e6e79d99-8720-451a-ae4d-08f9bbb5e3b7" />
+
+## 遇到的困難與解決方案：
+### 問題1：clk 沒有持續產生方波
+* 原因：只寫了 `#10 clk = ~clk;` 一次，之後沒有任何機制讓 clk 持續振盪，DUT 完全不會觸發
+* 解法：改成 `initial clk = 0; always #5 clk = ~clk;` 持續產生週期性方波
+
+### 問題2：check() 沒有等待 clock edge，也沒處理 pipeline 延遲
+* 原因：賦值後立刻比對，沒有等任何 posedge clk；alu_v2 是 2-stage pipeline，結果要 2 拍後才會反映到 res/flag
+* 解法：在賦值與比對之間加上 `@(posedge clk)` 兩次
+
+### 問題3：reset 沒有撐過完整 clock cycle 就結束
+* 原因：`rst_n = 0` 之後沒有等待任何 clock edge 就直接動作
+* 解法：用 `repeat(2) @(posedge clk);` 讓 reset 訊號至少過 2 個 clock edge 再解除
+
+### 問題5（花最多輪才找到原因）：加了正確拍數還是持續 FAIL，且結果連續多輪完全相同
+* 排查過程：一開始懷疑是 Vivado 沒有重新編譯到最新程式碼（用 Relaunch、Reset Output Products、甚至手動清除 xsim 編譯產物都懷疑過），但檢查 RTL 、改了多次 testbench，數值依然完全相同
+* 真正原因：**NBA（非阻塞賦值）取樣時機的競爭條件（race condition）**—— 在 RTL 的 DUT 內 `res <= final_res;` 是非阻塞賦值，實際生效發生在該次 posedge 的 NBA 更新區；但 testbench 裡 `@(posedge clk);` 恢復執行後緊接著的 blocking 讀值敘述，發生時機比 NBA 真正生效還早，讀到的是「這次更新前」的舊值
+* 解法：在最後一次 `@(posedge clk);` 之後加上 `#1;`，確保讀值時 NBA 已經真正落地，加上後全數 PASS
+
+## 關鍵知識/詞彙：
+### NBA（非阻塞賦值）與讀值時機的競爭條件
+* `<=` 賦值在硬體上代表暫存器行為，模擬時的生效時機是在該次事件的 NBA 更新區，晚於同一時間點的 blocking 敘述
+* 如果 testbench 在 `@(posedge clk)` 恢復執行後，立刻用 blocking 敘述去讀 DUT 的輸出訊號，有可能讀到「這次 edge 更新前」的舊值，因為讀值時機比 NBA 真正生效還早
+* 標準解法：在讀值前多留一個極小延遲（如 `#1`），或改成在 `@(negedge clk)` 讀值，確保 NBA 已經真正落地
+
+### Debug 過程的啟示
+* 「結果不對」不一定代表「設計邏輯錯了」，也可能是「觀察／取樣的時機不對」，兩者要分開排查，不要一路只往 RTL 邏輯或環境快取的方向找
+
+[回目錄](#toc)
+
+---
+
+<a id="m08d05"></a>
+
+## 2026 年 8 月 5 日
+
+## 今日成果探討：
+### ALU 設計：
+### 32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果
+* Constraints sources - 1st
+```
+create_clock -period 20 -name clk [get_ports clk]
+```
+
+* Constraints sources - 2nd
+```
+create_clock -period 6 -name clk [get_ports clk]
+```
+
+* Constraints sources - 3rd
+```
+create_clock -period 5 -name clk [get_ports clk]
+```
+
+* Constraints sources - 4th
+```
+create_clock -period 4.5 -name clk [get_ports clk]
+```
+
+* 模擬結果
+1. period 20：
+   * 反推 Fmax：`(20 - 14.489) = 5.511ns -> Fmax ≈ 1000 / 5.511 ≈ 181.5 MHz`
+<img width="1336" height="89" alt="image" src="https://github.com/user-attachments/assets/9c8a5dec-93aa-4fea-8864-44167cd95726" />
+
+2. period 6：
+   * 反推 Fmax：`(6 − 1.327) = 4.673ns -> Fmax ≈ 1000 / 4.673 ≈ 214.0 MHz`
+<img width="1335" height="89" alt="image" src="https://github.com/user-attachments/assets/5c21149f-dcb8-46ba-be32-c51a4055ca4b" />
+
+3. period 5：
+   * 反推 Fmax：`(5 − 0.751) = 4.249ns -> Fmax ≈ 1000 / 4.249 ≈ 235.3 MHz`
+<img width="1334" height="88" alt="image" src="https://github.com/user-attachments/assets/a1f26036-345d-4680-9d55-7353304710fe" />
+
+4. period 4.5：
+   * 反推 Fmax：`(4.5 − 0.551) = 3.949ns -> Fmax ≈ 1000 / 3.949 ≈ 253.2 MHz`
+<img width="1334" height="90" alt="image" src="https://github.com/user-attachments/assets/2dbb2fc8-a190-44de-8fe9-cfb091fc207f" />
+
+### ALU_V2（Pipeline）最終基準線數據
+* Period = 4.5 ns, WNS = 0.551 ns
+* Fmax ≈ 253.2 MHz
+* LUT = 317, FF = 172
+
+### Baseline vs Pipeline 最終對照表
+
+| 項目 | Baseline（alu_v1） | Pipeline（alu_v2, 2-stage） |
+|---|---|---|
+| Period（收斂值） | 7.2 ns | 4.5 ns |
+| WNS | 0.516 ns | 0.551 ns |
+| Fmax | ≈ 149.6 MHz | ≈ 253.2 MHz |
+| LUT | 327 | 317 |
+| FF | 103 | 172 |
+| Latency | 1 cycle | 2 cycle |
+
+### 說明
+1. Baseline 版本是純組合邏輯，加法器用 Ripple Carry Adder，關鍵路徑是進位一路傳到最高位，限制了整體時脈上限，收斂後 Fmax 約 149.6MHz。
+   
+2. Pipeline 版本把資料路徑切成 2 個 stage，中間插入暫存器，把原本一次算完的長路徑拆成兩段較短的路徑，收斂後 Fmax 約 253.2MHz，相較 baseline 提升約 1.69 倍。
+   
+3. trade-off ：
+   * 用「面積換取速度」換來的：FF 用量從 103 增加到 172（多了約 69 顆暫存器，用於 Stage1/Stage2 之間鎖存中繼資料）
+   * LUT 用量反而略降（327→317），代表邏輯本身沒有變複雜，資源增加主要來自新增的暫存器，不是額外的運算邏輯。
+   * Latency 則從 1 cycle 增加為 2 cycle
+   * 犧牲單筆資料的延遲，換取整體吞吐量（throughput）與可運作頻率的提升。
+
+4. 兩個版本的功能都用同一組 testbench 驗證過，結果完全等價，確保這組時序數據的比較是建立在功能正確、公平的基準。
+
+## 未來優化方向（依 Timing Report 的 Net/Logic Delay 比例修正）
+1. Timing Report
+<img width="1062" height="387" alt="image" src="https://github.com/user-attachments/assets/6beb2c5e-173a-4285-907e-b0ef765f42f5" />
+
+* Worst Path 前幾名的 Net Delay 都明顯大於 Logic Delay（例如 Path1: Logic=1.202ns, Net=2.611ns），且 High Fanout 高達16~32
+* 代表瓶頸主要來自控制訊號（op_code_stg1、b_stg1[4]）扇出過大造成的繞線延遲
+
+2. 優化方向：降低高扇出控制訊號的負載，而非搬動運算邏輯
+* op_code_stg1 要同時驅動 Stage2 裡的移位選擇、final_res 的 8-way mux、flag 邏輯，扇出大
+* 可以考慮的做法：
+  * 在 Stage1 鎖存後，提早把 op_code_stg1 解碼成 one-hot 控制訊號，讓每條下游邏輯只接自己需要的那一條 select 線，而不是所有邏輯都共用同一組 3-bit bus，降低單一訊號的扇出數
+  * 對高扇出訊號下 MAX_FANOUT 屬性限制，讓 Vivado 在 synthesis 階段主動做訊號複製（從 `res_reg[31]_lopt_replica` 這個命名可以看出，Vivado 已自動幫 res_reg[31] 做過一次複製優化，代表工具本身也判斷這是扇出問題，可以再手動加強）
+* 優化不能只停留在架構設計，實際的 layout/繞線行為也會回頭影響該怎麼調整 RTL
+
+## 關鍵知識/詞彙：
+### 降低扇出的兩種做法
+1. **提早解碼成 one-hot**：把一個多用途、被到處讀取的訊號（例如 op_code），提前轉換成多條各自獨立、各自代表單一意義的線（is_add、is_sub...），讓下游邏輯各自只接自己需要的那一條，分散單一訊號的驅動負擔，屬於 RTL 設計面的優化
+2. **MAX_FANOUT 屬性**：透過 XDC 對特定訊號下扇出限制的約束，讓 Vivado 自動把超過門檻的訊號複製成多份分擔負擔，屬於工具層面的輔助手段，不需要更動 RTL 邏輯
+
+### 為何產生_replica 
+<img width="328" height="58" alt="image" src="https://github.com/user-attachments/assets/ce8cfae4-3dcd-429b-a2a8-a684708bfdd5" />
+
+* Vivado 有時會自動判斷扇出過大並主動做訊號複製，產生類似 `_replica` 命名的訊號，代表工具本身已經在處理這類問題，可以透過約束加強這個機制
+
+### Timing Report 的 Logic Delay vs Net Delay
+* Logic Delay：訊號經過邏輯閘本身運算所花的時間
+* Net Delay：訊號在實體接線上傳遞所花的時間（受扇出、繞線距離影響）
+* 兩者比例可以幫助判斷關鍵路徑慢的根本原因：Logic Delay 高代表邏輯層數太深，Net Delay 高代表扇出/繞線是瓶頸，優化方向會完全不同
+
+[回目錄](#toc)
 
 ---
