@@ -6,6 +6,7 @@
 
 - **[點我觀看完整的「每日學習與 Debug 日誌」](./learning_log.md)**
 - **[點我觀看完整的「專題製作過程與 Debug 日誌」](./32-bit_ALU_log.md)**
+- **[點我觀看「參考文獻」](./References.md)**
 ------------------------------
 
 ## 核心亮點與 PPA 性能對比 (Performance & Trade-off)
