@@ -428,7 +428,7 @@ endmodule
 	 * 延遲原因： 訊號必須**連續穿過 5 個 32-bit MUX**。每一個 MUX 的 Gate Delay 會**線性累加**，形成全模組最長的邏輯鏈（Logic Chain）。
 
    * 33-bit Add/Sub（加減法器）：次要瓶頸
-	 * 邏輯結構： `assign add_sub = {1'b0, a} + {1 me0, b_op} + sub;`
+	 * 邏輯結構： `assign add_sub = {1'b0, a} + {1'b0, b_op} + sub;`
 	 * 延遲原因： 高位元（MSB）必須等待低位元（LSB）一路傳遞上來的**進位訊號（Carry Chain）**，需等待 32 個 Full Adder 的傳遞延遲。
 
    * 位元邏輯運算（AND / OR / XOR）：非瓶頸
