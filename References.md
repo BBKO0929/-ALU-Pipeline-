@@ -1,22 +1,18 @@
 # 硬體設計理論、Verilog 規範與 EDA 工具文獻依據 (Theoretical Foundations & References)
 
-本專案在 32-bit ALU 及 2-Stage Pipeline 運算單元之設計、靜態時序分析（STA）與硬體除錯過程中，所採用的關鍵技術與 Debug 判斷依據，皆遵循以下學術權威文獻、國際標準規範與工業界 EDA 官方指南。
+本專案在 32-bit ALU 及 2-Stage Pipeline 運算單元之設計、靜態時序分析（STA）與硬體除錯過程中，所採用的關鍵技術與 Debug 判斷依據，皆遵循以下學術文獻、國際標準規範與工業界 EDA 官方指南。
 
 ---
 
 ## 1. 計算機結構與算術邏輯 (Computer Architecture & Arithmetic)
 
 ### 桶型移位器 (Barrel Shifter) 與平滑縱向切割
-* **理論依據：** 採用 5 階串聯 2-to-1 多工器（$1, 2, 4, 8, 16 \text{ bits}$）實現 $O(\log_2 N)$ 時間複雜度的移位運算。在 2-Stage Pipeline 中，將前 3 階（$1, 2, 4 \text{ bits}$）與 33-bit 加法器放在 Stage 1，後 2 階（$8, 16 \text{ bits}$）與 Flag 判斷放在 Stage 2，達到時序延遲的均等平分（Timing Balance）。
 * **參考文獻：**
   * Behrooz Parhami, *Computer Arithmetic: Algorithms and Hardware Designs*, Oxford University Press.
   * A. He, "Barrel Shifters in Verilog: A Beginner's Guide to Fast Multi-Bit Shifting," *Medium*.
   * VLSI Facts, "How to Design an Efficient Barrel Shifter in Verilog: Step-by-Step Guide."
 
 ### 2 補數加減法與 Flag (Carry / Overflow) 判斷
-* **理論依據：** 
-  * 減法透過 2 補數轉換為 $A + \sim B + 1$ 實現，共用 33-bit 加法邏輯。
-  * 溢位（Overflow, $V$）判斷依據為：$(\sim(A_{31} \oplus B_{op,31})) \land (A_{31} \oplus S_{31})$，即「兩同號數相加卻得到異號結果」。
 * **參考文獻：**
   * David A. Patterson and John L. Hennessy, *Computer Organization and Design: The Hardware/Software Interface* (RISC-V / MIPS Editions), Morgan Kaufmann.
 
