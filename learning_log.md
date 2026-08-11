@@ -4263,8 +4263,188 @@ create_clock -period 4.5 -name clk [get_ports clk]
 
 ## 今日成果探討：
 ### ALU 設計優化：
-### 32bit_ALU_V2（pipeline） - RTL 邏輯與 PPA 架構優化 (RTL Architecture & PPA Optimization)
+### 32bit_ALU_V2（pipeline） - 主動重構，把邏輯運算與 SLT 先獨立拆成一個組合邏輯 `res_com1`（`always@(*)`），Stage1 暫存器改成**每拍無條件更新**：
 
+* 程式碼
+```verilog
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 2026/08/03 10:00:47
+// Design Name: 
+// Module Name: alu_v2
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module alu_v2(
+    input clk,
+    input rst_n,
+    input [31:0]a,
+    input [31:0]b,
+    input [2:0]op_code,
+    output reg[31:0]res,
+    output reg[3:0]flag
+);
+
+// --- stag1：前半段運算　＋　暫存器（stag1 registers）---
+
+    //構建3個 32bit 暫存器用於 barrel shifter
+    //Shamt 選用 b[0] ~ b[2] 判斷移動幾個 bit
+    wire [31:0]s1_l, s2_l, s3_l; 
+    wire [31:0]s1_r, s2_r, s3_r;
+    
+    // 構建共用的 33-bit 加減法邏輯（在 case 外面算）
+    wire sub;
+    wire [31:0]b_op;
+    wire [32:0]add_sub;
+
+    assign sub = (op_code == 3'b001); // op_code == 3'b001，執行減法
+    assign b_op = b ^ {32{sub}}; // 將 b 逐位元反相
+    assign add_sub = {1'b0, a} + {1'b0, b_op} + sub; // ADD: a+b；SUB: a + ~b + 1（2補數，+1 由 sub 提供）
+    
+    // b[0] ~ b[2] 的 logic_shift_left
+    assign s1_l = (b[0]) ? {a[30:0], 1'b0} : a;
+    assign s2_l = (b[1]) ? {s1_l[29:0], 2'b00} : s1_l;
+    assign s3_l = (b[2]) ? {s2_l[27:0], 4'b0000} : s2_l;
+    
+    // b[0] ~ b[2] 的 arithmetic_shift_right
+    assign s1_r = (b[0]) ? {a[31], a[31:1]} : a;
+    assign s2_r = (b[1]) ? {{2{a[31]}}, s1_r[31:2]} : s1_r;
+    assign s3_r = (b[2]) ? {{4{a[31]}}, s2_r[31:4]} : s2_r;
+    
+    // 構建 stage1 -> stage2 中間暫存器
+    reg [31:0]a_stg1, b_stg1;
+    reg [2:0]op_code_stg1;
+    reg [32:0]add_sub_stg1;
+    reg [31:0]b_op_stg1;
+    reg [31:0]shift_stg_l;
+    reg [31:0]shift_stg_r;
+    reg [31:0]res_stg1;
+    
+    
+    reg [31:0]res_com1;
+    always@(*)begin
+        case(op_code)
+            3'b010 : res_com1 = a & b;
+            3'b011 : res_com1 = a | b;
+            3'b100 : res_com1 = a ^ b;
+            3'b111 : res_com1 = ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;
+            default : res_com1 = 0;
+        endcase
+    end
+    
+    
+    // 前半段資料 -> stage 1
+    always@(posedge clk)begin
+        if(~rst_n)begin
+            a_stg1 <= 0;
+            b_stg1 <= 0;
+            b_op_stg1 <= 0;
+            op_code_stg1 <= 0;
+            add_sub_stg1 <= 0;
+            shift_stg_l <= 0;
+            shift_stg_r <= 0;
+            res_stg1 <= 0;
+        end
+        else begin
+            a_stg1 <= a;
+            b_stg1 <= b;
+            b_op_stg1 <= b_op;
+            op_code_stg1 <= op_code;
+ 
+            add_sub_stg1 <= add_sub; // +、- 法運算結果存儲
+            shift_stg_l <= s3_l; // b[0] ~ b[3] 移位結果存儲
+            shift_stg_r <= s3_r; // b[0] ~ b[3] 移位結果存儲
+            
+            res_stg1 <= res_com1;     
+        end   
+    end
+    // --- stag1：前半段運算　＋　暫存器（stag1 registers）結束---
+
+    // --- stag2：後半段運算　＋　暫存器（stag2 registers）---
+    
+    //構建2個 32bit 暫存器用於 barrel shifter
+    //Shamt 選用 b_stg1[3] ~ b_stg1[4] 判斷移動幾個 bit
+    wire [31:0]s4_l, shift_l_res;
+    wire [31:0]s4_r, shift_r_res;
+    
+    // b_stg1[3] ~ b_stg1[4] 的 logic_shift_left
+    assign s4_l = (b_stg1[3]) ? {shift_stg_l[23:0], 8'b00000000} : shift_stg_l;
+    assign shift_l_res = (b_stg1[4]) ? {s4_l[15:0], 16'b0000000000000000} : s4_l;
+    // b_stg1[3] ~ b_stg1[4] 的 arithmetic_shift_right
+    assign s4_r = (b_stg1[3]) ? {{8{a_stg1[31]}}, shift_stg_r[31:8]} : shift_stg_r;
+    assign shift_r_res = (b_stg1[4]) ? {{16{a_stg1[31]}}, s4_r[31:16]} : s4_r;
+    
+    // 構建進位與溢位判斷
+    wire carry_stg1;
+    wire overflow_stg1;
+    assign carry_stg1 = add_sub_stg1[32]; //進位判斷 
+    assign overflow_stg1 = (~(a_stg1[31] ^ b_op_stg1[31])) && (a_stg1[31] ^ add_sub_stg1[31]); //溢位判斷
+    
+    // stage 1 -> stage 2（final_res）
+    reg [31:0] final_res;
+    always @(*) begin
+        case(op_code_stg1)
+            3'b000 : final_res = add_sub_stg1[31:0];
+            3'b001 : final_res = add_sub_stg1[31:0];
+            3'b010 : final_res = res_stg1;
+            3'b011 : final_res = res_stg1;
+            3'b100 : final_res = res_stg1;
+            3'b101: final_res = shift_l_res;
+            3'b110: final_res = shift_r_res;
+            3'b111 : final_res = res_stg1;
+            default: final_res = 0;
+        endcase
+    end
+    
+    // stage 2 -> resault
+    always@(posedge clk)begin
+        if(~rst_n)begin
+            res <= 0;
+            flag <= 0;
+        end
+        else begin
+            res <= final_res; // 直接用統一選好的值，case 不用重複寫兩次
+            // Z/N 對每種運算都更新，C/V 只在 ADD/SUB 才有意義
+            flag <= {(final_res == 32'd0), final_res[31],
+             ((op_code_stg1==3'b000)||(op_code_stg1==3'b001)) ? carry_stg1    : 1'b0,
+             ((op_code_stg1==3'b000)||(op_code_stg1==3'b001)) ? overflow_stg1 : 1'b0};
+        end   
+    end
+    // --- stag2：後半段運算　＋　暫存器（stag2 registers）結束---   
+    
+endmodule	
+```
+
+* 模擬結果
+<img width="287" height="309" alt="image" src="https://github.com/user-attachments/assets/640080aa-90f9-4679-a364-16d5d0bfe988" />
+<img width="1901" height="105" alt="image" src="https://github.com/user-attachments/assets/57a03d44-5b31-4280-8c29-92d10fc70e0e" />
+<img width="1645" height="390" alt="image" src="https://github.com/user-attachments/assets/35c5b00a-2fd0-4700-b99a-9d226f4368c4" />
+
+### ALU_V2（Pipeline）基準線數據
+* Period = 4.5 ns, WNS = 0.473 ns
+* Fmax ≈ (4.5-0.473)=4.027ns → Fmax≈248.3MHz MHz
+* LUT = 392, FF = 171
+
+* 效果：四個暫存器每拍都拿到組合邏輯即時算出的新鮮值，徹底排除「case 分支沒列到、讀到殘留舊值」這類問題，也避免被合成器推斷成帶 load-enable 的非預期結構；Stage2 仍靠 `op_code_stg1` 從 `final_res` 正確挑選來源，功能不受影響
+* Trade-off：每拍所有暫存器都會翻動（即使跟當拍運算無關），會多耗一點動態功耗，是刻意的簡潔度/穩定度換功耗的設計取捨
+
+
+## 關鍵知識/詞彙
+### 下階段優化考量
 1. PPA / 暫存器面積優化：精簡 Stage 1 至 Stage 2 跨級暫存器
 
 * **原設計瓶頸 (Baseline Bottleneck)：**
@@ -4293,153 +4473,7 @@ create_clock -period 4.5 -name clk [get_ports clk]
 * **改善效益 (Benefits)：**
   直接**省去 Stage 1 一組 32-bit 比較器**的硬體邏輯閘與連線延遲，有效減輕 Stage 1 的組合邏輯負載並提升時脈頻率（$F_{max}$）。
 
-3. 程式碼
-   ```verilog
-	`timescale 1ns / 1ps
 
-	module alu_v2(
-    input             clk,
-    input             rst_n,
-    input      [31:0] a,
-    input      [31:0] b,
-    input      [2:0]  op_code,
-    output reg [31:0] res,
-    output reg [3:0]  flag // {Z, N, C, V}
-	);
-
-    // =========================================================================
-    // Stage 1: 前半段運算 + Pipeline Registers
-    // =========================================================================
-
-    // 1. 共用 33-bit 加減法邏輯 (ADD: a+b ; SUB: a + ~b + 1)
-    wire        sub;
-    wire [31:0] b_op;
-    wire [32:0] add_sub;
-
-    assign sub     = (op_code == 3'b001); 
-    assign b_op    = b ^ {32{sub}}; 
-    assign add_sub = {1'b0, a} + {1'b0, b_op} + sub; 
-
-    // 2. Barrel Shifter Stage 1 (b[0] ~ b[2])
-    wire [31:0] s1_l, s2_l, s3_l; 
-    wire [31:0] s1_r, s2_r, s3_r;
-
-    // Logic Shift Left (1, 2, 4 bits)
-    assign s1_l = (b[0]) ? {a[30:0], 1'b0}       : a;
-    assign s2_l = (b[1]) ? {s1_l[29:0], 2'b00}    : s1_l;
-    assign s3_l = (b[2]) ? {s2_l[27:0], 4'b0000}  : s2_l;
-
-    // Arithmetic Shift Right (1, 2, 4 bits)
-    assign s1_r = (b[0]) ? {a[31], a[31:1]}        : a;
-    assign s2_r = (b[1]) ? {{2{a[31]}}, s1_r[31:2]} : s1_r;
-    assign s3_r = (b[2]) ? {{4{a[31]}}, s2_r[31:4]} : s2_r;
-
-    // 3. Stage 1 邏輯運算 (AND, OR, XOR) — 使用阻塞賦值 (=)
-    reg [31:0] logic_res_stg1;
-    always @(*) begin
-        case(op_code)
-            3'b010  : logic_res_stg1 = a & b;
-            3'b011  : logic_res_stg1 = a | b;
-            3'b100  : logic_res_stg1 = a ^ b;
-            default : logic_res_stg1 = 32'd0;
-        endcase
-    end
-
-    // 4. Stage 1 -> Stage 2 Pipeline Registers
-    reg [2:0]  op_code_stg1;
-    reg [32:0] add_sub_stg1;
-    reg        a_sign_stg1;    // 僅鎖存 a[31] 供 Stage 2 算術右移與溢位使用
-    reg        b_op_sign_stg1; // 僅鎖存 b_op[31] 供 Stage 2 溢位使用
-    reg [1:0]  shamt_stg2;     // 僅鎖存 b[4:3] 供 Stage 2 Barrel Shifter 使用
-    reg [31:0] shift_stg_l;
-    reg [31:0] shift_stg_r;
-    reg [31:0] res_logic_stg1;
-
-    always @(posedge clk or negedge rst_n) begin
-        if (~rst_n) begin
-            op_code_stg1   <= 3'b0;
-            add_sub_stg1   <= 33'b0;
-            a_sign_stg1    <= 1'b0;
-            b_op_sign_stg1 <= 1'b0;
-            shamt_stg2     <= 2'b0;
-            shift_stg_l    <= 32'b0;
-            shift_stg_r    <= 32'b0;
-            res_logic_stg1 <= 32'b0;
-        end else begin
-            op_code_stg1   <= op_code;
-            add_sub_stg1   <= add_sub;
-            a_sign_stg1    <= a[31];
-            b_op_sign_stg1 <= b_op[31];
-            shamt_stg2     <= b[4:3];
-            shift_stg_l    <= s3_l;
-            shift_stg_r    <= s3_r;
-            res_logic_stg1 <= logic_res_stg1;
-        end
-    end
-
-    // =========================================================================
-    // Stage 2: 後半段運算 + 旗標計算 + 輸出 Register
-    // =========================================================================
-
-    // 1. Barrel Shifter Stage 2 (shamt_stg2: 8, 16 bits)
-    wire [31:0] s4_l, shift_l_res;
-    wire [31:0] s4_r, shift_r_res;
-
-    assign s4_l        = (shamt_stg2[0]) ? {shift_stg_l[23:0], 8'h00}         : shift_stg_l;
-    assign shift_l_res = (shamt_stg2[1]) ? {s4_l[15:0], 16'h0000}             : s4_l;
-
-    assign s4_r        = (shamt_stg2[0]) ? {{8{a_sign_stg1}}, shift_stg_r[31:8]} : shift_stg_r;
-    assign shift_r_res = (shamt_stg2[1]) ? {{16{a_sign_stg1}}, s4_r[31:16]}     : s4_r;
-
-    // 2. 進位 (C)、溢位 (V) 與 SLT 判斷
-    wire carry_stg1;
-    wire overflow_stg1;
-    wire slt_res_stg2;
-
-    assign carry_stg1    = add_sub_stg1[32]; 
-    assign overflow_stg1 = (~(a_sign_stg1 ^ b_op_sign_stg1)) && (a_sign_stg1 ^ add_sub_stg1[31]);
-    assign slt_res_stg2  = add_sub_stg1[31] ^ overflow_stg1; // 利用減法結果與溢位計算 SLT
-
-    // 3. Stage 2 最終結果選擇
-    reg [31:0] final_res;
-    always @(*) begin
-        case(op_code_stg1)
-            3'b000  : final_res = add_sub_stg1[31:0];      // ADD
-            3'b001  : final_res = add_sub_stg1[31:0];      // SUB
-            3'b010  : final_res = res_logic_stg1;          // AND
-            3'b011  : final_res = res_logic_stg1;          // OR
-            3'b100  : final_res = res_logic_stg1;          // XOR
-            3'b101  : final_res = shift_l_res;             // SLL
-            3'b110  : final_res = shift_r_res;             // SRA
-            3'b111  : final_res = {31'd0, slt_res_stg2};   // SLT
-            default : final_res = 32'd0;
-        endcase
-    end
-
-    // 4. 輸出 Register (res & flag)
-    wire is_add_sub;
-    assign is_add_sub = (op_code_stg1 == 3'b000) || (op_code_stg1 == 3'b001);
-
-    always @(posedge clk or negedge rst_n) begin
-        if (~rst_n) begin
-            res  <= 32'd0;
-            flag <= 4'd0;
-        end else begin
-            res  <= final_res;
-            // flag format: {Z, N, C, V}
-            flag <= {
-                (final_res == 32'd0),   // Z: Zero
-                final_res[31],          // N: Negative
-                is_add_sub ? carry_stg1    : 1'b0, // C: Carry
-                is_add_sub ? overflow_stg1 : 1'b0  // V: Overflow
-            };
-        end
-    end
-
-	endmodule
-   ```
-
-## 關鍵知識/詞彙
 ### SLT (Set Less Than) 邏輯運算與硬體實現原理
 
 * 在 2 補數算術邏輯單元（ALU）中，有號數大小比較 $A < B$（即 SLT 指令）可直接共享加減法器的運算結果，透過 **減法結果符號位元（Sign Bit, $S_{31}$）** 與 **溢位旗標（Overflow Flag, $V$）** 的 XOR 運算精準導出：
