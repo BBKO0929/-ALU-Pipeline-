@@ -38,6 +38,7 @@
 | [8/5](#m08d05) | ALU 設計：32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
 | [8/10](#m08d10) | Digital Design and Computer Architecture (ARM / RISC-V Edition) |
 | [8/11](#m08d11) | ALU 設計優化：主動重構，把邏輯運算與 SLT 先獨立拆成一個組合邏輯，Stage1 暫存器改成**每拍無條件更新** |
+| [8/12](#m08d12) | 刷題：完成 HDLBits 的 Shift Registers。 |
 
 
 ---
@@ -4525,6 +4526,351 @@ endmodule
 * 利用 $S_{31} \oplus V$：
 1. **面積優化：** 僅需額外增加一個 **2-input XOR 邏輯閘**，無需合成複雜的 32-bit 專用符號比較器（Signed Comparator）。
 2. **時序優化：** 完全共享加減法器（Adder/Subtractor）的運算路徑，大幅節省晶片面積並優化關鍵路徑（Critical Path）延遲。
+
+[回目錄](#toc)
+
+---
+<a id="m08d12"></a>
+
+## 2026 年 8 月 12 日
+
+## 今日進度：
+### 刷題：完成 HDLBits 的 Shift Registers。
+
+## 遇到的困難與解決方案：
+### Exams/2014 q4b
+<img width="1214" height="844" alt="image" src="https://github.com/user-attachments/assets/351e30f6-f364-4a48-b2a9-2a7d25b969ca" />
+
+1. 問題：
+* **多重驅動衝突 (Multiple Drivers Error)**：
+   * 在 `top_module` 中同時使用子模組 (`MUXDFF inst0(...)`) 與 `always @(posedge clk)` 區塊對相同的輸出埠 (`LEDR`) 進行指派。
+   * **硬體觀念**：在數位電路中，一根導線 (Wire) 不能同時被兩個邏輯閘的輸出端驅動，否則會造成訊號衝突（短路/未知態 `X`）。
+* **架構分工模糊 (Lack of Separation of Concerns)**：
+   * 忽視了 `MUXDFF` 內部應包含 MUX 多路選擇器邏輯，導致頂層模組既做腳位串接又做邏輯判斷，失去模組化的意義。
+
+2. 程式
+```verilog
+  	module top_module (
+    input [3:0] SW,
+    input [3:0] KEY,
+    output [3:0] LEDR
+); 
+    
+    
+    MUXDFF inst0(
+        .clk(KEY[0]),
+        .q(LEDR[0])
+    );
+    MUXDFF inst1(
+        .clk(KEY[0]),
+        .q(LEDR[1])
+    );
+    MUXDFF inst2(
+        .clk(KEY[0]),
+        .q(LEDR[2])
+    );
+    MUXDFF inst3(
+        .clk(KEY[0]),
+        .q(LEDR[3])
+    );
+    
+    always@(posedge KEY[0])begin
+        case({KEY[1], KEY[2]})
+            2'b00 : LEDR <= LEDR;
+            2'b01 : LEDR <= SW;
+            2'b10 : LEDR <= KEY[3];
+            2'b11 : LEDR <= SW;
+        endcase
+    end
+
+endmodule
+
+module MUXDFF(
+    input clk,
+    input d,
+    output q
+);
+    
+    always@(posedge clk)begin
+    	q <= d;
+    end
+
+endmodule
+```
+
+### Exams/ece241 2013 q12
+<img width="1213" height="613" alt="image" src="https://github.com/user-attachments/assets/4888ad9d-2d7a-45af-9a8d-c95ea2f529e3" />
+
+1. 問題：
+* **多重驅動衝突 (Multiple Drivers Error)**：
+   * 在頂層模組中同時實體化了 8 個 `dff8` (`inst0` ~ `inst7`)，且每一個子模組都將其 `Z` 腳位連接到頂層的 `output Z`。
+   * **硬體觀念**：多個輸出端同時驅動同一根導線會造成訊號衝突（短路 / 未知態 `X`）。
+     
+* **時序與組合邏輯混淆 (Sequential vs. Combinational Misunderstanding)**：
+   * 原設計將讀取選擇器（`case({A, B, C})`）寫在 `always @(posedge clk)` 的 `else` 分支內。
+   * **問題所在**：
+     * 當 `enable = 1`（進行移位寫入）時，`else` 不會執行，導致 `Z` **無法更新**。
+     * LUT / RAM 的讀取動作（Random Access）本質上是 **組合邏輯 (Multiplexer)**，應該隨時反映 `{A, B, C}` 的位址變化，而不應該等待 `clk` 上升觸發或受 `enable` 控制。
+
+2. 程式
+```verilog
+  	module top_module (
+    input clk,
+    input enable,
+    input S,
+    input A, B, C,
+    output Z ); 
+    
+    dff8 inst0(
+        .clk(clk),
+        .enable(enable),
+        .d(S),
+        .A(A),
+        .B(B),
+        .C(C),
+        .Z(Z) 
+    );
+    dff8 inst1(
+        .clk(clk),
+        .enable(enable),
+        .A(A),
+        .B(B),
+        .C(C),
+        .Z(Z) 
+    );
+    dff8 inst2(
+        .clk(clk),
+        .enable(enable),
+        .A(A),
+        .B(B),
+        .C(C),
+        .Z(Z) 
+    );
+    dff8 inst3(
+        .clk(clk),
+        .enable(enable),
+        .A(A),
+        .B(B),
+        .C(C),
+        .Z(Z) 
+    );
+    dff8 inst4(
+        .clk(clk),
+        .enable(enable),
+        .A(A),
+        .B(B),
+        .C(C),
+        .Z(Z) 
+    );
+    dff8 inst5(
+        .clk(clk),
+        .enable(enable),
+        .A(A),
+        .B(B),
+        .C(C),
+        .Z(Z) 
+    );
+    dff8 inst6(
+        .clk(clk),
+        .enable(enable),
+        .A(A),
+        .B(B),
+        .C(C),
+        .Z(Z) 
+    );
+    dff8 inst7(
+        .clk(clk),
+        .enable(enable),
+        .A(A),
+        .B(B),
+        .C(C),
+        .Z(Z) 
+    );
+    
+    
+endmodule
+
+module dff8(
+    input clk,
+    input enable,
+    input d,
+    input A, B, C,
+    output Z,
+    output [7:0]q
+);
+    
+    always@(posedge clk)begin
+        if(enable)begin
+            q[0] <= d;
+            q[1] <= q[0];
+            q[2] <= q[1];
+            q[3] <= q[2];
+            q[4] <= q[3];
+            q[5] <= q[4];
+            q[6] <= q[5];
+            q[7] <= q[6];
+        end
+        else begin
+            case({A, B, C})
+                3'b000 : Z <= q[0];
+                3'b001 : Z <= q[1];
+                3'b010 : Z <= q[2];
+                3'b011 : Z <= q[3];
+                3'b100 : Z <= q[4];
+                3'b101 : Z <= q[5];
+                3'b110 : Z <= q[6];
+                3'b111 : Z <= q[7];
+            endcase
+        end
+    end
+    
+endmodule
+```
+
+
+### 解法：
+### Exams/2014 q4b
+1. **頂層模組 (`top_module`)**：專注於硬體連線 (Wiring/Instantiation)，**完全移除 `always` 區塊**，避免重複驅動 `LEDR`。
+2. **子模組 (`MUXDFF`)**：將 MUX 選擇邏輯（`L` 判斷是載入 `R` 還是移位 `w`）與 D-Flip-Flop 包裹在子模組內部。
+
+3. 程式碼
+  ```verilog
+  module top_module (
+    input [3:0] SW,
+    input [3:0] KEY,
+    output [3:0] LEDR
+	); //
+    
+	    MUXDFF inst0(
+	        .clk(KEY[0]),
+	        .E(KEY[1]),
+	        .L(KEY[2]),
+	        .w(LEDR[1]),
+	        .R(SW[0]),
+	        .q(LEDR[0])
+	    );
+	    
+	    MUXDFF inst1(
+	        .clk(KEY[0]),
+	        .E(KEY[1]),
+	        .L(KEY[2]),
+	        .w(LEDR[2]),
+	        .R(SW[1]),
+	        .q(LEDR[1])
+	    );
+	    
+	    MUXDFF inst2(
+	        .clk(KEY[0]),
+	        .E(KEY[1]),
+	        .L(KEY[2]),
+	        .w(LEDR[3]),
+	        .R(SW[2]),
+	        .q(LEDR[2])
+	    );
+	    
+	    MUXDFF inst3(
+	        .clk(KEY[0]),
+	        .E(KEY[1]),
+	        .L(KEY[2]),
+	        .w(KEY[3]),
+	        .R(SW[3]),
+	        .q(LEDR[3])
+	    );
+	
+	endmodule
+	module MUXDFF (
+    input clk,
+    input w, E, L, R,
+    output q
+	);
+    
+    	always@(posedge clk)begin
+        	case({E, L})
+        		2'b00 : q <= q;
+            	2'b01 : q <= R;
+            	2'b10 : q <= w;
+            	2'b11 : q <= R;
+        	endcase
+    	end
+
+	endmodule
+  ```
+
+### Exams/ece241 2013 q12
+1. **無需拆分 8 個子模組**：`top_module` 本身即包含一個 8-bit 的移位暫存器 (`reg [7:0] q`)。
+2. **寫入邏輯（時序邏輯）**：當 `enable = 1` 時，在 `posedge clk` 將 `S` 移入 `q[0]`。
+3. **讀取邏輯（組合邏輯）**：直接利用動態索引 `assign Z = q[{A, B, C}];` 實作 8-to-1 MUX，確保讀取獨立且無延遲。
+
+5. 程式碼
+  ```verilog
+  module top_module (
+    input clk,
+    input enable,
+    input S,
+    input A, B, C,
+    output Z
+);
+
+    reg [7:0] q;
+
+    // 寫入部分：當 enable=1 時，進行 8-bit 移位 (Sequential Logic)
+    always @(posedge clk) begin
+        if (enable) begin
+            // S 輸入給 Q[0]，其他位元向高位移（Q[0]->Q[1]->...->Q[7]）
+            q <= {q[6:0], S}; 
+        end
+    end
+
+    // 讀取部分：以 {A, B, C} 作為位址選出對應的 Q[i] (Combinational Logic)
+    assign Z = q[{A, B, C}];
+
+endmodule
+  ```
+
+## 關鍵知識/詞彙：
+### 移位暫存器與 LFSR (Linear-Feedback Shift Register)
+
+1. 核心觀念
+* **Fibonacci vs. Galois 架構**：
+  * **Fibonacci 型**：多個 Taps 經過多層 XOR 再回授至輸入端，組合邏輯延遲較高。
+  * **Galois 型**：回授訊號（通常為 `q[0]`）直接拉出，並行插入到各 Tap 之間的 XOR 閘，**關鍵路徑僅經過 1 個 XOR 閘**，更易達到 Timing Closure。
+* **位元運算技巧**：
+  * **右移與回授**：`q <= {q[0], q[31:1]}` 實現了「將最高位填入回授 `q[0]`」與「其餘位元右移一階」。
+  * **特定 Tap 更新**：在非阻塞指派 (`<=`) 下，可直接用 `q[tap] <= q[tap+1] ^ q[0];` 覆蓋特定位置。
+
+2. 常見踩雷點
+* **狀態鎖死 (Lockup)**：以 XOR 為基礎的 LFSR **絕對不能初始化為全 0**（全 0 經過 XOR 結果永遠為 0），重置時必須載入非零 Seed（如 `5'h1`）。
+* **陣列越界 (Out of Bounds)**：使用 `for` 迴圈處理位元時，務必注意 0-based 索引（如 32-bit 的最高位為 `q[31]`，而非 `q[32]`）。
+
+---
+
+### 模組化設計與訊號驅動規則 (Submodules & Drivers)
+
+1. 核心觀念
+* **職責分離 (Separation of Concerns)**：
+  * **子模組 (Submodule)**：專注於組合與時序邏輯運算（如包含 MUX + DFF）。
+  * **頂層模組 (Top Module)**：專注於硬體結構串接 (Structural Modeling)，**儘量避免在頂層使用 `always` 區塊與子模組同時操作同一訊號**。
+
+2. 常見踩雷點
+* **多重驅動衝突 (Multiple Drivers Error)**：
+  * **現象**：同一訊號（如 `LEDR` 或 `Z`）同時被 `always` 區塊與子模組（`inst0`）驅動，或是多個子模組輸出接到同一導線。
+  * **硬體本質**：多個邏輯閘輸出直接短路，導致未知態 (`X`)。
+* **`reg` 與 `wire` 宣告混淆**：
+  * 在 `always` 區塊內指派的變數（如 `q <= d;`），其埠型態必須明確宣告為 **`output reg`**。
+
+---
+
+### 時序與組合邏輯的邊界 (Sequential vs. Combinational)
+
+1. 核心觀念
+* ** Look-Up Table (3-LUT / RAM) 設計**：
+  * **寫入 (Write)**：屬於**時序邏輯 (Sequential Logic)**，需受時脈 `clk` 與 `enable` 控制（如 `q <= {q[6:0], S};`）。
+  * **讀取 (Read)**：屬於**組合邏輯 (Combinational Logic)**，本質為 Multiplexer (MUX)，應獨立於 `clk` 與 `enable`，隨時反映位址輸入（如 `assign Z = q[{A, B, C}];`）。
+
+2. 最佳實踐 (Best Practices)
+* **動態索引即 MUX**：在 Verilog 中使用 `q[index]` 可以極簡且精確地被合成器轉譯為多路選擇器 (MUX)，無需撰寫冗長的 `case` 敘述。
+* **拼接運算符 `{}`**：優先使用 `{}` 進行位元拼接與移位（如 `{q[6:0], S}`），比編寫 `for` 迴圈更具可讀性且不容易出現語法錯誤。
+
 
 [回目錄](#toc)
 
