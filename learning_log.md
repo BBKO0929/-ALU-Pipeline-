@@ -37,7 +37,7 @@
 | [8/4](#m08d04) | ALU_V2（pipeline）設計：完成 Testbench - alu_v2_tt，驗證 pipeline 版本功能 |
 | [8/5](#m08d05) | ALU 設計：32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
 | [8/10](#m08d10) | Digital Design and Computer Architecture (ARM / RISC-V Edition) |
-| [8/11](#m08d11) | Digital Design and Computer Architecture (ARM / RISC-V Edition) |
+| [8/11](#m08d11) | ALU 設計優化：主動重構，把邏輯運算與 SLT 先獨立拆成一個組合邏輯，Stage1 暫存器改成**每拍無條件更新** |
 
 
 ---
@@ -4263,7 +4263,7 @@ create_clock -period 4.5 -name clk [get_ports clk]
 
 ## 今日成果探討：
 ### ALU 設計優化：
-### 32bit_ALU_V2（pipeline） - 主動重構，把邏輯運算與 SLT 先獨立拆成一個組合邏輯 `res_com1`（`always@(*)`），Stage1 暫存器改成**每拍無條件更新**：
+### 32bit_ALU_V2（pipeline） - 主動重構，把邏輯運算與 SLT 先獨立拆成一個組合邏輯，Stage1 暫存器改成**每拍無條件更新**：
 
 * 程式碼
 ```verilog
