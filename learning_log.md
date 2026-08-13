@@ -49,7 +49,7 @@
 ## 2026 年 7 月 3 日
 
 ## 今日進度：
-### 影片：TT 小教室第 1~5 課。
+### 影片：TT 小教室第 1~5 課[https://www.youtube.com/watch?v=W1DlwK63fxw&list=PLuhWBQnV46Q-3oMz33PFSqjhJOvDDVUbJ]
 ### 刷題：完成 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
 
 ## 遇到的困難與解決方案：
@@ -111,7 +111,7 @@ end
 ## 2026 年 7 月 4 日
 
 ## 今日進度：
-### 影片：TT 小教室第 6~7 課。
+### 影片：TT 小教室第 6~7 課[https://www.youtube.com/watch?v=W1DlwK63fxw&list=PLuhWBQnV46Q-3oMz33PFSqjhJOvDDVUbJ]
 ### 刷題：複習 HDLBits 的 "basics" 到 "8-bit wide shift register of length 3(Three module)"。
 
 ## 遇到的困難與解決方案：
@@ -246,7 +246,7 @@ endmodule
 ## 2026 年 7 月 5 日
 
 ## 今日進度：
-### 影片：TT 小教室第 8~11 課。
+### 影片：TT 小教室第 8~11 課[https://www.youtube.com/watch?v=W1DlwK63fxw&list=PLuhWBQnV46Q-3oMz33PFSqjhJOvDDVUbJ]
 ### 刷題：完成 HDLBits 的 "Adder1" 到 "Adder2"。
 
 ## 遇到的困難與解決方案：
@@ -765,7 +765,7 @@ endmodule
 ## 2026 年 7 月 7 日
 
 ## 今日進度：
-### 影片：清大OCW王俊堯教授數位邏輯設計第 8B~8E 講。
+### 影片：清大OCW王俊堯教授數位邏輯設計第 8B~8E 講[https://www.youtube.com/watch?v=fW6xAPTOMm0&list=PLS0SUwlYe8czJbz5-sRtbuTleObQE9mOa]
 ### 資料：複習7/3 - 7/6進度。
 ### 刷題：複習7/3 - 7/6進度、完成 HDLBits 的 "Always nolatches" 到 "Create a 100-bit binary ripple-carry adder"。
 
@@ -1068,7 +1068,7 @@ module add1(
 ## 2026 年 7 月 9 日
 
 ## 今日進度：
-### 影片：看財經村長-數位IC設計面試1。
+### 影片：看財經村長-數位IC設計面試 1[https://www.youtube.com/watch?v=yATdPIrKdug&t=2092s]
 ### 刷題：完成 HDLBits - "Combinational Logic" 中的 "Basic gates"。
 
 ## 遇到的困難與解決方案：
@@ -2062,7 +2062,7 @@ endmodule
 ## 2026 年 7 月 16 日
 
 ## 今日進度：
-### 影片：TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】
+### 影片：TT 小教室 Verilog RTL design 進階教學【Coding Style】- 【Synchronizer】[https://www.youtube.com/watch?v=U1ZQzLmoARM&list=PLuhWBQnV46Q92gAT-KvzdJUhBh3maNkFF]
 ### 刷題：完成 HDLBits - counters 的 Four-bit binary counter  到 slow decade counter。
 
 ## 遇到的困難與解決方案：
@@ -2214,7 +2214,7 @@ endmodule
 ## 2026 年 7 月 17 日
 
 ## 今日進度：
-### 影片：TT 小教室 Verilog RTL design 進階教學【Memory】
+### 影片：TT 小教室 Verilog RTL design 進階教學【Memory】[https://www.youtube.com/watch?v=U1ZQzLmoARM&list=PLuhWBQnV46Q92gAT-KvzdJUhBh3maNkFF]
 ### 刷題：完成 HDLBits 的 "counter 1-12" 到 "4-digit BCD counter (Countbcd)"；待完成 "12-hour clock"。
 
 ## 遇到的困難與解決方案：
@@ -2805,7 +2805,7 @@ end
 ## 2026 年 7 月 24 日
 
 ## 今日進度：
-### 影片：財經村長 - 如何面試上一線數位IC公司 II
+### 影片：財經村長 - 如何面試上一線數位IC公司 II[https://www.youtube.com/watch?v=Xo0VADH-yX4&t=1448s]
 
 ## 關鍵知識/詞彙：
 ### 亞穩態深度解析
