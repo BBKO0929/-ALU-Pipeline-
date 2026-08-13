@@ -38,7 +38,8 @@
 | [8/5](#m08d05) | ALU 設計：32bit_ALU_V2（pipeline） - 第一次 Synthesis + Implementation 結果，並記錄收斂到 WNS 接近 0 的結果 |
 | [8/10](#m08d10) | Digital Design and Computer Architecture (ARM / RISC-V Edition) |
 | [8/11](#m08d11) | ALU 設計優化：主動重構，把邏輯運算與 SLT 先獨立拆成一個組合邏輯，Stage1 暫存器改成**每拍無條件更新** |
-| [8/12](#m08d12) | 刷題：複習 HDLBits 7/3 - 8/11 進度；完成 HDLBits 的 Shift Registers。 |
+| [8/12](#m08d12) | 刷題：複習 HDLBits 7/3 - 8/11 進度；完成 HDLBits 的 Shift Registers |
+| [8/13](#m08d13) | 影片：Digital Design and Computer Architecture(Spring 2025) L1 - L2 |
 
 
 ---
@@ -4870,6 +4871,108 @@ endmodule
 2. 最佳實踐 (Best Practices)
 * **動態索引即 MUX**：在 Verilog 中使用 `q[index]` 可以極簡且精確地被合成器轉譯為多路選擇器 (MUX)，無需撰寫冗長的 `case` 敘述。
 * **拼接運算符 `{}`**：優先使用 `{}` 進行位元拼接與移位（如 `{q[6:0], S}`），比編寫 `for` 迴圈更具可讀性且不容易出現語法錯誤。
+
+
+[回目錄](#toc)
+
+---
+<a id="m08d13"></a>
+
+## 2026 年 8 月 13 日
+
+## 今日進度：
+### 資料：
+1. Digital Design and Computer Architecture(Spring 2025)[https://safari.ethz.ch/ddca/spring2025/doku.php?id=start]
+2. Digital Design and Computer Architecture, David Harris and Sarah Harris (Chapter 1-2)[https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture]
+
+### 影片：
+1. Digital Design and Computer Architecture(Spring 2025) L1 - L2
+
+
+## 關鍵知識/詞彙：
+### 計算機系統抽象層級 (Layers of Abstraction)
+<img width="438" height="585" alt="image" src="https://github.com/user-attachments/assets/891d39eb-f677-4c41-b5dd-72b94c6918f2" />
+
+| 層級 | 英文名稱 | 範例與說明 |
+| :--- | :--- | :--- |
+| 頂層 | Problem | 實際欲解決的問題（如：AI 圖像識別） |
+| | Algorithm | 解決問題的演算法（如：Quick Sort, CNN） |
+| | Program/Language | 高階程式語言（如：C++, Python, Java） |
+| | System Software | 作業系統、編譯器、組譯器（OS, Compilers） |
+| 中介 | SW/HW Interface | 指令集架構 (ISA)：如 x86, ARM, RISC-V |
+| | Micro-architecture | 處理器內部硬體實現（如：流水線、快取設計） |
+| | Logic | 數位邏輯閘與電路（如：AND/OR/NAND、暫存器） |
+| | Devices | 半導體元件（如：晶體管 Transistors, MOSFET） |
+| 底層 | Electrons | 物理層與電子運動 |
+
+* 關鍵概念：SW/HW Interface (ISA)：
+	* 軟硬體的橋樑：介於系統軟體與底層硬體之間，是兩者溝通的標準協定。
+	* 抽象化契約：定義了機器看得懂的指令集、暫存器（Registers）、記憶體定址模式與資料型態。軟體開發者只需針對 ISA 寫作/編譯，無需關心硬體底層電路的具體實現。
+---
+### 當前計算機架構的挑戰 (Computer Architecture Today)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/92e0b2df-2d4a-4565-b9f7-0299f55773fd" />
+
+* 現代計算機架構正經歷重大範式轉移（Paradigm Shift），主要推動因素與面對的難題如下：
+	* 巨量數據需求 (Data Hunger)：AI 與數據密集型應用的快速崛起。
+	* 功耗/散熱限制 (Power Constraints)：功耗牆限制了單核頻率的無限制提升。
+	* 設計複雜度 (Design Complexity)：晶片規模與驗證難度大幅增加。
+	* 技術微縮困難 (Technology Scaling)：摩爾定律（Moore's Law）與鄧納德縮放定律（Dennard Scaling）放緩。
+	* 記憶體瓶頸 (Memory Bottleneck)：「記憶體牆」問題，即 CPU 算力遠快於 DRAM 存取速度。
+	* 資安與硬體漏洞 (Security & Privacy)：如 Spectre、Meltdown 及 Rowhammer 攻擊。
+---
+### 硬體實現技術比較 (Hardware Platforms)
+<img width="995" height="683" alt="image" src="https://github.com/user-attachments/assets/d794b7e9-79e9-421f-9ba2-5aee9b721454" />
+
+| 比較項目 | 微處理器 (Microprocessors) | FPGA | ASIC |
+| :--- | :--- | :--- | :--- |
+| 特性 | 通用構件（CPU/GPU） | 可重新組態的硬體，極具彈性 | 完全客製化的專用晶片 |
+| 開發時間 | 幾分鐘（撰寫軟體） | 幾天（邏輯合成與佈局） | 幾個月（實體光罩與下片） |
+| 相對效能 | 基準 (o) | 較優 (+) | 極佳 (++) |
+| 適用場景 | 通用計算、簡單易用 | 原型設計 (Prototyping)、小量生產 | 量產產品、追求極致效能與低功耗 |
+| 產出形式 | 可執行檔 (Executable File) | 位元流檔案 (Bitstream) | 設計光罩 (Design Masks) |
+| 程式語言 | C / C++ / Java / Python | Verilog / VHDL | Verilog / VHDL |
+| 代表廠商 | Intel, AMD, ARM, Apple, NVIDIA | Xilinx (AMD), Altera (Intel) | TSMC (台積電), GlobalFoundries |
+---
+### CMOS 邏輯閘結構 (CMOS Logic Gates)
+<img width="1000" height="749" alt="image" src="https://github.com/user-attachments/assets/1423d5e6-080b-4106-b5c1-04cf5e147478" />
+
+1. 邏輯規則：
+  * 電晶體並聯 (Parallel)：任意一個導通，網路即導通（對應 OR 邏輯）。
+  * 電晶體串聯 (Series)：所有電晶體皆導通，網路才導通（對應 AND 邏輯）。
+
+2. 特性：pMOS 與 nMOS 互補，在靜態時絕不同時導通，因此靜態功耗極低，且預設輸出為反相特性（如 NOT, NAND, NOR）。
+
+3. 變型結構：Pseudo-nMOS 
+<img width="186" height="193" alt="image" src="https://github.com/user-attachments/assets/e18859f7-16e6-4e07-8009-ee0036ad1335" />
+
+* 為了減少晶片面積與電晶體數量，將上拉網路替換為單一常開的弱 pMOS（Weak pMOS）：
+	* 優點：N 個輸入只需 N + 1 個電晶體（標準 CMOS 需要 2N 個），大幅縮減面積與輸入電容。
+	* 缺點：當輸出為邏輯 0 時，pMOS 與 nMOS 同時導通，會產生持續的靜態功耗 (Static Power)；且輸出低電位準（VOL）無法完美降至 0V，雜訊邊限較差。
+---
+### 功耗與能量消耗 (Power & Energy Consumption)
+<img width="999" height="749" alt="image" src="https://github.com/user-attachments/assets/aaefda82-5d66-4b78-a3d3-69955b87500c" />
+
+1. 動態功耗 (Dynamic Power)
+* 電路在訊號切換（0 <-> 1）對電容充放電時產生的功耗。
+
+$$P_{\text{dynamic}} = C \cdot V^2 \cdot f$$
+
+* C：電路的負載電容（包含連線與邏輯閘電容）
+* V：工作電壓（降低電壓可帶來二次方的省電效果）
+* f：電容充放電的切換頻率
+
+2. 靜態功耗 (Static Power)
+電路靜止未切換時，因半導體漏電流（Leakage Current）所產生的功耗。
+
+$$P_{\text{static}} = V \cdot I_{\text{leakage}}$$
+
+* I_leakage：漏電流（隨製程微縮而持續增加）
+
+3. 總能量消耗 (Energy Consumption)
+執行特定工作負載所消耗的總能量：
+
+$$\text{Energy} = \text{Power} \times \text{Time}$$
+
 
 
 [回目錄](#toc)
