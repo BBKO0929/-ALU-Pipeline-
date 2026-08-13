@@ -4886,7 +4886,7 @@ endmodule
 2. Digital Design and Computer Architecture, David Harris and Sarah Harris (Chapter 1-2)[https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture]
 
 ### 影片：
-1. Digital Design and Computer Architecture(Spring 2025) L1 - L2
+1. Digital Design and Computer Architecture(Spring 2025) L1 - L2[https://www.youtube.com/watch?v=ubhxKNlOlRg&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3]
 
 
 ## 關鍵知識/詞彙：
