@@ -5043,8 +5043,6 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
   * `WE` (Write Enable)：寫入致能訊號。當 `WE = 1` 時允許寫入。
   * $D_i[2:0]$：準備寫入的 3-bit 輸入資料線。
 * **寫入控制邏輯：**
-  * 上排寫入條件：$\text{WE} \cdot \overline{\text{Addr}[0]}$
-  * 下排寫入條件：$\text{WE} \cdot \text{Addr}[0]$
   * 只有被選中那一排的 D-Latch Enable 端會被拉高，進而鎖存 $D_i[2:0]$ 的新資料。
 
 3. 讀寫模式對照
