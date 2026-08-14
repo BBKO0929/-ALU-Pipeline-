@@ -40,6 +40,8 @@
 | [8/11](#m08d11) | ALU 設計優化：主動重構，把邏輯運算與 SLT 先獨立拆成一個組合邏輯，Stage1 暫存器改成**每拍無條件更新** |
 | [8/12](#m08d12) | 刷題：複習 HDLBits 7/3 - 8/11 進度；完成 HDLBits 的 Shift Registers |
 | [8/13](#m08d13) | 影片：Digital Design and Computer Architecture(Spring 2025) L1 - L2 |
+| [8/14](#m08d14) |  |
+
 
 
 ---
@@ -4972,6 +4974,27 @@ $$P_{\text{static}} = V \cdot I_{\text{leakage}}$$
 執行特定工作負載所消耗的總能量：
 
 $$\text{Energy} = \text{Power} \times \text{Time}$$
+
+
+
+[回目錄](#toc)
+
+---
+<a id="m08d14"></a>
+
+## 2026 年 8 月 14 日
+
+## 今日進度：
+### 刷題：複習 HDLbits - Shift Registers
+### 資料：
+1. [Digital Design and Computer Architecture(Spring 2025)](https://safari.ethz.ch/ddca/spring2025/doku.php?id=start)
+2. [Digital Design and Computer Architecture, David Harris and Sarah Harris (Chapter 1-2)](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
+
+### 影片：
+1. [Digital Design and Computer Architecture(Spring 2025) L1 - L2](https://www.youtube.com/watch?v=ubhxKNlOlRg&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3)
+
+
+## 關鍵知識/詞彙：
 
 
 
