@@ -40,7 +40,7 @@
 | [8/11](#m08d11) | ALU 設計優化：主動重構，把邏輯運算與 SLT 先獨立拆成一個組合邏輯，Stage1 暫存器改成**每拍無條件更新** |
 | [8/12](#m08d12) | 刷題：複習 HDLBits 7/3 - 8/11 進度；完成 HDLBits 的 Shift Registers |
 | [8/13](#m08d13) | 影片：Digital Design and Computer Architecture(Spring 2025) L1 - L2 |
-| [8/14](#m08d14) |  |
+| [8/14](#m08d14) | 影片：Digital Design and Computer Architecture(Spring 2025) L3 |
 
 
 
@@ -4885,7 +4885,7 @@ endmodule
 ## 今日進度：
 ### 資料：
 1. [Digital Design and Computer Architecture(Spring 2025)](https://safari.ethz.ch/ddca/spring2025/doku.php?id=start)
-2. [Digital Design and Computer Architecture, David Harris and Sarah Harris (Chapter 1-2)](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
+2. [Digital Design and Computer Architecture, David Harris and Sarah Harris](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
 
 ### 影片：
 1. [Digital Design and Computer Architecture(Spring 2025) L1 - L2](https://www.youtube.com/watch?v=ubhxKNlOlRg&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3)
@@ -4988,14 +4988,122 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ### 刷題：複習 HDLbits - Shift Registers
 ### 資料：
 1. [Digital Design and Computer Architecture(Spring 2025)](https://safari.ethz.ch/ddca/spring2025/doku.php?id=start)
-2. [Digital Design and Computer Architecture, David Harris and Sarah Harris (Chapter 1-2)](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
+2. [Digital Design and Computer Architecture, David Harris and Sarah Harris](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
 
 ### 影片：
-1. [Digital Design and Computer Architecture(Spring 2025) L1 - L2](https://www.youtube.com/watch?v=ubhxKNlOlRg&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3)
+1. [Digital Design and Computer Architecture(Spring 2025) L3](https://www.youtube.com/watch?v=smHJ1W7S-2Q&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3&index=3)
 
 
 ## 關鍵知識/詞彙：
+### 三態緩衝器應用 (Tri-State Buffer Applications)
+<img width="1001" height="683" alt="image" src="https://github.com/user-attachments/assets/fa232dfd-aa1a-4202-9d05-748f060bc7bc" />
 
+1. 應用情境與問題
+* **共用匯流排問題：** 假設有一條導線（Shared Bus）同時連接 CPU 與記憶體（Memory）。
+* **存取限制：** 在任何時間點，只能由 CPU **或** 記憶體其中一方將數值傳送到導線上，絕不能兩者同時傳送。
+* **短路風險：** 若兩者同時輸出不同的電位（例如 CPU 輸出高電位 1，記憶體輸出低電位 0），會導致**匯流排衝突（Bus Contention）**，造成短路並損壞晶片。
+
+2. 解決方案與運作機制
+* **雙三態緩衝器架構：** 一個由 CPU 驅動，另一個由記憶體驅動。
+<img width="1003" height="708" alt="image" src="https://github.com/user-attachments/assets/d9972c28-760c-4400-9959-0c0ab0646aed" />
+
+3. 控制邏輯狀態
+* **CPU 寫入至匯流排：** `GateCPU = 1`（導通），`GateMem = 0`（高阻抗 Hi-Z）。
+* **記憶體讀出至匯流排：** `GateCPU = 0`（高阻抗 Hi-Z），`GateMem = 1`（導通）。
+* **匯流排空閒 (Idle)：** `GateCPU = 0`，`GateMem = 0`（兩者皆為高阻抗 Hi-Z，斷開連接）。
+
+---
+### 儲存元件總覽 (Storage Elements)
+<img width="1002" height="754" alt="image" src="https://github.com/user-attachments/assets/23697252-c053-49c5-b058-e22b83015878" />
+
+| 儲存元件種類 | 速度 | 成本與結構 | 適用場景 / 用途 |
+| :--- | :--- | :--- | :--- |
+| **Latches & Flip-Flops** | 極快 (Very fast)，支援平行存取 | 極高 (Very expensive)，1 bit 需要數十個電晶體 | CPU 暫存器 (Registers) |
+| **SRAM (Static RAM)** | 相對快 (Relatively fast) | 高 (Expensive)，1 bit 需要 6 個以上的電晶體 (6T+) | CPU 快取記憶體 (Cache, L1/L2/L3) |
+| **DRAM (Dynamic RAM)** | 較慢，讀取會破壞資料（需 Refresh） | 便宜 (Cheap)，1 bit 僅需 1 電晶體 + 1 電容 (1T1C) | 主記憶體 (Main Memory / RAM) |
+| **Other Storage** (Flash/HDD/Tape) | 非常慢，存取時間長 | 極便宜 (Very cheap)，具備非揮發性 (Non-volatile) | 外部與長期儲存設備 (SSD, HDD, 磁帶) |
+
+---
+### 記憶體讀取與寫入架構 (Memory Read & Write Architecture)
+
+1. 讀取機制 (Reading from Memory)
+<img width="1003" height="749" alt="image" src="https://github.com/user-attachments/assets/68bb5479-daaf-451a-af6b-176a7aa16fcc" />
+
+* **位址解碼 (Address Decoding)：**
+  * 2 個位址需要 $\log_2(2) = 1\text{ bit}$ 的位址線 (`Addr[0]`)。
+  * `Addr[0] = 0` 時經由反相器選中上排（Address 0）；`Addr[0] = 1` 時選中下排（Address 1）。
+* **資料輸出多工 (Data Multiplexing)：**
+  * 每個儲存單元後方接一個 AND 閘作為讀取門控。
+  * 同一行的兩排訊號透過 OR 閘匯合輸出，確保資料線 $D[2:0]$ 輸出正確選中的位址資料。
+
+2. 寫入機制 (Writing to Memory)
+<img width="1002" height="751" alt="image" src="https://github.com/user-attachments/assets/3f1dddaf-b7b5-4fff-8a43-b42f6dbe11d4" />
+
+* **控制訊號：**
+  * `WE` (Write Enable)：寫入致能訊號。當 `WE = 1` 時允許寫入。
+  * $D_i[2:0]$：準備寫入的 3-bit 輸入資料線。
+* **寫入控制邏輯：**
+  * 上排寫入條件：$\text{WE} \cdot \overline{\text{Addr}[0]}$
+  * 下排寫入條件：$\text{WE} \cdot \text{Addr}[0]$
+  * 只有被選中那一排的 D-Latch Enable 端會被拉高，進而鎖存 $D_i[2:0]$ 的新資料。
+
+3. 讀寫模式對照
+<img width="1004" height="750" alt="image" src="https://github.com/user-attachments/assets/4cdb4a99-89f0-4198-9e28-dba326f292b6" />
+
+| 操作模式 | WE | Addr[0] | 運作行為 |
+| :--- | :---: | :---: | :--- |
+| **純讀取 (Read)** | `0` | `0` 或 `1` | 寫入控制 AND 閘皆為 0，鎖存器保持舊資料。右側依 `Addr[0]` 輸出位址資料至 $D[2:0]$。 |
+| **寫入 Address 0** | `1` | `0` | 上排寫入 AND 閘輸出 1，將 $D_i[2:0]$ 鎖存至上排。 |
+| **寫入 Address 1** | `1` | `1` | 下排寫入 AND 閘輸出 1，將 $D_i[2:0]$ 鎖存至下排。 |
+
+---
+### FPGA 中的尋找表 (Lookup Tables / LUTs)
+<img width="1001" height="749" alt="image" src="https://github.com/user-attachments/assets/dbf03ba4-8413-4ae0-b0b5-5448c4764bd2" />
+
+
+* **概念：** LUT 本質上是一組 SRAM 記憶體，事先載入邏輯運算的真值表 (Truth Table)，用以實現可程式化／可重新組態邏輯 (Reconfigurable Logic)。
+* **多功能拆分 (Resource Utilization)：**
+  較大的 LUT（例如 4-Input LUT）可透過多工器 (MUX) 與訊號路由，靈活分割成多個獨立的低輸入邏輯元件（如拆成 3-Input 的 LE 1 與 2-Input 的 LE 2），藉此提高硬體利用率。
+
+---
+### 有限狀態機 (Finite State Machines, FSM)
+
+1. 什麼是 FSM？
+<img width="1000" height="748" alt="image" src="https://github.com/user-attachments/assets/37a0d202-56fc-424e-b1ae-c1a10f61856e" />
+<img width="1003" height="748" alt="image" src="https://github.com/user-attachments/assets/64806188-f996-4395-ba98-e0d8f69ffac3" />
+
+
+* **離散時間模型：** 一個用來表示具有狀態之系統（Stateful System）的離散時間抽象模型。
+* **狀態 (State)：** 代表系統在特定時間點所有相關要素的靜態快照 (Snapshot)。
+* **應用範例：** 序列密碼鎖、紅綠燈、電梯、風扇轉速控制、微處理器控制器。
+
+2. 案例解析：序列密碼鎖 (Sequential Lock)
+<img width="1002" height="748" alt="image" src="https://github.com/user-attachments/assets/040a0b47-c30f-405f-9309-b318fd335e64" />
+
+* **開鎖密碼序列：** `R13 -> L22 -> R3`
+* **狀態定義：**
+  * **State A (Initial Locked)：** 初始鎖定狀態。
+  * **State B (Completed R13)：** 已正確完成第一步 `R13`。
+  * **State C (Completed R13-L22)：** 已正確完成前兩步 `R13-L22`。
+  * **State D (Unlocked)：** 成功開鎖。
+* **容錯機制：** 若輸入非預期之指令，系統會歸零重置回 State A。
+
+3. FSM 的五大理論要素
+<img width="1004" height="749" alt="image" src="https://github.com/user-attachments/assets/af9683c6-ea5d-422f-84b2-27ee18c18077" />
+
+* 有限數量的**狀態 (States)**
+* 有限數量的**外部輸入 (External Inputs)**
+* 有限數量的**外部輸出 (External Outputs)**
+* 明確定義的**狀態轉移規則 (State Transitions)**
+* 明確定義的**輸出決定規則 (Output Specification)**
+
+4. FSM 的硬體架構與分工
+<img width="1000" height="748" alt="image" src="https://github.com/user-attachments/assets/4d10a739-c84a-4026-97e1-d858d3f55fde" />
+<img width="1001" height="749" alt="image" src="https://github.com/user-attachments/assets/8148bcd0-364d-4546-bf37-4714bd4c2297" />
+
+* **次狀態邏輯 (Next State Logic)：** 組合邏輯電路 (CL)。根據當前輸入與當前狀態，即時計算出下一個狀態 ($S'$)。
+* **狀態暫存器 (State Register)：** 時序邏輯電路 (SL)。利用 Flip-Flops 在每個時脈邊緣（Clock Edge）將下一個狀態鎖存為當前狀態 ($S$)。
+* **輸出邏輯 (Output Logic)：** 組合邏輯電路 (CL)。根據當前狀態（或包含輸入）產生對應的外部輸出訊號。
 
 
 [回目錄](#toc)
