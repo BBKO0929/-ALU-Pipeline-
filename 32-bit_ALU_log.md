@@ -1080,9 +1080,6 @@ endmodule
   * `a_sign_stg1` (1-bit) $\leftarrow$ `a[31]`
   * `shamt_stg2` (2-bit) $\leftarrow$ `b[4:3]`
 
-* **改善效益 (Benefits)：**
-  在 RTL 層級直接**削減 61 個 Flip-Flops (FF)**。雖然 EDA 工具（如 Vivado Synthesis）具備 Register Pruning 機制，但由設計者在 RTL 主動精確宣告，能確保硬體架構的確定性並降低邏輯合成風險。
-
 2. 邏輯運算單元優化：SLT (Set Less Than) 共享加減法器結果
 
 * **原設計瓶頸 (Baseline Bottleneck)：**
@@ -1092,10 +1089,6 @@ endmodule
   利用補數算術邏輯，有號數比較 $A < B$ 在數學上完全等同於判斷 $A - B$ 結果的**負號（Sign Bit, $S_{31}$）與溢位（Overflow, $V$）**。SLT 運算可直接移至 Stage 2，共享加減法器的運算結果：
 
   $$\text{SLT} = S_{31} \oplus V$$
-
-* **改善效益 (Benefits)：**
-  直接**省去 Stage 1 一組 32-bit 比較器**的硬體邏輯閘與連線延遲，有效減輕 Stage 1 的組合邏輯負載並提升時脈頻率（$F_{max}$）。
-
 
 ### SLT (Set Less Than) 邏輯運算與硬體實現原理
 
