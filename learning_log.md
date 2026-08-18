@@ -41,6 +41,7 @@
 | [8/12](#m08d12) | 刷題：複習 HDLBits 7/3 - 8/11 進度；完成 HDLBits 的 Shift Registers |
 | [8/13](#m08d13) | 影片：Digital Design and Computer Architecture(Spring 2025) L1 - L2 |
 | [8/14](#m08d14) | 影片：Digital Design and Computer Architecture(Spring 2025) L3 |
+| [8/18](#m08d18) | 影片：Digital Design and Computer Architecture(Spring 2025) L4 |
 
 
 
@@ -5102,6 +5103,26 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 * **次狀態邏輯 (Next State Logic)：** 組合邏輯電路 (CL)。根據當前輸入與當前狀態，即時計算出下一個狀態 ($S'$)。
 * **狀態暫存器 (State Register)：** 時序邏輯電路 (SL)。利用 Flip-Flops 在每個時脈邊緣（Clock Edge）將下一個狀態鎖存為當前狀態 ($S$)。
 * **輸出邏輯 (Output Logic)：** 組合邏輯電路 (CL)。根據當前狀態（或包含輸入）產生對應的外部輸出訊號。
+
+
+[回目錄](#toc)
+
+---
+<a id="m08d18"></a>
+
+## 2026 年 8 月 18 日
+
+## 今日進度：
+### 刷題：複習 HDLbits - Shift Registers
+### 資料：
+1. [Digital Design and Computer Architecture(Spring 2025)](https://safari.ethz.ch/ddca/spring2025/doku.php?id=start)
+2. [Digital Design and Computer Architecture, David Harris and Sarah Harris](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
+
+### 影片：
+1. [Digital Design and Computer Architecture(Spring 2025) L3](https://www.youtube.com/watch?v=smHJ1W7S-2Q&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3&index=3)
+
+
+## 關鍵知識/詞彙：
 
 
 [回目錄](#toc)
