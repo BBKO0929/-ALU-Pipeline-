@@ -5113,16 +5113,103 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ## 2026 年 8 月 18 日
 
 ## 今日進度：
-### 刷題：複習 HDLbits - Shift Registers
 ### 資料：
 1. [Digital Design and Computer Architecture(Spring 2025)](https://safari.ethz.ch/ddca/spring2025/doku.php?id=start)
 2. [Digital Design and Computer Architecture, David Harris and Sarah Harris](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
 
 ### 影片：
-1. [Digital Design and Computer Architecture(Spring 2025) L3](https://www.youtube.com/watch?v=smHJ1W7S-2Q&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3&index=3)
+1. [Digital Design and Computer Architecture(Spring 2025) L4](https://www.youtube.com/watch?v=MHlj1bARKPw&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3&index=5)
 
 
 ## 關鍵知識/詞彙：
+
+### FSM 基本概念與分類
+<img width="1200" height="900" alt="image" src="https://github.com/user-attachments/assets/9cc1c2f7-2653-469f-a541-a5baf550824d" />
+
+* **基本運作**：下一個狀態 (Next State) 由「當前狀態 (Current State)」與「輸入 (Inputs)」共同決定。
+* **分類方式**：有限狀態機依據**輸出邏輯 (Output Logic)** 的決定方式分為兩類：
+  * **Moore FSM**：輸出僅取決於當前狀態 (Current State)。
+  * **Mealy FSM**：輸出同時取決於當前狀態 (Current State) 與輸入 (Inputs)。
+
+---
+
+### FSM 狀態編碼 (State Encoding)
+<img width="1199" height="898" alt="image" src="https://github.com/user-attachments/assets/bfcb4697-90e0-4385-bfc6-10c901b72d3f" />
+<img width="1202" height="900" alt="image" src="https://github.com/user-attachments/assets/ef9cff2c-3afb-42ca-bbda-b78b1fe9e8e8" />
+<img width="1198" height="899" alt="image" src="https://github.com/user-attachments/assets/30a0d97f-0942-4574-a491-34ed3e5391b0" />
+
+
+* 狀態位元編碼主要有三種常見策略，各自具備不同的 Trade-offs ：
+
+| 編碼策略 | 位元數與規則 | 特性與極值優化 | 範例編碼 (以 4 狀態號誌為例) |
+| --- | --- | --- | --- |
+| **Binary Encoding (Full Encoding)** | 使用最小可能位元數，即 log2(num_states) 個位元。 | **極小化** Flip-Flops 數量，但不一定能簡化輸出或次狀態邏輯。 | `00`, `01`, `10`, `11` |
+| **One-Hot Encoding** | 每個位元代表一個狀態，使用 num_states 個位元，且任意狀態下恰好只有 1 個位元為高電位 ("hot")。 | **極大化** Flip-Flops 數量，**極小化** 次狀態邏輯，設計流程最簡單且高度自動化。 | `0001`, `0010`, `0100`, `1000` |
+| **Output Encoding** | 輸出直接包含於狀態編碼中。例如 3 個燈號輸出即用 3 位元表示，Bit0 為綠燈、Bit1 為黃燈、Bit2 為紅燈。 | **極小化** 輸出邏輯，但**僅適用於 Moore FSM**（因其輸出純粹為狀態的函數）。 | `001`, `010`, `100`, `110` |
+
+* **設計原則**：設計者必須在給定的硬體限制條件下，仔細選擇編碼方案以達到設計的最佳化。
+
+---
+
+### FSM 設計流程 (FSM Design Procedure)
+<img width="1200" height="894" alt="image" src="https://github.com/user-attachments/assets/a8bb5324-233c-4a6e-a730-de3e41021ddb" />
+
+
+1. **確定所有可能狀態**：列出該機器所有可能的狀態。
+   
+2. **建立狀態轉移圖 (State Transition Diagram)**：
+  * 通常從文字描述轉化而成。
+  * 須確定每個狀態的輸入與輸出，並釐清狀態轉移的條件與路徑
+    
+3. **設計實作方法**：
+  * 從定義**重置狀態 (Reset State)** 開始，這是理想的起點。
+  * 逐步加入轉移條件 (Transitions) 與新狀態 (States)。
+  * 選擇**良好且具意義的狀態名稱**非常重要。
+    
+4. **FSM 與軟體程式設計之對比**：
+  * 建構 FSM 類似於編寫程式，但兩者並不等同。
+  * FSM 具有類似包含條件判斷與 goto 語句的順序控制流程 (Control-Flow)。
+  * if-then-else 結構由一個或多個輸入控制。
+  * 輸出由狀態或輸入控制。
+  * 在實際硬體中，系統通常同時運作許多併發 (Concurrent) 的 FSM。
+    
+5. **本質定義**：FSM 是一個具狀態系統的離散時間模型 (A discrete-time model of a stateful system)。
+
+### 什麼是 FPGA (What is an FPGA?)
+<img width="1024" height="578" alt="image" src="https://github.com/user-attachments/assets/d856fb4d-d9e5-4dfa-96dc-0df6f66df538" />
+
+* **全稱**：Field Programmable Gate Array（現場可程式化邏輯閘陣列）。
+* **核心定義**：FPGA 是一種可透過**軟體重新組態 (software-reconfigurable)** 的硬體基底。
+* **三大可重組要素**：
+  * **可重組功能 (Reconfigurable functions)**：自訂內部邏輯運算。
+  * **可重組互連線路 (Reconfigurable interconnection of functions)**：自訂內部模組間的連接關係。
+  * **可重組輸入/輸出 (Reconfigurable input/output IO)**：自訂外部腳位與介面規格。
+
+---
+
+### FPGA 高階架構總覽 (High-Level Overview)
+<img width="1601" height="900" alt="image" src="https://github.com/user-attachments/assets/56d41acb-42a9-4d2d-a669-32264b820c48" />
+
+* **四大核心組成要素**：
+  * **邏輯區塊 (Logic Blocks)**：負責執行電路的邏輯運算。
+  * **開關區塊 (Switch Blocks)**：控制不同路徑之間的切換與導通。
+  * **互連線路 (Interconnects)**：分佈於網格間，連接各個區塊的訊號導線。
+  * **輸入/輸出區塊 (I/O Blocks)**：排列於晶片外圍，負責與外部硬體設備對接。
+* **運作機制**：透過**配置 (Configure)** 邏輯區塊、連接線路與 I/O 區塊，以構建出目標硬體電路，並將程式映射 (Map) 至這些硬體電路上運作。
+
+---
+
+### FPGA 內部架構細節 (FPGA Architecture)
+<img width="1024" height="575" alt="image" src="https://github.com/user-attachments/assets/b42a8abd-cb53-4ca3-b40c-0724761db75a" />
+
+* **兩大主要建構區塊 (Main Building Blocks)**：
+  * **尋找表 (Look-Up Table, LUT)**：用於實作任意組合邏輯功能。
+  * **開關 (Switches)**：用於實現可程式化的電路路由與訊號切換。
+* **內部邏輯單元結構**：
+  * **配置記憶體 (Configuration Memory)**：儲存 LUT 的真值表資料與開關控制位元。
+  * **觸發器 (Flip-Flop)**：配合 LUT 輸出，提供時序邏輯（Sequential Logic）暫存功能。
+  * **架構分工**：整體資源分為負責實際電路運作的「動作邏輯 (Action logic)」與儲存組態設定的「配置記憶體 (Configuration memory)」。
+
 
 
 [回目錄](#toc)
