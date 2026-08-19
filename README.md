@@ -27,7 +27,7 @@
 2. 透過 Stage 2 統一選通多工器（Mux）設計避免重複邏輯，達成 **LUT 不升反降** 的微架構優化
 ---
 
-## 🛠️ 架構設計與流水線切割策略 (Microarchitecture)
+## 架構設計與流水線切割策略 (Microarchitecture)
 <img width="544" height="316" alt="image" src="https://github.com/user-attachments/assets/edfdfcaf-8039-4a88-8e76-640d7a6a100d" />
 <img width="923" height="507" alt="image" src="https://github.com/user-attachments/assets/24a57abe-c425-42a0-8ac1-af8253aafec1" />
 
