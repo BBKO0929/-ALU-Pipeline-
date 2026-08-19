@@ -1370,11 +1370,20 @@ endmodule
 
 ## 設計與優化歷程
 
-1. **Baseline 設計**：純組合邏輯 ALU，加法/減法共用同一顆 33-bit 加法器（2 補數技巧），barrel shifter 支援可變移位量（`shamt = b[4:0]`），並補上完整的 C/Z/N/V 四個狀態旗標。
-2. **Pipeline 切割**：分析 baseline 的 critical path 後，確認 barrel shifter（5 級 MUX）與 33-bit 加法器是主要瓶頸，依「時間延遲均等平分」原則切成 2-stage：Stage1 負責前 3 級移位＋加減法，Stage2 負責後 2 級移位＋flag 產生。
-3. **多輪除錯**：切 pipeline 過程中反覆修正資料流未串接、控制訊號時間點不同步（例如移位控制位元與資料未同拍鎖存）、flag 讀值來源錯誤等問題，並用同一組 corner case testbench 驗證每個版本與 baseline 功能等價。
-4. **時序收斂**：透過二分法逐步調整 XDC 的 clock period，收斂找出 baseline 與 pipeline 各自的真實 Fmax，而非只用單一寬鬆設定的數字。
-5. **瓶頸再分析與優化嘗試**：從 Timing Report 的 Net Delay／Logic Delay 比例與 High Fanout 欄位，定位出真正瓶頸是 `op_code_stg1` 控制訊號扇出過大（High Fanout 27~31）造成的繞線延遲，而非邏輯層數過深；並嘗試讓 SLT 運算共用加法器硬體（用 `overflow XOR sign` 判斷取代獨立比較器），同時精簡 Stage1 暫存器位元寬度，只保留 Stage2 真正需要的位元。
+1. **Baseline 設計**：
+   * 純組合邏輯 ALU，加法/減法共用同一顆 33-bit 加法器（2 補數技巧），barrel shifter 支援可變移位量（`shamt = b[4:0]`），並補上完整的 C/Z/N/V 四個狀態旗標。
+
+2. **Pipeline 切割**：
+   * 分析 baseline 的 critical path 後，確認 barrel shifter（5 級 MUX）與 33-bit 加法器是主要瓶頸，依「時間延遲均等平分」原則切成 2-stage：Stage1 負責前 3 級移位＋加減法，Stage2 負責後 2 級移位＋flag 產生。
+     
+3. **多輪除錯**：
+   * 切 pipeline 過程中反覆修正資料流未串接、控制訊號時間點不同步（例如移位控制位元與資料未同拍鎖存）、flag 讀值來源錯誤等問題，並用同一組 corner case testbench 驗證每個版本與 baseline 功能等價。
+     
+4. **時序收斂**：
+   * 透過二分法逐步調整 XDC 的 clock period，收斂找出 baseline 與 pipeline 各自的真實 Fmax，而非只用單一寬鬆設定的數字。
+     
+5. **瓶頸再分析與優化嘗試**：
+    * 從 Timing Report 的 Net Delay／Logic Delay 比例與 High Fanout 欄位，定位出真正瓶頸是 `op_code_stg1` 控制訊號扇出過大（High Fanout 27~31）造成的繞線延遲，而非邏輯層數過深；並嘗試讓 SLT 運算共用加法器硬體（用 `overflow XOR sign` 判斷取代獨立比較器），同時精簡 Stage1 暫存器位元寬度，只保留 Stage2 真正需要的位元。
 
 ## 結果檢視：優化不一定總是往預期方向走
 
