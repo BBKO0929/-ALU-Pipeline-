@@ -5306,6 +5306,10 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 | **行為特性** | 呈現硬體並列運作的真實物理特性 | 行為類似傳統順序式程式語言 (如 C / Python) |
 | **適用邏輯** | **時序邏輯 (Sequential Logic)** | **組合邏輯 (Combinational Logic)** |
 
+* Design Rules
+	* 時序邏輯 (Sequential Logic)：描述觸發器 (Flip-Flops) 或時脈邊緣驅動電路（如 always @(posedge clk)）時，一律使用非阻塞賦值 (<=)。
+	* 組合邏輯 (Combinational Logic)：描述純組合電路的 always 區塊（如 always @(*)）時，一律使用阻塞賦值 (=)。
+	* 禁止混用：切勿在同一個 always 區塊中混合使用 = 與 <=，以免產生模擬與合成不一致 (Simulation/Synthesis Mismatch) 的問題。
 ---
 
 
