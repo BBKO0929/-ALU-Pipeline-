@@ -42,6 +42,7 @@
 | [8/13](#m08d13) | 影片：Digital Design and Computer Architecture(Spring 2025) L1 - L2 |
 | [8/14](#m08d14) | 影片：Digital Design and Computer Architecture(Spring 2025) L3 |
 | [8/18](#m08d18) | 影片：Digital Design and Computer Architecture(Spring 2025) L4 |
+| [8/19](#m08d19) | 影片：Digital Design and Computer Architecture(Spring 2025) L5 |
 
 
 
@@ -5210,6 +5211,102 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
   * **觸發器 (Flip-Flop)**：配合 LUT 輸出，提供時序邏輯（Sequential Logic）暫存功能。
   * **架構分工**：整體資源分為負責實際電路運作的「動作邏輯 (Action logic)」與儲存組態設定的「配置記憶體 (Configuration memory)」。
 
+
+
+[回目錄](#toc)
+
+---
+<a id="m08d19"></a>
+
+## 2026 年 8 月 19 日
+
+## 今日進度：
+### 資料：
+1. [Digital Design and Computer Architecture(Spring 2025)](https://safari.ethz.ch/ddca/spring2025/doku.php?id=start)
+2. [Digital Design and Computer Architecture, David Harris and Sarah Harris](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
+
+### 影片：
+1. [Digital Design and Computer Architecture(Spring 2025) L5](https://www.youtube.com/watch?v=3Sqt0GIFPbc&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3&index=7)
+
+
+## 關鍵知識/詞彙：
+### 電路設計的權衡 (Circuit Design Tradeoffs)
+<img width="956" height="718" alt="image" src="https://github.com/user-attachments/assets/f308f71d-cb4f-437f-b081-5d5eca416a52" />
+
+數位電路設計需要平衡以下四個核心面向：
+
+* **面積 (Area)**：晶片電路面積直接決定硬體的成本 (Cost)。
+* **速度與吞吐量 (Speed / Throughput)**：追求更快、處理能力更強的電路執行效能。
+* **功耗與能量 (Power / Energy)**：
+  * 行動裝置受限於有限的電源供應。
+  * 高效能裝置的散熱功率密度可能超過 100 W/cm²。
+* **設計時間 (Design Time)**：工程師的時間與人力成本高昂，且市場競爭不允許過長的開發週期。
+
+---
+
+### HDL 的主要實作風格 (Two Main Styles of HDL Implementation)
+<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/f2fd7414-977c-4f4d-b80e-926685b3700c" />
+
+* **結構化描述 (Structural / Gate-Level)**：
+  * 模組內部包含閘級 (Gate-Level) 的電路描述。
+  * 詳細定義模組與模組之間的互連方式。
+  * 透過模組實體化 (Instances) 與導線連接，建構出階層化 (Hierarchy) 的邏輯閘結構。
+* **行為級描述 (Behavioral)**：
+  * 模組內部包含電路功能的邏輯與算術運算描述。
+  * 抽象化程度高於閘級 (Gate-Level)。
+  * 一種行為級描述可經由工具合成為多種不同的閘級硬體實作。
+* **實務應用**：大多數實際的電路設計皆為兩者的混合使用。
+
+---
+
+### Verilog 數字表示法 (Number Representation in Verilog)
+<img width="958" height="718" alt="image" src="https://github.com/user-attachments/assets/14c36012-a3bb-40c2-9f19-856192869466" />
+
+---
+
+### HDL 程式碼處理流程 (Synthesis & Simulation)
+<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/bf4fa34a-5ae2-4b87-9671-765a80d498d7" />
+
+1. 硬體合成 (Hardware Synthesis)
+* **定義**：現代開發工具能將可合成的 (Synthesizable) HDL 程式碼映射至低階元件庫 (Cell Libraries)，產生由邏輯閘與導線組成的網表 (Netlist)。
+* **限制**：工具會進行多項最佳化，但**無法保證**得到絕對最佳解（主因是佈線與佈局 Placement and Routing 演算法的運算複雜度極高）。
+* **最佳實踐**：設計師需以易於合成 (Nice-to-synthesize) 的風格撰寫 HDL 程式碼。
+
+2. 電路模擬 (Simulation)
+* **定義**：可在無需實際製造晶片的情況下，驗證電路的功能與行為。
+* **適用性**：模擬器可支援結構化 (Structural) 或行為級 (Behavioral) 的 HDL 描述。
+* **重要性**：是進行功能驗證 (Functional Verification) 與時序驗證 (Timing Verification) 不可或缺的步驟。
+
+---
+
+### `always` 區塊與組合邏輯 (Combinational `always` Block)
+<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/539412ed-160f-4c54-b489-acb955d1eb9a" />
+
+* **關鍵概念**：`always` 區塊**不必然**代表具備記憶功能的時序電路 (Flip-Flops / Latches)。
+* **組合邏輯條件**：
+  * 敏感列表 (Sensitivity List) 包含所有輸入訊號。
+  * 在所有條件分支 (如 `if...else`) 中，輸出訊號皆有被明確指派數值。
+* **範例分析**：
+  ```verilog
+  always @ (inv, data)
+      if (inv) result <= ~data;
+      else     result <= data;
+  ```
+  
+* 當 inv 或 data 改變時即觸發運算；因為包含完整 else 分支，此段描述會合成為純組合邏輯電路 (Combinational Logic, no memory)。
+
+### 阻塞與非阻塞賦值 (Blocking vs. Non-blocking Assignments)
+<img width="958" height="716" alt="image" src="https://github.com/user-attachments/assets/6d4c244c-e82c-4f55-8459-e9beef4f8d7f" />
+
+| 比較項目 | 非阻塞賦值 (Non-blocking) | 阻塞賦值 (Blocking) |
+| :--- | :--- | :--- |
+| **運算子 (Syntax)** | `<=` | `=` |
+| **執行機制** | 區塊內所有賦值會在**區塊結束時同時更新**（平行處理） | 每個賦值會**立即生效**，完成後才執行下一行（順序執行） |
+| **控制流程** | 不會阻塞 (Not-blocked) 後續程式碼評估 | 會阻塞 (Blocks) 後續程式碼的執行 |
+| **行為特性** | 呈現硬體並列運作的真實物理特性 | 行為類似傳統順序式程式語言 (如 C / Python) |
+| **適用邏輯** | **時序邏輯 (Sequential Logic)** | **組合邏輯 (Combinational Logic)** |
+
+---
 
 
 [回目錄](#toc)
