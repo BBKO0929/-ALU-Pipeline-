@@ -43,6 +43,7 @@
 | [8/14](#m08d14) | 影片：Digital Design and Computer Architecture(Spring 2025) L3 |
 | [8/18](#m08d18) | 影片：Digital Design and Computer Architecture(Spring 2025) L4 |
 | [8/19](#m08d19) | 影片：Digital Design and Computer Architecture(Spring 2025) L5 |
+| [8/20](#m08d20) | 影片：Digital Design and Computer Architecture(Spring 2025) L6 |
 
 
 
@@ -5311,6 +5312,301 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 	* 組合邏輯 (Combinational Logic)：描述純組合電路的 always 區塊（如 always @(*)）時，一律使用阻塞賦值 (=)。
 	* 禁止混用：切勿在同一個 always 區塊中混合使用 = 與 <=，以免產生模擬與合成不一致 (Simulation/Synthesis Mismatch) 的問題。
 ---
+
+
+[回目錄](#toc)
+
+---
+<a id="m08d20"></a>
+
+## 2026 年 8 月 20 日
+
+## 今日進度：
+
+### 刷題：複習 HDLbits - Shift Registers
+
+### 資料：
+1. [Digital Design and Computer Architecture(Spring 2025)](https://safari.ethz.ch/ddca/spring2025/doku.php?id=start)
+2. [Digital Design and Computer Architecture, David Harris and Sarah Harris](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
+
+### 影片：
+1. [Digital Design and Computer Architecture(Spring 2025) L5](https://www.youtube.com/watch?v=DBsDuQwpPsI&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3&index=8)
+
+
+## 關鍵知識/詞彙：
+### 電路延遲與其變異 (Circuit Delay and Its Variation)
+1. 延遲的成因與影響因素
+<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/54a2cf6a-f928-4f60-86a2-122ce31f2911" />
+
+* **根本成因**：
+  * 電路中存在的**電容 (Capacitance)** 與 **電阻 (Resistance)**。
+  * **光速的有限性 (Finite speed of light)**：在奈秒 (ns) 尺度下，光速傳播其實並不夠快。
+    
+* **影響延遲的變因**：
+  * **訊號轉折方向**：上升沿（ $0 \rightarrow 1$ ）與下降沿（ $1 \rightarrow 0$ ）的轉換時間不同。
+  * **輸入路徑差異**：不同的輸入端經過的邏輯閘數量與路徑長度不同。
+  * **環境變化**：如運作溫度的改變。
+  * **元件老化 (Aging)**：晶片長期使用後的特性衰退。
+    
+* **結論**：從輸入到輸出，電路呈現的是一個**可能延遲的範圍 (Range of delays)**，而非固定單一值。
+
+---
+
+2. 延遲類型定義： $t_{cd}$ 與 $t_{pd}$
+<img width="959" height="718" alt="image" src="https://github.com/user-attachments/assets/990add3b-6a1e-44f5-9e08-7681ac67519d" />
+
+* **污染延遲 (Contamination delay, $t_{cd}$ )**：輸入發生變化後，輸出 $Y$ **開始產生改變**所需的最短時間。
+* **傳播延遲 (Propagation delay, $t_{pd}$ )**：輸入發生變化後，輸出 $Y$ **完成改變並達到穩定狀態**所需的最長時間。
+* **時序圖表示**：時序圖中的交叉斜線網格 (Cross-hatching) 區域，代表輸出值目前處於不穩定的過渡狀態。
+---
+
+3. 最長與最短延遲路徑計算 (Critical & Short Path)
+<img width="961" height="716" alt="image" src="https://github.com/user-attachments/assets/37da23ef-1f5a-4064-83e8-1f90619c4690" />
+<img width="959" height="718" alt="image" src="https://github.com/user-attachments/assets/d1f34507-ae9f-4cd1-a623-d6347d9cfac8" />
+
+* 關鍵路徑 / 最長路徑 (Critical / Longest Path)
+	* **傳遞路徑**：輸入 $A \rightarrow \text{AND1} \rightarrow n1 \rightarrow \text{OR} \rightarrow n2 \rightarrow \text{AND2} \rightarrow Y$。
+	* **計算公式**： $$t_{pd} = 2 \cdot t_{pd\_AND} + t_{pd\_OR}$$
+
+* 最短路徑 (Shortest Path)
+	* **傳遞路徑**：輸入 $D \rightarrow \text{AND2} \rightarrow Y$。
+	* **計算公式**： $$t_{cd} = t_{cd\_AND}$$
+
+---
+
+4. 實體元件延遲實例 (74HC00 NAND Gate)
+<img width="958" height="716" alt="image" src="https://github.com/user-attachments/assets/dfed58df-25c1-47db-9d33-7c9341b4682d" />
+
+* 實體晶片的傳播延遲時間極度依賴於**工作電壓 (Voltage)** 與 **環境溫度 (Temperature)**：
+
+---
+
+5. 4:1 多工器 (Multiplexer) 架構與延遲比較
+<img width="584" height="367" alt="image" src="https://github.com/user-attachments/assets/8695f5d0-6f23-4f8e-90d0-976fda2fc6dd" />
+
+* 兩階邏輯 (Two-level Logic) vs. 三態邏輯 (Tristate Logic)
+
+	* **兩階邏輯架構**：
+  		* **選擇訊號延遲**： $t_{pd\_sy} = t_{pd\_INV} + t_{pd\_AND3} + t_{pd\_OR4} = 30\text{ ps} + 80\text{ ps} + 90\text{ ps} = \mathbf{200\text{ ps}}$
+  		* **資料訊號延遲**： $t_{pd\_dy} = t_{pd\_AND3} + t_{pd\_OR4} = \mathbf{170\text{ ps}}$
+	* **三態邏輯架構**：
+  		* **選擇訊號延遲**： $t_{pd\_sy} = t_{pd\_INV} + t_{pd\_AND2} + t_{pd\_TRI\_SY} = 30\text{ ps} + 60\text{ ps} + 35\text{ ps} = \mathbf{125\text{ ps}}$
+  		* **資料訊號延遲**： $t_{pd\_dy} = t_{pd\_TRI\_AY} = \mathbf{50\text{ ps}}$
+
+### 階層式 2:1 多工器串接 (Hierarchical 2:1 Muxes)
+<img width="241" height="286" alt="image" src="https://github.com/user-attachments/assets/90d66e30-3dc4-476f-a90c-50332a0b6e01" />
+
+使用三個 2:1 多工器模組組合出 4:1 多工器：
+
+* **選擇訊號 $S_0$ 延遲**： $$t_{pd\_s0y} = t_{pd\_TRLSY} + t_{pd\_TRI\_AY} = 85\text{ ns}$$
+  
+* **資料訊號 $D$ 延遲**： $$t_{pd\_dy} = 2 \cdot t_{pd\_TRI\_AY} = 100\text{ ns}$$
+
+---
+### 電路毛刺與訊號突波 (Glitches)
+
+1. 定義與成因
+<img width="960" height="716" alt="image" src="https://github.com/user-attachments/assets/a7609aac-2fda-4226-8e6a-f79881438767" />
+
+* **定義**：單一輸入訊號的轉折（Transition），導致輸出端產生多次不必要的過渡轉折（例如 $1 \rightarrow 0 \rightarrow 1$ ）。
+* **成因**：電路中同時存在**快路徑 (Fast path)** 與 **慢路徑 (Slow path)**。由於傳遞路徑上的邏輯閘數量不同或延遲不均，造成訊號抵達時間不一致。
+* **範例分析**：當輸入 $B$ 發生 $1 \rightarrow 0$ 轉折時，經由 2 個邏輯閘的快路徑與經由 3 個邏輯閘的慢路徑產生時間差，導致輸出 $Y$ 短暫掉至 $0$ 後又升回 $1$（即出現 $1 \rightarrow 0 \rightarrow 1$ 的 Glitch）。
+
+---
+
+2. 利用卡諾圖 (K-Maps) 消除毛刺
+<img width="957" height="716" alt="image" src="https://github.com/user-attachments/assets/554489af-9de4-42fb-988f-b0a7040e093d" />
+
+* **解決機制**：在卡諾圖中加入**共識項 (Consensus Term)**，填補相鄰主要隱項 (Prime Implicants) 之間的過渡邊界。
+* **邏輯推導**：
+  * **原始表示式**（存在毛刺）： $$Y = \bar{A}\bar{B} + BC$$
+  * **加入共識項後**（消除毛刺）： $$Y = \bar{A}\bar{B} + BC + \mathbf{\bar{A}C}$$
+* **效果**：新增的共識項 $\bar{A}C$ **不依賴變數 $B$**。當變數 $B$ 發生轉折時， $\bar{A}C$ 項能持續保持輸出為 $1$，從而完全消除毛刺。
+
+---
+
+3. 實務設計權衡 (Design Trade-offs)
+<img width="957" height="719" alt="image" src="https://github.com/user-attachments/assets/1a8e05fc-c6b7-4ec4-ab80-b55ccbe30c77" />
+
+#### 消除毛刺的代價
+* **晶片面積增加 (More Area)**：需要額外的邏輯閘來實作共識項。
+* **功耗上升 (More Power)**：更多的電路邏輯帶來更高功耗。
+* **開發成本增加 (More Design Effort)**：額外的設計與驗證工時。
+
+#### 是否總是需要消除毛刺？
+* **不需要**。無論過渡期間是否發生毛刺，電路最終保證會收斂 (Converge) 至正確的穩定狀態值。
+* **應用場景判斷**：
+  * 若系統僅關注**長期穩態輸出 (Long-term Steady State)**（如同步時序電路在 Clock Edge 採樣），毛刺通常可被忽略。
+  * 由設計師根據應用需求決定（例如非同步控制、時脈驅動或重置訊號等敏感路徑才需特別消除毛刺）。
+---
+### 時序邏輯電路時序約束 (Sequential Circuit Timing Constraints)
+
+1. D 觸發器 (D Flip-Flop) 輸入時序限制
+<img width="957" height="718" alt="image" src="https://github.com/user-attachments/assets/fc10874b-9065-4612-a891-50510f8fa18b" />
+
+為了確保 D 觸發器能正確採樣資料，輸入訊號 $D$ 在時脈有效邊緣 (Active Clock Edge) 採樣時必須保持穩定。
+
+* **建立時間 (Setup Time, $t_{\text{setup}}$ )**：資料訊號在時脈邊緣**到達前**，必須維持穩定的最短時間。
+* **保持時間 (Hold Time, $t_{\text{hold}}$ )**：資料訊號在時脈邊緣**到達後**，必須維持穩定的最短時間。
+* **孔徑時間 (Aperture Time, $t_{\text{a}}$ )**：資料必須保持絕對穩定的總時間視窗，定義為： $$t_{\text{a}} = t_{\text{setup}} + t_{\text{hold}}$$
+
+---
+
+2. 時序電路運作條件與違規 (Timing Violations)
+<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/5d581f88-56d7-40e1-8064-2e3f95675ad2" />
+<img width="960" height="718" alt="image" src="https://github.com/user-attachments/assets/303ef8d6-884a-4fff-b93e-e593df1b3180" />
+
+在相鄰兩個觸發器（例如 $R1 \rightarrow \text{組合邏輯 } (CL) \rightarrow R2$ ）之間的資料傳輸中：
+
+* **組合邏輯過慢 (Too Slow)**：導致資料無法及時到達 $R2$，引發 ** $t_{\text{setup}}$ 違規 (Setup Violation) **。
+* **組合邏輯過快 (Too Fast)**：新資料過早到達 $R2$，覆蓋掉剛採樣的舊資料，引發 ** $t_{\text{hold}}$ 違規 (Hold Violation) **。
+
+---
+
+3. 建立時間約束 (Setup Time Constraint)
+<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/6fe2e667-91e3-4e58-bb70-5e9eeef3abf9" />
+<img width="957" height="716" alt="image" src="https://github.com/user-attachments/assets/ef642ed0-e4d4-4532-9c63-32883d44dbc2" />
+
+* **核心概念**：取決於從 $R1$ 到 $R2$ 的**最長延遲路徑（關鍵路徑 Critical Path）**。
+* **約束公式**： $$T_{\text{c}} > t_{\text{pcq}} + t_{\text{pd}} + t_{\text{setup}}$$
+  *(其中 $T_{\text{c}}$ 為時脈週期， $t_{\text{pcq}}$ 為觸發器傳播延遲， $t_{\text{pd}}$ 為組合邏輯傳播延遲)*
+* **效能影響**：
+  * 關鍵路徑決定了系統的最短時脈週期 $T_{\text{c}}$ 與最高工作頻率 $f_{\text{max}} = 1 / T_{\text{c}}$。
+  * 若關鍵路徑過長，整體設計將被迫在較低頻率下運作。
+  * **定序開銷 (Sequencing Overhead)**： $t_{\text{pcq}} + t_{\text{setup}}$ 屬於每個週期中被浪費的時間開銷，僅有 $t_{\text{pd}}$ 是進行有效邏輯運算的時間。
+
+---
+
+4. 保持時間約束 (Hold Time Constraint)
+<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/4bfc41dc-890e-4a13-87f9-ce027df20305" />
+
+* **核心概念**：取決於從 $R1$ 到 $R2$ 的**最短延遲路徑 (Shortest Path)**。
+* **約束公式**： $$t_{\text{ccq}} + t_{\text{cd}} > t_{\text{hold}} \implies t_{\text{cd}} > t_{\text{hold}} - t_{\text{ccq}}$$
+  *(其中 $t_{\text{ccq}}$ 為觸發器污染延遲， $t_{\text{cd}}$ 為組合邏輯污染延遲)*
+* **重要特性**：
+  * **與時脈週期 $T_{\text{c}}$ 完全無關**！調慢時脈頻率無法解決 Hold Violation。
+  * 晶片製造完成後若發生 $t_{\text{hold}}$ 違規極難修復，必須直接修改電路佈局（例如插入延遲 Buffer）。
+
+---
+
+5. 時序參數總結 (Timing Summary)
+<img width="959" height="719" alt="image" src="https://github.com/user-attachments/assets/b92f3931-7a22-4f33-9ba9-25d01dc68042" />
+
+| 符號 | 完整名稱 | 定義與說明 |
+| :--- | :--- | :--- |
+| ** $t_{\text{ccq}} / t_{\text{pcq}}$ ** | Clock-to-Q Delay | 時脈邊緣觸發後，觸發器輸出端 Q 開始改變 ( $t_{\text{ccq}}$ ) 或達到穩定改變 ( $t_{\text{pcq}}$ ) 的延遲。 |
+| ** $t_{\text{cd}} / t_{\text{pd}}$ ** | Logic Delay | 組合邏輯電路的污染延遲 ( $t_{\text{cd}}$ ) 與傳播延遲 ( $t_{\text{pd}}$ )。 |
+| ** $t_{\text{setup}}$ ** | Setup Time | 觸發器輸入端在時脈邊緣**前**必須保持穩定的最短時間。 |
+| ** $t_{\text{hold}}$ ** | Hold Time | 觸發器輸入端在時脈邊緣**後**必須保持穩定的最短時間。 |
+| ** $T_{\text{c}}$ ** | Clock Period | 時脈訊號的週期時間。 |
+---
+### 時脈偏移與時脈網路 (Clock Skew and Clock Network)
+<img width="959" height="718" alt="image" src="https://github.com/user-attachments/assets/4761e2a0-c687-47ee-a610-74b7a62dd5ab" />
+
+1. 時脈偏移 (Clock Skew) 的影響
+
+* **實質效應**：時脈偏移 (Clock Skew) 會同時**增加**系統實務上所需的 $t_{\text{setup}}$ 與 $t_{\text{hold}}$ 裕度。
+* **定序開銷增加 (Increased Sequencing Overhead)**：
+  * Skew 相當於額外消耗了時脈週期中的可用時間。
+  * 導致每個時脈週期內，能用來進行有效邏輯運算 (Useful Work) 的時間變得更少。
+
+---
+
+2. 時脈網路設計目標 (Clock Network Goals)
+
+* **最小化 Skew**：設計師必須盡可能將全晶片內部的時脈偏移降至最低。
+* **核心目標**：確保時脈訊號 (Clock) 能在**幾乎相同的時間**抵達晶片上各個觸發器的時脈輸入端。
+* **解決方案**：需要在整個晶片佈局中規劃並建構智慧型的「**時脈網路 (Clock Network)**」。
+
+---
+### 時脈網路分配架構 (Clock Network Architectures)
+
+為了消除跨區延遲差異，晶片設計中會採用不同的時脈分配結構：
+
+* **時脈樹 (Clock Tree)**：透過階層式的驅動器 (Drivers) 進行對稱分枝，平衡各路徑的傳播延遲。
+* **跨接網絡 (Crosslink / Spine)**：在樹狀結構的中間層加入跨接線，強化不同區域間時脈的同相度。
+* **時脈網格 (Clock Mesh / Grid)**：建立全域 (Global) 與局部 (Local) 的網格狀導線，雖然功耗較高且佔用面積，但能提供極佳的抗變異能力與最低的 Skew。
+---
+### 自動檢查測試平台與測試向量 (Self-Checking Testbench & Testvectors)
+
+1. 基礎自動檢查測試平台 (Self-Checking Testbench)
+<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/3e232f38-d27c-4867-9f77-2cc91569425c" />
+
+* **優點 (Pros)**
+  * **設計簡單**：結構直覺且易於撰寫。
+  * **方便測試特定情境**：能輕易驗證少數特定輸入（例如 Corner Cases）。
+  * **自動報錯**：只要發生錯誤，模擬器會自動印出訊息 (`Simulator will print whenever an error occurs`)。
+
+* **缺點 (Cons)**
+  * **缺乏擴充性**：無法有效擴展至數百萬個測試用例。
+  * **硬編碼值 (Hardcoded Values) 易生錯**：
+    * 寫測試平台出錯的機率與寫實際電路程式碼一樣高。
+    * 發生錯誤時，難以釐清問題是在測試平台還是在待測物 (DUT, Device Under Test)。
+---
+
+2. 使用測試向量的測試平台 (Testbench using Testvectors)
+<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/983a4ee4-5022-43f9-a483-f3b98a0ec7f9" />
+
+* **測試向量檔案 (Testvector File)**
+  * **定義**：包含輸入與預期輸出對應關係的文字列表。
+  * **產生方式**：可手動編寫，或利用已驗證且較簡單的「黃金模型 (Golden Model)」自動產生。
+---
+
+3. 測試向量測試平台設計機制 (Testbench with Testvectors Design)
+<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/5b9c6364-5e2a-4ff6-9a15-0271b6215388" />
+
+* **時脈訊號 (Clock Signal) 的作用**
+  * 用於指定輸入與讀取輸出，每個時脈週期 (Clock Cycle) 測試一組測試向量。
+  * **上升沿 (Rising Edge)**：施加輸入訊號 (Apply input)。
+  * **下降沿 (Falling Edge)**：檢查輸出結果 (Check outputs)。
+
+* **注意事項**
+  * **隔離作用**：時脈訊號僅用來在時序上分隔「輸入」與「輸出」，以便在波形圖中進行觀察。
+  * **非實體時序驗證**：此處的時脈**不用於**檢查實體電路時序（如 $t_{\text{setup}}$ 與 $t_{\text{hold}}$ ）。
+
+---
+
+4. 測試向量自動檢查機制之優缺點 (Pros & Cons)
+<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/8fbff339-cff6-4035-90b8-faece1b0ad09" />
+
+| 類別 | 特性與說明 |
+| :--- | :--- |
+| **優點 (Pros)** | • **維持易用性**：依然易於設計且適合測試 Corner Cases。<br>• **自動報錯**：錯誤發生時模擬器會自動印出訊息。<br>• **不需修改硬編碼**：執行不同測試時，不需要修改程式碼中的硬編碼值，只需更換測試向量檔。 |
+| **缺點 (Cons)** | • **品質依賴**：若測試向量來源不準確，容易產生錯誤 (Error-prone)。<br>• **受限於檔案與記憶體**：雖然擴充性較高，但仍受限於檔案讀取與記憶體容量；若待測組合邏輯路徑數量極大，可能無法全數載入記憶體。 |
+---
+### 滿足時序約束與設計原則 (Meeting Timing Constraints & Design Principles)
+
+1. 滿足時序約束的實務方法 (Meeting Timing Constraints)
+<img width="958" height="715" alt="image" src="https://github.com/user-attachments/assets/000f1ef8-f268-4b2e-903e-6b7313844b22" />
+
+* **手動與疊代過程 (Manual & Iterative Process)**
+  * 滿足嚴格的時序約束（例如高效能設計）通常是一個極其繁瑣 (Tedious) 的手動疊代過程。
+
+* **工具層面與參數調整 (Synthesis / Place-and-Route Options)**
+  * **更換隨機種子 (Random Seeds)**：嘗試不同的隨機種子重新進行合成與佈局繞線。
+  * **手動提供引導 (Manual Hints)**：為佈局繞線工具提供手動優化提示。
+
+* **手動優化問題路徑 (Manually Optimize Problem Paths)**
+  * **簡化複雜邏輯 (Simplify Complicated Logic)**：重構邏輯架構以縮短級數。
+  * **拆分過長組合邏輯路徑 (Split Long Combinational Logic Paths)**：透過插入暫存器進行流水線化 (Pipelining)。
+  * **修復 $t_{\text{hold}}$ 違規**：藉由加入**更多**邏輯或延遲緩衝器 (Buffer) 來修復。
+
+---
+2. 時序設計三大核心原則 (Timing Design Principles)
+<img width="958" height="716" alt="image" src="https://github.com/user-attachments/assets/0a6459b6-e07a-4853-ac48-f3fbe91556b0" />
+
+* **基本概念**
+  * 時脈週期時間 (Clock Cycle Time) 取決於系統在不違反時序約束的前提下所能容忍的最大邏輯延遲。
+
+* **良好設計的三大原則 (Good Design Principles)**
+
+| 設計原則 | 核心內容與策略 | 效益與目標 |
+| :--- | :--- | :--- |
+| **關鍵路徑設計<br>(Critical Path Design)** | 極小化最大邏輯延遲 (Minimize maximum logic delay)。 | **極大化整體效能 (Maximizes Performance)** |
+| **平衡設計<br>(Balanced Design)** | 平衡系統中各個區域（即不同 Flip-Flop 對之間）的最大邏輯延遲。 | **消除效能瓶頸並極小化浪費的時間 (No Bottlenecks + Minimizes Wasted Time)** |
+| **常態優化設計<br>(Bread and Butter Design)** | 優先優化最常見的執行情境 (Optimize for Common Case)，同時確保非常態情境不會拖垮整體設計。 | **極大化真實應用場景下的效能 (Maximizes Performance for Realistic Cases)** |
+
+
 
 
 [回目錄](#toc)
