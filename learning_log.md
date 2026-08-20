@@ -5471,7 +5471,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 * **約束公式**： $$T_{\text{c}} > t_{\text{pcq}} + t_{\text{pd}} + t_{\text{setup}}$$
   *(其中 $T_{\text{c}}$ 為時脈週期， $t_{\text{pcq}}$ 為觸發器傳播延遲， $t_{\text{pd}}$ 為組合邏輯傳播延遲)*
 * **效能影響**：
-  * 關鍵路徑決定了系統的最短時脈週期 $T_{\text{c}}$ 與最高工作頻率 $f_{\text{max}} = 1 / T_{\text{c}}$。
+  * 關鍵路徑決定了系統的最短時脈週期 $T_{\text{c}}$ 與最高工作頻率 $f_{\text{max}} = 1 / T_{\text{c}}$ 。
   * 若關鍵路徑過長，整體設計將被迫在較低頻率下運作。
   * **定序開銷 (Sequencing Overhead)**： $t_{\text{pcq}} + t_{\text{setup}}$ 屬於每個週期中被浪費的時間開銷，僅有 $t_{\text{pd}}$ 是進行有效邏輯運算的時間。
 
@@ -5482,7 +5482,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 
 * **核心概念**：取決於從 $R1$ 到 $R2$ 的**最短延遲路徑 (Shortest Path)**。
 * **約束公式**： $$t_{\text{ccq}} + t_{\text{cd}} > t_{\text{hold}} \implies t_{\text{cd}} > t_{\text{hold}} - t_{\text{ccq}}$$
-  *(其中 $t_{\text{ccq}}$ 為觸發器污染延遲， $t_{\text{cd}}$ 為組合邏輯污染延遲)*
+  *(其中  $t_{\text{ccq}}$  為觸發器污染延遲，  $t_{\text{cd}}$  為組合邏輯污染延遲)*
 * **重要特性**：
   * **與時脈週期 $T_{\text{c}}$ 完全無關**！調慢時脈頻率無法解決 Hold Violation。
   * 晶片製造完成後若發生 $t_{\text{hold}}$ 違規極難修復，必須直接修改電路佈局（例如插入延遲 Buffer）。
