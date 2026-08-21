@@ -4926,7 +4926,7 @@ endmodule
 	* 資安與硬體漏洞 (Security & Privacy)：如 Spectre、Meltdown 及 Rowhammer 攻擊。
 ---
 ### 硬體實現技術比較 (Hardware Platforms)
-<img width="995" height="683" alt="image" src="https://github.com/user-attachments/assets/d794b7e9-79e9-421f-9ba2-5aee9b721454" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/d794b7e9-79e9-421f-9ba2-5aee9b721454" />
 
 | 比較項目 | 微處理器 (Microprocessors) | FPGA | ASIC |
 | :--- | :--- | :--- | :--- |
@@ -4939,7 +4939,7 @@ endmodule
 | 代表廠商 | Intel, AMD, ARM, Apple, NVIDIA | Xilinx (AMD), Altera (Intel) | TSMC (台積電), GlobalFoundries |
 ---
 ### CMOS 邏輯閘結構 (CMOS Logic Gates)
-<img width="1000" height="749" alt="image" src="https://github.com/user-attachments/assets/1423d5e6-080b-4106-b5c1-04cf5e147478" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/1423d5e6-080b-4106-b5c1-04cf5e147478" />
 
 1. 邏輯規則：
   * 電晶體並聯 (Parallel)：任意一個導通，網路即導通（對應 OR 邏輯）。
@@ -4955,7 +4955,7 @@ endmodule
 	* 缺點：當輸出為邏輯 0 時，pMOS 與 nMOS 同時導通，會產生持續的靜態功耗 (Static Power)；且輸出低電位準（VOL）無法完美降至 0V，雜訊邊限較差。
 ---
 ### 功耗與能量消耗 (Power & Energy Consumption)
-<img width="999" height="749" alt="image" src="https://github.com/user-attachments/assets/aaefda82-5d66-4b78-a3d3-69955b87500c" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/aaefda82-5d66-4b78-a3d3-69955b87500c" />
 
 1. 動態功耗 (Dynamic Power)
 * 電路在訊號切換（0 <-> 1）對電容充放電時產生的功耗。
@@ -4999,7 +4999,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 
 ## 關鍵知識/詞彙：
 ### 三態緩衝器應用 (Tri-State Buffer Applications)
-<img width="1001" height="683" alt="image" src="https://github.com/user-attachments/assets/fa232dfd-aa1a-4202-9d05-748f060bc7bc" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/fa232dfd-aa1a-4202-9d05-748f060bc7bc" />
 
 1. 應用情境與問題
 * **共用匯流排問題：** 假設有一條導線（Shared Bus）同時連接 CPU 與記憶體（Memory）。
@@ -5008,7 +5008,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 
 2. 解決方案與運作機制
 * **雙三態緩衝器架構：** 一個由 CPU 驅動，另一個由記憶體驅動。
-<img width="1003" height="708" alt="image" src="https://github.com/user-attachments/assets/d9972c28-760c-4400-9959-0c0ab0646aed" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/d9972c28-760c-4400-9959-0c0ab0646aed" />
 
 3. 控制邏輯狀態
 * **CPU 寫入至匯流排：** `GateCPU = 1`（導通），`GateMem = 0`（高阻抗 Hi-Z）。
@@ -5017,7 +5017,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 
 ---
 ### 儲存元件總覽 (Storage Elements)
-<img width="1002" height="754" alt="image" src="https://github.com/user-attachments/assets/23697252-c053-49c5-b058-e22b83015878" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/23697252-c053-49c5-b058-e22b83015878" />
 
 | 儲存元件種類 | 速度 | 成本與結構 | 適用場景 / 用途 |
 | :--- | :--- | :--- | :--- |
@@ -5030,7 +5030,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ### 記憶體讀取與寫入架構 (Memory Read & Write Architecture)
 
 1. 讀取機制 (Reading from Memory)
-<img width="1003" height="749" alt="image" src="https://github.com/user-attachments/assets/68bb5479-daaf-451a-af6b-176a7aa16fcc" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/68bb5479-daaf-451a-af6b-176a7aa16fcc" />
 
 * **位址解碼 (Address Decoding)：**
   * 2 個位址需要 $\log_2(2) = 1\text{ bit}$ 的位址線 (`Addr[0]`)。
@@ -5040,7 +5040,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
   * 同一行的兩排訊號透過 OR 閘匯合輸出，確保資料線 $D[2:0]$ 輸出正確選中的位址資料。
 
 2. 寫入機制 (Writing to Memory)
-<img width="1002" height="751" alt="image" src="https://github.com/user-attachments/assets/3f1dddaf-b7b5-4fff-8a43-b42f6dbe11d4" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/3f1dddaf-b7b5-4fff-8a43-b42f6dbe11d4" />
 
 * **控制訊號：**
   * `WE` (Write Enable)：寫入致能訊號。當 `WE = 1` 時允許寫入。
@@ -5049,7 +5049,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
   * 只有被選中那一排的 D-Latch Enable 端會被拉高，進而鎖存 $D_i[2:0]$ 的新資料。
 
 3. 讀寫模式對照
-<img width="1004" height="750" alt="image" src="https://github.com/user-attachments/assets/4cdb4a99-89f0-4198-9e28-dba326f292b6" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/4cdb4a99-89f0-4198-9e28-dba326f292b6" />
 
 | 操作模式 | WE | Addr[0] | 運作行為 |
 | :--- | :---: | :---: | :--- |
@@ -5059,7 +5059,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 
 ---
 ### FPGA 中的尋找表 (Lookup Tables / LUTs)
-<img width="1001" height="749" alt="image" src="https://github.com/user-attachments/assets/dbf03ba4-8413-4ae0-b0b5-5448c4764bd2" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/dbf03ba4-8413-4ae0-b0b5-5448c4764bd2" />
 
 
 * **概念：** LUT 本質上是一組 SRAM 記憶體，事先載入邏輯運算的真值表 (Truth Table)，用以實現可程式化／可重新組態邏輯 (Reconfigurable Logic)。
@@ -5070,8 +5070,8 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ### 有限狀態機 (Finite State Machines, FSM)
 
 1. 什麼是 FSM？
-<img width="1000" height="748" alt="image" src="https://github.com/user-attachments/assets/37a0d202-56fc-424e-b1ae-c1a10f61856e" />
-<img width="1003" height="748" alt="image" src="https://github.com/user-attachments/assets/64806188-f996-4395-ba98-e0d8f69ffac3" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/37a0d202-56fc-424e-b1ae-c1a10f61856e" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/64806188-f996-4395-ba98-e0d8f69ffac3" />
 
 
 * **離散時間模型：** 一個用來表示具有狀態之系統（Stateful System）的離散時間抽象模型。
@@ -5079,7 +5079,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 * **應用範例：** 序列密碼鎖、紅綠燈、電梯、風扇轉速控制、微處理器控制器。
 
 2. 案例解析：序列密碼鎖 (Sequential Lock)
-<img width="1002" height="748" alt="image" src="https://github.com/user-attachments/assets/040a0b47-c30f-405f-9309-b318fd335e64" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/040a0b47-c30f-405f-9309-b318fd335e64" />
 
 * **開鎖密碼序列：** `R13 -> L22 -> R3`
 * **狀態定義：**
@@ -5090,7 +5090,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 * **容錯機制：** 若輸入非預期之指令，系統會歸零重置回 State A。
 
 3. FSM 的五大理論要素
-<img width="1004" height="749" alt="image" src="https://github.com/user-attachments/assets/af9683c6-ea5d-422f-84b2-27ee18c18077" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/af9683c6-ea5d-422f-84b2-27ee18c18077" />
 
 * 有限數量的**狀態 (States)**
 * 有限數量的**外部輸入 (External Inputs)**
@@ -5099,8 +5099,8 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 * 明確定義的**輸出決定規則 (Output Specification)**
 
 4. FSM 的硬體架構與分工
-<img width="1000" height="748" alt="image" src="https://github.com/user-attachments/assets/4d10a739-c84a-4026-97e1-d858d3f55fde" />
-<img width="1001" height="749" alt="image" src="https://github.com/user-attachments/assets/8148bcd0-364d-4546-bf37-4714bd4c2297" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/4d10a739-c84a-4026-97e1-d858d3f55fde" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/8148bcd0-364d-4546-bf37-4714bd4c2297" />
 
 * **次狀態邏輯 (Next State Logic)：** 組合邏輯電路 (CL)。根據當前輸入與當前狀態，即時計算出下一個狀態 ($S'$)。
 * **狀態暫存器 (State Register)：** 時序邏輯電路 (SL)。利用 Flip-Flops 在每個時脈邊緣（Clock Edge）將下一個狀態鎖存為當前狀態 ($S$)。
@@ -5126,7 +5126,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ## 關鍵知識/詞彙：
 
 ### FSM 基本概念與分類
-<img width="1200" height="900" alt="image" src="https://github.com/user-attachments/assets/9cc1c2f7-2653-469f-a541-a5baf550824d" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/9cc1c2f7-2653-469f-a541-a5baf550824d" />
 
 * **基本運作**：下一個狀態 (Next State) 由「當前狀態 (Current State)」與「輸入 (Inputs)」共同決定。
 * **分類方式**：有限狀態機依據**輸出邏輯 (Output Logic)** 的決定方式分為兩類：
@@ -5136,9 +5136,9 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 ### FSM 狀態編碼 (State Encoding)
-<img width="1199" height="898" alt="image" src="https://github.com/user-attachments/assets/bfcb4697-90e0-4385-bfc6-10c901b72d3f" />
-<img width="1202" height="900" alt="image" src="https://github.com/user-attachments/assets/ef9cff2c-3afb-42ca-bbda-b78b1fe9e8e8" />
-<img width="1198" height="899" alt="image" src="https://github.com/user-attachments/assets/30a0d97f-0942-4574-a491-34ed3e5391b0" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/bfcb4697-90e0-4385-bfc6-10c901b72d3f" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/ef9cff2c-3afb-42ca-bbda-b78b1fe9e8e8" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/30a0d97f-0942-4574-a491-34ed3e5391b0" />
 
 
 * 狀態位元編碼主要有三種常見策略，各自具備不同的 Trade-offs ：
@@ -5154,7 +5154,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 ### FSM 設計流程 (FSM Design Procedure)
-<img width="1200" height="894" alt="image" src="https://github.com/user-attachments/assets/a8bb5324-233c-4a6e-a730-de3e41021ddb" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/a8bb5324-233c-4a6e-a730-de3e41021ddb" />
 
 
 1. **確定所有可能狀態**：列出該機器所有可能的狀態。
@@ -5178,7 +5178,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 5. **本質定義**：FSM 是一個具狀態系統的離散時間模型 (A discrete-time model of a stateful system)。
 
 ### 什麼是 FPGA (What is an FPGA?)
-<img width="1024" height="578" alt="image" src="https://github.com/user-attachments/assets/d856fb4d-d9e5-4dfa-96dc-0df6f66df538" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/d856fb4d-d9e5-4dfa-96dc-0df6f66df538" />
 
 * **全稱**：Field Programmable Gate Array（現場可程式化邏輯閘陣列）。
 * **核心定義**：FPGA 是一種可透過**軟體重新組態 (software-reconfigurable)** 的硬體基底。
@@ -5190,7 +5190,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 ### FPGA 高階架構總覽 (High-Level Overview)
-<img width="1601" height="900" alt="image" src="https://github.com/user-attachments/assets/56d41acb-42a9-4d2d-a669-32264b820c48" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/56d41acb-42a9-4d2d-a669-32264b820c48" />
 
 * **四大核心組成要素**：
   * **邏輯區塊 (Logic Blocks)**：負責執行電路的邏輯運算。
@@ -5202,7 +5202,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 ### FPGA 內部架構細節 (FPGA Architecture)
-<img width="1024" height="575" alt="image" src="https://github.com/user-attachments/assets/b42a8abd-cb53-4ca3-b40c-0724761db75a" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/b42a8abd-cb53-4ca3-b40c-0724761db75a" />
 
 * **兩大主要建構區塊 (Main Building Blocks)**：
   * **尋找表 (Look-Up Table, LUT)**：用於實作任意組合邏輯功能。
@@ -5232,7 +5232,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 
 ## 關鍵知識/詞彙：
 ### 電路設計的權衡 (Circuit Design Tradeoffs)
-<img width="956" height="718" alt="image" src="https://github.com/user-attachments/assets/f308f71d-cb4f-437f-b081-5d5eca416a52" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/f308f71d-cb4f-437f-b081-5d5eca416a52" />
 
 數位電路設計需要平衡以下四個核心面向：
 
@@ -5246,7 +5246,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 ### HDL 的主要實作風格 (Two Main Styles of HDL Implementation)
-<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/f2fd7414-977c-4f4d-b80e-926685b3700c" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/f2fd7414-977c-4f4d-b80e-926685b3700c" />
 
 * **結構化描述 (Structural / Gate-Level)**：
   * 模組內部包含閘級 (Gate-Level) 的電路描述。
@@ -5261,12 +5261,12 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 ### Verilog 數字表示法 (Number Representation in Verilog)
-<img width="958" height="718" alt="image" src="https://github.com/user-attachments/assets/14c36012-a3bb-40c2-9f19-856192869466" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/14c36012-a3bb-40c2-9f19-856192869466" />
 
 ---
 
 ### HDL 程式碼處理流程 (Synthesis & Simulation)
-<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/bf4fa34a-5ae2-4b87-9671-765a80d498d7" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/bf4fa34a-5ae2-4b87-9671-765a80d498d7" />
 
 1. 硬體合成 (Hardware Synthesis)
 * **定義**：現代開發工具能將可合成的 (Synthesizable) HDL 程式碼映射至低階元件庫 (Cell Libraries)，產生由邏輯閘與導線組成的網表 (Netlist)。
@@ -5281,7 +5281,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 ### `always` 區塊與組合邏輯 (Combinational `always` Block)
-<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/539412ed-160f-4c54-b489-acb955d1eb9a" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/539412ed-160f-4c54-b489-acb955d1eb9a" />
 
 * **關鍵概念**：`always` 區塊**不必然**代表具備記憶功能的時序電路 (Flip-Flops / Latches)。
 * **組合邏輯條件**：
@@ -5297,7 +5297,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 * 當 inv 或 data 改變時即觸發運算；因為包含完整 else 分支，此段描述會合成為純組合邏輯電路 (Combinational Logic, no memory)。
 
 ### 阻塞與非阻塞賦值 (Blocking vs. Non-blocking Assignments)
-<img width="958" height="716" alt="image" src="https://github.com/user-attachments/assets/6d4c244c-e82c-4f55-8459-e9beef4f8d7f" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/6d4c244c-e82c-4f55-8459-e9beef4f8d7f" />
 
 | 比較項目 | 非阻塞賦值 (Non-blocking) | 阻塞賦值 (Blocking) |
 | :--- | :--- | :--- |
@@ -5336,7 +5336,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ## 關鍵知識/詞彙：
 ### 電路延遲與其變異 (Circuit Delay and Its Variation)
 1. 延遲的成因與影響因素
-<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/54a2cf6a-f928-4f60-86a2-122ce31f2911" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/54a2cf6a-f928-4f60-86a2-122ce31f2911" />
 
 * **根本成因**：
   * 電路中存在的**電容 (Capacitance)** 與 **電阻 (Resistance)**。
@@ -5353,7 +5353,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 2. 延遲類型定義： $t_{cd}$ 與 $t_{pd}$
-<img width="959" height="718" alt="image" src="https://github.com/user-attachments/assets/990add3b-6a1e-44f5-9e08-7681ac67519d" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/990add3b-6a1e-44f5-9e08-7681ac67519d" />
 
 * **污染延遲 (Contamination delay, $t_{cd}$ )**：輸入發生變化後，輸出 $Y$ **開始產生改變**所需的最短時間。
 * **傳播延遲 (Propagation delay, $t_{pd}$ )**：輸入發生變化後，輸出 $Y$ **完成改變並達到穩定狀態**所需的最長時間。
@@ -5361,8 +5361,8 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 3. 最長與最短延遲路徑計算 (Critical & Short Path)
-<img width="961" height="716" alt="image" src="https://github.com/user-attachments/assets/37da23ef-1f5a-4064-83e8-1f90619c4690" />
-<img width="959" height="718" alt="image" src="https://github.com/user-attachments/assets/d1f34507-ae9f-4cd1-a623-d6347d9cfac8" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/37da23ef-1f5a-4064-83e8-1f90619c4690" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/d1f34507-ae9f-4cd1-a623-d6347d9cfac8" />
 
 * 關鍵路徑 / 最長路徑 (Critical / Longest Path)
 	* **傳遞路徑**：輸入 $A \rightarrow \text{AND1} \rightarrow n1 \rightarrow \text{OR} \rightarrow n2 \rightarrow \text{AND2} \rightarrow Y$。
@@ -5375,7 +5375,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 4. 實體元件延遲實例 (74HC00 NAND Gate)
-<img width="958" height="716" alt="image" src="https://github.com/user-attachments/assets/dfed58df-25c1-47db-9d33-7c9341b4682d" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/dfed58df-25c1-47db-9d33-7c9341b4682d" />
 
 * 實體晶片的傳播延遲時間極度依賴於**工作電壓 (Voltage)** 與 **環境溫度 (Temperature)**：
 
@@ -5406,7 +5406,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ### 電路毛刺與訊號突波 (Glitches)
 
 1. 定義與成因
-<img width="960" height="716" alt="image" src="https://github.com/user-attachments/assets/a7609aac-2fda-4226-8e6a-f79881438767" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/a7609aac-2fda-4226-8e6a-f79881438767" />
 
 * **定義**：單一輸入訊號的轉折（Transition），導致輸出端產生多次不必要的過渡轉折（例如 $1 \rightarrow 0 \rightarrow 1$ ）。
 * **成因**：電路中同時存在**快路徑 (Fast path)** 與 **慢路徑 (Slow path)**。由於傳遞路徑上的邏輯閘數量不同或延遲不均，造成訊號抵達時間不一致。
@@ -5415,7 +5415,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 2. 利用卡諾圖 (K-Maps) 消除毛刺
-<img width="957" height="716" alt="image" src="https://github.com/user-attachments/assets/554489af-9de4-42fb-988f-b0a7040e093d" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/554489af-9de4-42fb-988f-b0a7040e093d" />
 
 * **解決機制**：在卡諾圖中加入**共識項 (Consensus Term)**，填補相鄰主要隱項 (Prime Implicants) 之間的過渡邊界。
 * **邏輯推導**：
@@ -5426,7 +5426,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 3. 實務設計權衡 (Design Trade-offs)
-<img width="957" height="719" alt="image" src="https://github.com/user-attachments/assets/1a8e05fc-c6b7-4ec4-ab80-b55ccbe30c77" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/1a8e05fc-c6b7-4ec4-ab80-b55ccbe30c77" />
 
 #### 消除毛刺的代價
 * **晶片面積增加 (More Area)**：需要額外的邏輯閘來實作共識項。
@@ -5442,7 +5442,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ### 時序邏輯電路時序約束 (Sequential Circuit Timing Constraints)
 
 1. D 觸發器 (D Flip-Flop) 輸入時序限制
-<img width="957" height="718" alt="image" src="https://github.com/user-attachments/assets/fc10874b-9065-4612-a891-50510f8fa18b" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/fc10874b-9065-4612-a891-50510f8fa18b" />
 
 為了確保 D 觸發器能正確採樣資料，輸入訊號 $D$ 在時脈有效邊緣 (Active Clock Edge) 採樣時必須保持穩定。
 
@@ -5453,8 +5453,8 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 2. 時序電路運作條件與違規 (Timing Violations)
-<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/5d581f88-56d7-40e1-8064-2e3f95675ad2" />
-<img width="960" height="718" alt="image" src="https://github.com/user-attachments/assets/303ef8d6-884a-4fff-b93e-e593df1b3180" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/5d581f88-56d7-40e1-8064-2e3f95675ad2" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/303ef8d6-884a-4fff-b93e-e593df1b3180" />
 
 在相鄰兩個觸發器（例如 $R1 \rightarrow \text{組合邏輯 } (CL) \rightarrow R2$ ）之間的資料傳輸中：
 
@@ -5464,8 +5464,8 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 3. 建立時間約束 (Setup Time Constraint)
-<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/6fe2e667-91e3-4e58-bb70-5e9eeef3abf9" />
-<img width="957" height="716" alt="image" src="https://github.com/user-attachments/assets/ef642ed0-e4d4-4532-9c63-32883d44dbc2" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/6fe2e667-91e3-4e58-bb70-5e9eeef3abf9" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/ef642ed0-e4d4-4532-9c63-32883d44dbc2" />
 
 * **核心概念**：取決於從 $R1$ 到 $R2$ 的**最長延遲路徑（關鍵路徑 Critical Path）**。
 * **約束公式**： $$T_{\text{c}} > t_{\text{pcq}} + t_{\text{pd}} + t_{\text{setup}}$$
@@ -5490,7 +5490,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 5. 時序參數總結 (Timing Summary)
-<img width="959" height="719" alt="image" src="https://github.com/user-attachments/assets/b92f3931-7a22-4f33-9ba9-25d01dc68042" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/b92f3931-7a22-4f33-9ba9-25d01dc68042" />
 
 | 符號 | 完整名稱 | 定義與說明 |
 | :--- | :--- | :--- |
@@ -5501,7 +5501,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 | ** $T_{\text{c}}$ ** | Clock Period | 時脈訊號的週期時間。 |
 ---
 ### 時脈偏移與時脈網路 (Clock Skew and Clock Network)
-<img width="959" height="718" alt="image" src="https://github.com/user-attachments/assets/4761e2a0-c687-47ee-a610-74b7a62dd5ab" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/4761e2a0-c687-47ee-a610-74b7a62dd5ab" />
 
 1. 時脈偏移 (Clock Skew) 的影響
 
@@ -5530,7 +5530,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ### 自動檢查測試平台與測試向量 (Self-Checking Testbench & Testvectors)
 
 1. 基礎自動檢查測試平台 (Self-Checking Testbench)
-<img width="958" height="719" alt="image" src="https://github.com/user-attachments/assets/3e232f38-d27c-4867-9f77-2cc91569425c" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/3e232f38-d27c-4867-9f77-2cc91569425c" />
 
 * **優點 (Pros)**
   * **設計簡單**：結構直覺且易於撰寫。
@@ -5545,7 +5545,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 2. 使用測試向量的測試平台 (Testbench using Testvectors)
-<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/983a4ee4-5022-43f9-a483-f3b98a0ec7f9" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/983a4ee4-5022-43f9-a483-f3b98a0ec7f9" />
 
 * **測試向量檔案 (Testvector File)**
   * **定義**：包含輸入與預期輸出對應關係的文字列表。
@@ -5553,7 +5553,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 3. 測試向量測試平台設計機制 (Testbench with Testvectors Design)
-<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/5b9c6364-5e2a-4ff6-9a15-0271b6215388" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/5b9c6364-5e2a-4ff6-9a15-0271b6215388" />
 
 * **時脈訊號 (Clock Signal) 的作用**
   * 用於指定輸入與讀取輸出，每個時脈週期 (Clock Cycle) 測試一組測試向量。
@@ -5567,7 +5567,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ---
 
 4. 測試向量自動檢查機制之優缺點 (Pros & Cons)
-<img width="959" height="717" alt="image" src="https://github.com/user-attachments/assets/8fbff339-cff6-4035-90b8-faece1b0ad09" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/8fbff339-cff6-4035-90b8-faece1b0ad09" />
 
 | 類別 | 特性與說明 |
 | :--- | :--- |
@@ -5577,7 +5577,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 ### 滿足時序約束與設計原則 (Meeting Timing Constraints & Design Principles)
 
 1. 滿足時序約束的實務方法 (Meeting Timing Constraints)
-<img width="958" height="715" alt="image" src="https://github.com/user-attachments/assets/000f1ef8-f268-4b2e-903e-6b7313844b22" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/000f1ef8-f268-4b2e-903e-6b7313844b22" />
 
 * **手動與疊代過程 (Manual & Iterative Process)**
   * 滿足嚴格的時序約束（例如高效能設計）通常是一個極其繁瑣 (Tedious) 的手動疊代過程。
@@ -5593,7 +5593,7 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 
 ---
 2. 時序設計三大核心原則 (Timing Design Principles)
-<img width="958" height="716" alt="image" src="https://github.com/user-attachments/assets/0a6459b6-e07a-4853-ac48-f3fbe91556b0" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/0a6459b6-e07a-4853-ac48-f3fbe91556b0" />
 
 * **基本概念**
   * 時脈週期時間 (Clock Cycle Time) 取決於系統在不違反時序約束的前提下所能容忍的最大邏輯延遲。
