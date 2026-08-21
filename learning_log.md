@@ -44,7 +44,7 @@
 | [8/18](#m08d18) | 影片：Digital Design and Computer Architecture(Spring 2025) L4 |
 | [8/19](#m08d19) | 影片：Digital Design and Computer Architecture(Spring 2025) L5 |
 | [8/20](#m08d20) | 影片：Digital Design and Computer Architecture(Spring 2025) L6 |
-
+| [8/21](#m08d21) | 複習7/3 - 8/20內容 |
 
 
 ---
@@ -5607,6 +5607,33 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 | **常態優化設計<br>(Bread and Butter Design)** | 優先優化最常見的執行情境 (Optimize for Common Case)，同時確保非常態情境不會拖垮整體設計。 | **極大化真實應用場景下的效能 (Maximizes Performance for Realistic Cases)** |
 
 
+
+
+[回目錄](#toc)
+
+---
+---
+<a id="m08d21"></a>
+
+## 2026 年 8 月 21 日
+
+## 今日進度：
+
+### 資料：複習 7/3 - 8/20 內容
+
+
+## 關鍵知識/詞彙：
+### 為什麼使用緩衝區可以提高驅動能力？
+<img width="907" height="645" alt="image" src="https://github.com/user-attachments/assets/3abe54a7-e009-46b9-8771-f2462fad8bdb" />
+<img width="900" height="900" alt="image" src="https://github.com/user-attachments/assets/dcc22333-ee0a-4a11-8a97-e586cc1f67d8" />
+<img width="802" height="165" alt="image" src="https://github.com/user-attachments/assets/80af12f4-8b6d-43d5-a5e3-f5f2f9a98088" />
+
+### clock gating 類別
+<img width="763" height="739" alt="image" src="https://github.com/user-attachments/assets/c1a958aa-fc66-4423-a282-efcbadbebc82" />
+<img width="771" height="728" alt="image" src="https://github.com/user-attachments/assets/383718ac-cd4e-4481-8fd6-66306bffdc23" />
+<img width="788" height="664" alt="image" src="https://github.com/user-attachments/assets/e6d035d6-d2c5-4abb-b569-53728b46015c" />
+<img width="785" height="356" alt="image" src="https://github.com/user-attachments/assets/2b10ca1e-80bc-43f7-a9cb-e592a5817cbf" />
+<img width="769" height="456" alt="image" src="https://github.com/user-attachments/assets/c71d17d8-a172-4392-9e98-7eaedc576cc1" />
 
 
 [回目錄](#toc)
