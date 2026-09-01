@@ -5649,6 +5649,47 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 
 ### 資料：複習7/3 - 8/21 內容
 
+## 關鍵知識/詞彙：
+### 靜態功耗 vs. 動態功耗 (Static vs. Dynamic Power)
+### 1. 核心差異對比表
+
+| 比較項目 | 動態功耗 (Dynamic Power) | 靜態功耗 (Static Power) |
+| :--- | :--- | :--- |
+| **核心定義** | 電路觸發**邏輯切換 ($0 \leftrightarrow 1$)** 時所消耗的功率 | 晶片通電後**怠速待機 (Idle)** 時產生的漏電功率 |
+| **物理來源** | 寄生電容充放電 (Switching) + 晶體管短路瞬間電流 | 電晶體內部的物理**漏電流 (Leakage Current)** |
+| **主要影響因子** | 工作頻率 ($f$)、工作電壓 ($V_{DD}$)、邏輯切換率 ($\alpha$) | 製程節點 (奈米數越小越嚴重)、運作溫度、工作電壓 ($V_{DD}$) |
+| **控制公式** | $P_{dynamic} = \alpha \cdot C_L \cdot V_{DD}^2 \cdot f$ | $P_{static} = V_{DD} \cdot I_{leak}$ |
+| **主流優化技術** | **Clock Gating** (時脈門控)、DVFS (動態調壓調頻) | **Power Gating** (電源門控)、Multi-VT (多門檻電壓) |
+
+---
+
+### 2. 物理機制拆解
+
+#### 1. 動態功耗 (Dynamic Power)
+電路在 Signal Switch 時產生的功耗，由兩部分組成：
+* **充放電功耗 (Switching Power)**：負載電容 $C_L$ 在高低電位轉移時進行充放電所消耗的能量。
+* **短路功耗 (Short-Circuit Power)**：CMOS 反相器在狀態切換瞬間，PMOS 與 NMOS 會短暫同時導通，產生對地的瞬間短路電流。
+
+$$P_{dynamic} = \alpha \cdot C_L \cdot V_{DD}^2 \cdot f + V_{DD} \cdot I_{sc}$$
+
+#### 2. 靜態功耗 (Static Power)
+只要晶片處於通電狀態，即使完全沒有 Clock 切換，元件內部發生的微觀漏電：
+* **次臨限漏電 (Subthreshold Leakage)**：電晶體關閉（$V_{gs} < V_{th}$）後，汲極（Drain）與源極（Source）之間依然殘留微小電流。
+* **閘極漏電 (Gate Leakage)**：先進製程下閘極絕緣層極薄，產生的量子穿隧效應電流。
+
+$$P_{static} = V_{DD} \cdot I_{leak}$$
+
+---
+
+### 3. 低功耗設計對策 (Low-Power Design Strategies)
+
+* **動態功耗降解方案**
+  * **Clock Gating**：在暫存器 Idle 或運算區塊無新資料時，關閉其 Clock 樹進給，將切換機率 $\alpha$ 降為 0。
+  * **DVFS (Dynamic Voltage and Frequency Scaling)**：低負載時主動降頻 $f$ 並降低電壓 $V_{DD}$（因電壓為平方項，降壓效益顯著）。
+
+* **靜態功耗降解方案**
+  * **Power Gating**：利用 Power Switch 元件，在區塊休眠時直接切斷 VDD 供電，完全杜絕 $I_{leak}$。
+  * **Multi-VT Cell Selection**：關鍵路徑（Critical Path）使用低閾值電壓（Low-VT）提升速度；非關鍵路徑使用高閾值電壓（High-VT）壓抑漏電流。
 
 [回目錄](#toc)
 
