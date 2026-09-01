@@ -44,7 +44,8 @@
 | [8/18](#m08d18) | 影片：Digital Design and Computer Architecture(Spring 2025) L4 |
 | [8/19](#m08d19) | 影片：Digital Design and Computer Architecture(Spring 2025) L5 |
 | [8/20](#m08d20) | 影片：Digital Design and Computer Architecture(Spring 2025) L6 |
-| [8/21](#m08d21) | 複習7/3 - 8/20內容 |
+| [8/21](#m08d21) | 刷題：複習 HDLBits 7/3 - 8/20 進度；資料：複習7/3 - 8/20 內容 |
+| [9/1](#m09d01) | 刷題：複習 HDLBits 7/3 - 8/21 進度；資料：複習7/3 - 8/21 內容 |
 
 
 ---
@@ -5612,14 +5613,13 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 [回目錄](#toc)
 
 ---
----
 <a id="m08d21"></a>
 
 ## 2026 年 8 月 21 日
 
 ## 今日進度：
 
-### 資料：複習 7/3 - 8/20 內容
+### 刷題：複習 HDLBits 7/3 - 8/20 進度；資料：複習7/3 - 8/20 內容
 
 
 ## 關鍵知識/詞彙：
@@ -5634,6 +5634,18 @@ $$\text{Energy} = \text{Power} \times \text{Time}$$
 <img width="788" height="664" alt="image" src="https://github.com/user-attachments/assets/e6d035d6-d2c5-4abb-b569-53728b46015c" />
 <img width="785" height="356" alt="image" src="https://github.com/user-attachments/assets/2b10ca1e-80bc-43f7-a9cb-e592a5817cbf" />
 <img width="769" height="456" alt="image" src="https://github.com/user-attachments/assets/c71d17d8-a172-4392-9e98-7eaedc576cc1" />
+
+
+[回目錄](#toc)
+
+---
+<a id="m09d01"></a>
+
+## 2026 年 9 月 1 日
+
+## 今日進度：
+
+### 刷題：複習 HDLBits 7/3 - 8/21 進度；資料：複習7/3 - 8/21 內容
 
 
 [回目錄](#toc)
