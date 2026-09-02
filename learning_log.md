@@ -3317,6 +3317,27 @@ endmodule
   ```
 
 ## 關鍵知識/詞彙：
+### Why Compute 33-bit Adder/Subtractor Outside the `always` Block?
+#### 1. 資源共享與面積最佳化 (Resource Sharing)
+* **傳統寫法問題**：若在 `always @(*)` 的 `case` 內分別寫 `res = a + b` 與 `res = a - b`，綜合工具 (Synthesizer) 容易推論出兩套獨立的 32-bit 加法器與減法器。
+* **優化解法**：利用 2 補數原理 ($A + \sim B + 1$)，在外部僅需建置**一套通用加法器**搭配 XOR 邏輯門即可完成加/減法，顯著節省 FPGA LUT 資源與 ASIC 晶片面積。
+
+#### 2. 精準擷取進位與溢位 (Carry & Overflow Detection)
+* **位元擴充**：透過 33-bit `{1'b0, a} + {1'b0, b_op} + sub` 運算，防止加法溢出位元（Bit 32）在賦值給 32-bit 暫存器時被強制裁切（Truncate）。
+* **訊號擷取**：
+  * **Carry Flag ($C$)**：直接擷取最高位 `add_sub[32]`。
+  * **Overflow Flag ($V$)**：利用符號位 `a[31]`, `b_op[31]`, `add_sub[31]` 精準推導有號數溢位。
+
+#### 3. 數據通路與控制邏輯解耦 (Datapath & Control Decoupling)
+* **Datapath (外部 `assign`)**：負責數據平行運算（加減法、邏輯運算、移位器同時計算）。
+* **Control Logic (內部 `always`)**：`always` 區塊退化為**純粹的多路選擇器 (MUX)**，僅負責依 `op_code` 選取運算結果。
+* **結構優點**：極大化降低控制邏輯複雜度，並防止在 `always` 邏輯分支不完備時誤推論出 Latch (鎖存器)。
+
+#### 4. 預留 SLT (Set Less Than) 硬體共享路徑
+* 在處理有號數比較（SLT）時，若寫 `$signed(a) < $signed(b)` 會額外合成一組比較器 (Comparator)。
+* 將減法器放在外部後，SLT 即可直接複用減法器的運算結果與 Flags（$\text{Overflow} \oplus \text{Sign Bit}$），完全不需額外增加硬體運算單元。
+---
+
 ### $signed()
 * Verilog 系統函式，將訊號重新解讀為 2 補數表示的有號數，只改變「詮釋方式」，不改變原始 bit pattern
 * 只在該次運算當下生效，不影響同一訊號在其他運算中的解讀方式
