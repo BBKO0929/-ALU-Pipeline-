@@ -46,7 +46,7 @@
 | [8/20](#m08d20) | 影片：Digital Design and Computer Architecture(Spring 2025) L6 |
 | [8/21](#m08d21) | 刷題：複習 HDLBits 7/3 - 8/20 進度；資料：複習7/3 - 8/20 內容 |
 | [9/1](#m09d01) | 刷題：複習 HDLBits 7/3 - 8/21 進度；資料：複習7/3 - 8/21 內容 |
-| [9/1](#m09d03) | 影片：Digital Design and Computer Architecture(Spring 2025) L7 |
+| [9/3](#m09d03) | 影片：Digital Design and Computer Architecture(Spring 2025) L7 |
 
 
 ---
