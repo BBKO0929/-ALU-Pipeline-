@@ -46,6 +46,7 @@
 | [8/20](#m08d20) | 影片：Digital Design and Computer Architecture(Spring 2025) L6 |
 | [8/21](#m08d21) | 刷題：複習 HDLBits 7/3 - 8/20 進度；資料：複習7/3 - 8/20 內容 |
 | [9/1](#m09d01) | 刷題：複習 HDLBits 7/3 - 8/21 進度；資料：複習7/3 - 8/21 內容 |
+| [9/1](#m09d03) | 影片：Digital Design and Computer Architecture(Spring 2025) L7 |
 
 
 ---
@@ -5711,6 +5712,276 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 * **靜態功耗降解方案**
   * **Power Gating**：利用 Power Switch 元件，在區塊休眠時直接切斷 VDD 供電，完全杜絕 $I_{leak}$。
   * **Multi-VT Cell Selection**：關鍵路徑（Critical Path）使用低閾值電壓（Low-VT）提升速度；非關鍵路徑使用高閾值電壓（High-VT）壓抑漏電流。
+
+[回目錄](#toc)
+
+---
+<a id="m09d03"></a>
+
+## 2026 年 9 月 3 日
+
+## 今日進度：
+### 刷題：複習 HDLbits - Shift Registers
+### 資料：
+1. [Digital Design and Computer Architecture(Spring 2025)](https://safari.ethz.ch/ddca/spring2025/doku.php?id=start)
+2. [Digital Design and Computer Architecture, David Harris and Sarah Harris](https://www.sciencedirect.com/book/9780123704979/digital-design-and-computer-architecture)
+
+### 影片：
+1. [Digital Design and Computer Architecture(Spring 2025) L7](https://www.youtube.com/watch?v=T0Ka9QG9t-o&list=PL5Q2soXY2Zi9Eo29LMgKVcaydS7V1zZW3&index=9)
+
+
+## 關鍵知識/詞彙：
+### 電腦基本組成與馮·紐曼模型 (Basic Components & Von Neumann Model)
+
+#### 電腦基本組成
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/f8e732e2-dfbc-4f34-8e8b-d49a3efe5141" />
+
+**執行任務的兩大要素**
+
+- **電腦程式 (Computer Program)**：指定電腦必須執行的任務內容
+- **電腦硬體 (The Computer)**：負責執行程式所指定的任務
+
+**程式與指令概念**
+
+| 名詞 | 定義 |
+|---|---|
+| 程式 (Program) | 一組指令的集合 (A set of instructions) |
+| 指令 (Instruction) | 程式中最小的可執行單位 (Smallest piece of specified work)，明確指定電腦執行的動作 |
+| 指令集 (Instruction Set) | 電腦設計上所能執行的所有可能指令之集合 |
+
+#### 馮·紐曼模型 (The von Neumann Model)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/239495ab-65be-433d-afcc-3ea5d8ffd466" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/fea60f68-3206-477a-a52a-8942548626e6" />
+
+- 由 John von Neumann 於 1946 年提出，為處理電腦程式的基礎執行模型
+- 現今所有通用型電腦皆採用此架構
+
+**五大核心組件**
+
+1. **記憶體 (Memory)**：存放程式 (Program) 與資料 (Data)
+2. **處理單元 (Processing Unit)**：包含算術邏輯單元 (ALU) 與暫存器，負責數據運算
+3. **控制單元 (Control Unit)**：控制指令執行的順序與流程
+4. **輸入設備 (Input)**：接收外部輸入（如鍵盤、滑鼠、磁碟）
+5. **輸出設備 (Output)**：輸出處理結果（如螢幕、印表機、磁碟）
+
+#### 記憶體架構與定址 (Memory Architecture)
+
+**基本單位**：記憶體儲存位元 (Bits)，邏輯上組合為位元組 (Bytes, 8 bits) 或字組 (Words，如 8/16/32 bits)
+
+**位址空間 (Address Space)** — 記憶體中唯一可識別位置的總數量：
+
+| 架構 | 位址空間 | 位址長度 |
+|---|---|---|
+| LC-3 | $2^{16}$ 個位址 | 16-bit |
+| MIPS | $2^{32}$ 個位址 | 32-bit |
+| x86-64 | 最高 $2^{48}$ 個位址 | 48-bit |
+
+**可定址性 (Addressability)**
+
+- **Byte-addressable**：每個位址儲存 8 個位元 (1 Byte)
+- **Word-addressable**：每個位址儲存一個字組 (Word)
+
+#### 大端序與小端序 (Big Endian vs. Little Endian)
+
+| 排列方式 | 定義 |
+|---|---|
+| 大端序 (Big Endian) | 最高有效位元組 (MSB) 存放在較低的記憶體位址；LSB 存放在較高位址 |
+| 小端序 (Little Endian) | 最低有效位元組 (LSB) 存放在較低的記憶體位址；MSB 存放在較高位址 |
+
+> 單一系統內部無影響，僅為設計慣例；但當 Big-endian 系統與 Little-endian 系統需要共享或交換資料時，必須進行轉換。
+
+#### 記憶體存取機制：MAR 與 MDR
+
+**核心暫存器**
+
+- **MAR (Memory Address Register)**：存放要存取的記憶體位址
+- **MDR (Memory Data Register)**：存放要寫入或剛讀出的資料內容
+
+**操作步驟**
+
+| 操作 | 步驟 |
+|---|---|
+| 讀取 (Read) | 1. 將目標位址載入 MAR<br>2. 記憶體該位址的資料被放置於 MDR 中 |
+| 寫入 (Write) | 1. 將目標位址載入 MAR，將欲寫入的資料載入 MDR<br>2. 觸發寫入致能訊號 (Write Enable)，將 MDR 中的值寫入 MAR 指定的位址 |
+
+#### 處理單元與暫存器檔案 (Processing Unit & Register File)
+
+- 記憶體容量大但存取速度慢；暫存器緊鄰 ALU，用於存放中間運算結果（例如計算 $((A+B) \times C) / D$ 時暫存 $A+B$ 的值），避免頻繁存取記憶體
+
+**暫存器檔案 (Register File)**
+
+| 架構 | GPR 數量 | 編號位元數 | 暫存器大小 |
+|---|---|---|---|
+| LC-3 | 8 個 (R0–R7) | 3-bit | 16 位元 |
+| MIPS | 32 個 (R0–R31) | 5-bit | 32 位元 |
+
+#### 控制單元 (Control Unit)
+
+- 如同樂團指揮家 (Conductor)，按順序逐步導引程式中每條指令的執行過程
+
+**關鍵暫存器**
+
+- **IR (Instruction Register)**：存放當前正在被處理/執行的指令
+- **PC (Program Counter / IP)**：存放下一條即將被執行的指令記憶體位址
+
+---
+
+### 指令集架構與執行機制 (ISA & Instruction Execution)
+
+#### 程式員可見狀態 (Programmer Visible State)
+
+- 指程式員或編譯器在撰寫與執行程式時，能夠直接存取、感知與修改的硬體狀態
+- 指令與程式的本質，即為定義如何轉換「程式員可見狀態」中的數值
+
+**核心組成要素**
+
+- **記憶體 (Memory)**：以位址作為索引的儲存陣列（從 $M[0]$ 到 $M[N-1]$）
+- **暫存器 (Registers)**：在 ISA 中賦予特定名稱（而非記憶體位址），分為通用暫存器與特殊用途暫存器
+- **程式計數器 (PC)**：存放當前或下一條即將執行指令的記憶體位址
+
+#### 儲存程式與順序執行 (Stored Program & Sequential Execution)
+
+- **儲存程式原理**：指令與資料皆儲存在記憶體中；通常指令長度會等於系統的字組長度
+- **擷取-解碼-執行循環 (Fetch-Decode-Execute Cycle)**
+  1. **Fetch**：處理器從記憶體擷取一條指令
+  2. **Decode & Execute**：對該指令進行解碼並執行對應動作
+  3. **Sequential Execution**：處理器自動接續執行下一條指令
+
+**PC 遞增規則**
+
+| 定址方式 | 範例架構 | PC 遞增規則 |
+|---|---|---|
+| 字組定址 (Word-addressable) | LC-3 | 每次遞增 1 |
+| 位元組定址 (Byte-addressable) | MIPS | 每次遞增指令的位元組長度（指令長 4 Bytes，故 PC + 4） |
+
+> MIPS 架構中，作業系統通常將 PC 初始化為 `0x00400000` 作為程式執行的起始位址。
+
+#### 指令結構與類型 (Instruction Structure & Types)
+
+- **指令 (Instruction)**：電腦處理的最基本單位；是電腦語言中的「字詞」，ISA 即為該語言的「詞彙表」
+- **機器語言 (Machine Language)**：電腦可直接讀取的二進位表示法 (0/1)
+- **組合語言 (Assembly Language)**：便於人類閱讀與撰寫的符號表示法
+
+**指令組成成分**
+
+- **操作碼 (Opcode)**：指定該指令要執行的動作 (WHAT)
+- **操作數 (Operands)**：指定動作執行的對象或目標位置 (WHO)
+
+**三大指令類型**
+
+1. **運算指令 (Operate instructions)**：在 ALU 中執行算術或邏輯運算
+2. **資料移動指令 (Data movement instructions)**：負責從記憶體讀取資料或將資料寫入記憶體
+3. **控制流指令 (Control flow instructions)**：改變程式原有的順序執行流程
+
+#### 指令格式與編碼 (Instruction Encoding)
+
+**LC-3 — Operate Format (16 bits)**
+
+| 欄位 | 位元範圍 | 說明 |
+|---|---|---|
+| OP | [15:12] (4 bits) | 操作碼（如 ADD=0001, AND=0101） |
+| DR | [11:9] (3 bits) | 目的暫存器 |
+| SR1 | [8:6] (3 bits) | 第一來源暫存器 |
+| — | [5:3] (3 bits) | 控制位元（設為 000） |
+| SR2 | [2:0] (3 bits) | 第二來源暫存器 |
+
+```
+0001 110 001 000 110  →  ADD R6, R2, R6   (R6 ← R2 + R6)
+```
+
+**MIPS — R-Type Format (32 bits)**
+
+| 欄位 | 位元範圍 | 說明 |
+|---|---|---|
+| opcode | [31:26] (6 bits) | 固定為 0 |
+| rs | [25:21] (5 bits) | 第一來源暫存器 |
+| rt | [20:16] (5 bits) | 第二來源暫存器 |
+| rd | [15:11] (5 bits) | 目的暫存器 |
+| shamt | [10:6] (5 bits) | 位移量 |
+| funct | [5:0] (6 bits) | 具體運算功能碼 |
+
+> 適用於 3 個暫存器操作數的運算指令
+
+#### 記憶體載入與定址模式 (Load Word & Addressing Mode)
+
+**載入指令概念**：高階語言 `a = A[i];` 對應組合語言 `load a, A, i`
+
+- `load`：載入字組的助記碼
+- `A`：基底位址 (Base address)
+- `i`：偏移量 (Offset)，可為立即數/常數
+- `a`：目的操作數 (Destination operand)
+- 執行語意：`a ← Memory[A + i]`
+
+**基底+偏移量定址 (Base+Offset Addressing Mode)**：指令透過「基底暫存器裡的值」加上「指定的偏移量」計算出最終記憶體目標位址。
+
+| 架構 | 組合語言範例 | 語意 |
+|---|---|---|
+| LC-3 | `LDR R3, R0, #2` | `R3 ← Memory[R0 + 2]` |
+| MIPS | `lw $s3, 2($s0)` | `$s3 ← Memory[$s0 + 2]` |
+
+---
+
+### 指令週期與控制指令 (Instruction Cycle & Control Flow)
+
+#### 指令週期概述 (The Instruction Cycle)
+
+指令週期是指令被執行時所經歷的一系列階段，完整包含六個階段：
+
+```
+FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE RESULT
+```
+
+**並非所有指令皆需要完整六階段**
+
+| 指令 | 省略的階段 |
+|---|---|
+| LDR | 不需要 EXECUTE 階段 |
+| ADD | 不需要 EVALUATE ADDRESS 階段 |
+| `ADD [eax], edx` (x86) | 需要完整六個階段的範例 |
+
+#### 擷取與解碼 (FETCH & DECODE)
+
+**FETCH（擷取指令）**：從記憶體取得指令並載入至 IR，此階段為所有指令類型共通。
+
+1. 將 PC 的內容載入 MAR，並同步將 PC 遞增
+2. 查詢記憶體，將記憶體讀出的指令放置於 MDR
+3. 將 MDR 的內容載入至 IR
+
+**DECODE（解碼指令）**：辨識指令類型並產生控制訊號，以供後續階段處理。
+
+- 以 4-to-16 解碼器為例，輸入為 IR[15:12] 的 4 個位元，用以辨識 16 種 Opcode 之一
+- 剩餘的 12 個位元用於辨識處理該指令所需的其他資訊
+
+#### 位址計算與操作數擷取
+
+**EVALUATE ADDRESS（計算位址）**：計算處理指令所需的記憶體目標位址。
+
+- LDR 需要：將暫存器內容加上偏移量，計算出欲從記憶體讀取的資料字組位址
+- ADD 不需要：不涉及記憶體位址存取
+
+**FETCH OPERANDS（擷取操作數）**：取得處理指令所需的來源操作數。
+
+- LDR：將計算出的位址載入 MAR → 讀取記憶體 → 將來源操作數放置於 MDR
+- ADD：直接從暫存器檔案取得來源操作數；部分微處理器可在 DECODE 同時同步進行暫存器操作數擷取
+
+#### 執行與結果儲存
+
+**EXECUTE（執行）**：執行指令的核心運算動作。
+
+- ADD：於 ALU 中執行加法運算
+- XOR：於 ALU 中執行逐位元 XOR 運算
+
+**STORE RESULT（儲存結果）**：將運算或處理結果寫回指定的目的地（暫存器或記憶體）。
+
+> 當 STORE RESULT 完成後，隨即開啟一個全新的指令週期（重新進入 FETCH 階段）。
+
+#### 改變執行順序 (Changing the Sequence of Execution)
+
+- **順序執行 (Sequential Execution)**：預設情況下，程式按照指令順序依次執行
+- **控制指令 (Control Instructions)**：允許程式進行非順序 (Out of sequence) 執行
+  - 運作機制：控制指令在 **EXECUTE 階段** 透過將目標位址載入 PC 來改變程式計數器的值
+  - 這會直接覆蓋/清除在 FETCH 階段時自動遞增的 PC 值，從而實現程式跳轉
+
 
 [回目錄](#toc)
 
