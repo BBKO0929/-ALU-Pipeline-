@@ -5875,6 +5875,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 > MIPS 架構中，作業系統通常將 PC 初始化為 `0x00400000` 作為程式執行的起始位址。
 
 #### 指令結構與類型 (Instruction Structure & Types)
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/362e9f1d-94be-43cf-8779-94b2d64fc9dc" />
 
 
@@ -5883,6 +5884,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 - **組合語言 (Assembly Language)**：便於人類閱讀與撰寫的符號表示法
 
 **指令組成成分**
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/30e3ac11-7593-484a-9a30-ffdfde7ba82c" />
 
 
@@ -5890,6 +5892,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 - **操作數 (Operands)**：指定動作執行的對象或目標位置 (WHO)
 
 **三大指令類型**
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/e95fb88b-ace5-4875-9e94-a9e23a2d5c85" />
 
 
@@ -5900,6 +5903,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 #### 指令格式與編碼 (Instruction Encoding)
 
 **LC-3 — Operate Format (16 bits)**
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/0d94a75d-3c26-4fc7-97c4-304eb75de438" />
 
 
@@ -5916,6 +5920,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 ```
 
 **MIPS — R-Type Format (32 bits)**
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/283e6ab4-fedc-4be2-9765-ca9e51c9b9b3" />
 
 
@@ -5931,6 +5936,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 > 適用於 3 個暫存器操作數的運算指令
 
 #### 記憶體載入與定址模式 (Load Word & Addressing Mode)
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/68134495-05bb-436b-a30c-1a8aef341c96" />
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/eb7eb902-3e39-4a02-a512-70c02edda756" />
 
@@ -5955,6 +5961,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 ### 指令週期與控制指令 (Instruction Cycle & Control Flow)
 
 #### 指令週期概述 (The Instruction Cycle)
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/4b6eef8d-1b8d-49b9-8943-bb39832602d0" />
 
 
@@ -5975,6 +5982,7 @@ FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE R
 #### 擷取與解碼 (FETCH & DECODE)
 
 **FETCH（擷取指令）**：從記憶體取得指令並載入至 IR，此階段為所有指令類型共通。
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/66ff34d1-053e-4bc9-8130-b3ec8ab7f1f7" />
 
 
@@ -5983,6 +5991,7 @@ FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE R
 3. 將 MDR 的內容載入至 IR
 
 **DECODE（解碼指令）**：辨識指令類型並產生控制訊號，以供後續階段處理。
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/dd91a12a-fea6-4086-aa4c-31177608be93" />
 
 
@@ -5992,6 +6001,7 @@ FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE R
 #### 位址計算與操作數擷取
 
 **EVALUATE ADDRESS（計算位址）**：計算處理指令所需的記憶體目標位址。
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/29d97b4f-1c70-4008-a859-d25e324e32f8" />
 
 
@@ -5999,6 +6009,7 @@ FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE R
 - ADD 不需要：不涉及記憶體位址存取
 
 **FETCH OPERANDS（擷取操作數）**：取得處理指令所需的來源操作數。
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/9b85597c-4124-4878-8fe7-f2dbcf3a1c80" />
 
 
@@ -6008,6 +6019,7 @@ FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE R
 #### 執行與結果儲存
 
 **EXECUTE（執行）**：執行指令的核心運算動作。
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/d217c90b-2f58-4ec3-b9ff-a2b9a6c8f07e" />
 
 
@@ -6015,12 +6027,14 @@ FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE R
 - XOR：於 ALU 中執行逐位元 XOR 運算
 
 **STORE RESULT（儲存結果）**：將運算或處理結果寫回指定的目的地（暫存器或記憶體）。
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/f6e048be-6483-492f-be30-2a139cdf9be4" />
 
 
 > 當 STORE RESULT 完成後，隨即開啟一個全新的指令週期（重新進入 FETCH 階段）。
 
 #### 改變執行順序 (Changing the Sequence of Execution)
+
 <img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/149aecec-1ddb-4489-a88f-7ab563a4af25" />
 
 
