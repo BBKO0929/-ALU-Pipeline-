@@ -5765,6 +5765,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 5. **輸出設備 (Output)**：輸出處理結果（如螢幕、印表機、磁碟）
 
 #### 記憶體架構與定址 (Memory Architecture)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/b9259bc7-fa38-4cb7-b01a-17d52515a91d" />
 
 **基本單位**：記憶體儲存位元 (Bits)，邏輯上組合為位元組 (Bytes, 8 bits) 或字組 (Words，如 8/16/32 bits)
 
@@ -5782,6 +5783,8 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 - **Word-addressable**：每個位址儲存一個字組 (Word)
 
 #### 大端序與小端序 (Big Endian vs. Little Endian)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/51ceaf29-83d0-403e-a96e-2f2d3b0bc3d3" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/8b092357-9537-4dd2-a5d9-1e2e9c0ee184" />
 
 | 排列方式 | 定義 |
 |---|---|
@@ -5791,6 +5794,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 > 單一系統內部無影響，僅為設計慣例；但當 Big-endian 系統與 Little-endian 系統需要共享或交換資料時，必須進行轉換。
 
 #### 記憶體存取機制：MAR 與 MDR
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/3f27204b-6b0d-4b32-80aa-0474df22b11f" />
 
 **核心暫存器**
 
@@ -5805,6 +5809,8 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 | 寫入 (Write) | 1. 將目標位址載入 MAR，將欲寫入的資料載入 MDR<br>2. 觸發寫入致能訊號 (Write Enable)，將 MDR 中的值寫入 MAR 指定的位址 |
 
 #### 處理單元與暫存器檔案 (Processing Unit & Register File)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/0292a560-b499-4979-84f2-744e9e4dca92" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/a9bce139-6c4d-4818-813f-b96e665bed8d" />
 
 - 記憶體容量大但存取速度慢；暫存器緊鄰 ALU，用於存放中間運算結果（例如計算 $((A+B) \times C) / D$ 時暫存 $A+B$ 的值），避免頻繁存取記憶體
 
@@ -5816,6 +5822,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 | MIPS | 32 個 (R0–R31) | 5-bit | 32 位元 |
 
 #### 控制單元 (Control Unit)
+<img width="957" height="718" alt="image" src="https://github.com/user-attachments/assets/c338fc4a-6bd5-4504-be91-71c51950ffd7" />
 
 - 如同樂團指揮家 (Conductor)，按順序逐步導引程式中每條指令的執行過程
 
@@ -5829,6 +5836,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 ### 指令集架構與執行機制 (ISA & Instruction Execution)
 
 #### 程式員可見狀態 (Programmer Visible State)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/6673bb06-9613-494e-96f4-7dd68da4bc60" />
 
 - 指程式員或編譯器在撰寫與執行程式時，能夠直接存取、感知與修改的硬體狀態
 - 指令與程式的本質，即為定義如何轉換「程式員可見狀態」中的數值
@@ -5840,6 +5848,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 - **程式計數器 (PC)**：存放當前或下一條即將執行指令的記憶體位址
 
 #### 儲存程式與順序執行 (Stored Program & Sequential Execution)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/051b8140-5af7-4078-a427-baf7f53f7c29" />
 
 - **儲存程式原理**：指令與資料皆儲存在記憶體中；通常指令長度會等於系統的字組長度
 - **擷取-解碼-執行循環 (Fetch-Decode-Execute Cycle)**
@@ -5857,17 +5866,20 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 > MIPS 架構中，作業系統通常將 PC 初始化為 `0x00400000` 作為程式執行的起始位址。
 
 #### 指令結構與類型 (Instruction Structure & Types)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/362e9f1d-94be-43cf-8779-94b2d64fc9dc" />
 
 - **指令 (Instruction)**：電腦處理的最基本單位；是電腦語言中的「字詞」，ISA 即為該語言的「詞彙表」
 - **機器語言 (Machine Language)**：電腦可直接讀取的二進位表示法 (0/1)
 - **組合語言 (Assembly Language)**：便於人類閱讀與撰寫的符號表示法
 
 **指令組成成分**
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/30e3ac11-7593-484a-9a30-ffdfde7ba82c" />
 
 - **操作碼 (Opcode)**：指定該指令要執行的動作 (WHAT)
 - **操作數 (Operands)**：指定動作執行的對象或目標位置 (WHO)
 
 **三大指令類型**
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/e95fb88b-ace5-4875-9e94-a9e23a2d5c85" />
 
 1. **運算指令 (Operate instructions)**：在 ALU 中執行算術或邏輯運算
 2. **資料移動指令 (Data movement instructions)**：負責從記憶體讀取資料或將資料寫入記憶體
@@ -5876,6 +5888,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 #### 指令格式與編碼 (Instruction Encoding)
 
 **LC-3 — Operate Format (16 bits)**
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/0d94a75d-3c26-4fc7-97c4-304eb75de438" />
 
 | 欄位 | 位元範圍 | 說明 |
 |---|---|---|
@@ -5890,6 +5903,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 ```
 
 **MIPS — R-Type Format (32 bits)**
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/283e6ab4-fedc-4be2-9765-ca9e51c9b9b3" />
 
 | 欄位 | 位元範圍 | 說明 |
 |---|---|---|
@@ -5903,6 +5917,8 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 > 適用於 3 個暫存器操作數的運算指令
 
 #### 記憶體載入與定址模式 (Load Word & Addressing Mode)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/68134495-05bb-436b-a30c-1a8aef341c96" />
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/eb7eb902-3e39-4a02-a512-70c02edda756" />
 
 **載入指令概念**：高階語言 `a = A[i];` 對應組合語言 `load a, A, i`
 
@@ -5924,6 +5940,7 @@ $$P_{static} = V_{DD} \cdot I_{leak}$$
 ### 指令週期與控制指令 (Instruction Cycle & Control Flow)
 
 #### 指令週期概述 (The Instruction Cycle)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/4b6eef8d-1b8d-49b9-8943-bb39832602d0" />
 
 指令週期是指令被執行時所經歷的一系列階段，完整包含六個階段：
 
@@ -5942,12 +5959,14 @@ FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE R
 #### 擷取與解碼 (FETCH & DECODE)
 
 **FETCH（擷取指令）**：從記憶體取得指令並載入至 IR，此階段為所有指令類型共通。
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/66ff34d1-053e-4bc9-8130-b3ec8ab7f1f7" />
 
 1. 將 PC 的內容載入 MAR，並同步將 PC 遞增
 2. 查詢記憶體，將記憶體讀出的指令放置於 MDR
 3. 將 MDR 的內容載入至 IR
 
 **DECODE（解碼指令）**：辨識指令類型並產生控制訊號，以供後續階段處理。
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/dd91a12a-fea6-4086-aa4c-31177608be93" />
 
 - 以 4-to-16 解碼器為例，輸入為 IR[15:12] 的 4 個位元，用以辨識 16 種 Opcode 之一
 - 剩餘的 12 個位元用於辨識處理該指令所需的其他資訊
@@ -5955,11 +5974,13 @@ FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE R
 #### 位址計算與操作數擷取
 
 **EVALUATE ADDRESS（計算位址）**：計算處理指令所需的記憶體目標位址。
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/29d97b4f-1c70-4008-a859-d25e324e32f8" />
 
 - LDR 需要：將暫存器內容加上偏移量，計算出欲從記憶體讀取的資料字組位址
 - ADD 不需要：不涉及記憶體位址存取
 
 **FETCH OPERANDS（擷取操作數）**：取得處理指令所需的來源操作數。
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/9b85597c-4124-4878-8fe7-f2dbcf3a1c80" />
 
 - LDR：將計算出的位址載入 MAR → 讀取記憶體 → 將來源操作數放置於 MDR
 - ADD：直接從暫存器檔案取得來源操作數；部分微處理器可在 DECODE 同時同步進行暫存器操作數擷取
@@ -5967,15 +5988,18 @@ FETCH → DECODE → EVALUATE ADDRESS → FETCH OPERANDS → EXECUTE → STORE R
 #### 執行與結果儲存
 
 **EXECUTE（執行）**：執行指令的核心運算動作。
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/d217c90b-2f58-4ec3-b9ff-a2b9a6c8f07e" />
 
 - ADD：於 ALU 中執行加法運算
 - XOR：於 ALU 中執行逐位元 XOR 運算
 
 **STORE RESULT（儲存結果）**：將運算或處理結果寫回指定的目的地（暫存器或記憶體）。
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/f6e048be-6483-492f-be30-2a139cdf9be4" />
 
 > 當 STORE RESULT 完成後，隨即開啟一個全新的指令週期（重新進入 FETCH 階段）。
 
 #### 改變執行順序 (Changing the Sequence of Execution)
+<img width="512" height="380" alt="image" src="https://github.com/user-attachments/assets/149aecec-1ddb-4489-a88f-7ab563a4af25" />
 
 - **順序執行 (Sequential Execution)**：預設情況下，程式按照指令順序依次執行
 - **控制指令 (Control Instructions)**：允許程式進行非順序 (Out of sequence) 執行
