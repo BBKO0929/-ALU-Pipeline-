@@ -840,18 +840,17 @@ create_clock -period 4.5 -name clk [get_ports clk]
 | Latency | 1 cycle | 2 cycle |
 
 ### 說明
-1. Baseline 版本是純組合邏輯，加法器用 Ripple Carry Adder，關鍵路徑是進位一路傳到最高位，限制了整體時脈上限，收斂後 Fmax 約 149.6MHz。
+1. Baseline 版本是純組合邏輯，加法器用 Ripple Carry Adder，關鍵路徑是進位一路傳到最高位，限制了整體時脈上限，收斂後 Fmax 約 149.6MHz(對應關鍵路徑實際延遲 6.710ns)。
    
-2. Pipeline 版本把資料路徑切成 2 個 stage，中間插入暫存器，把原本一次算完的長路徑拆成兩段較短的路徑，收斂後 Fmax 約 253.2MHz，相較 baseline 提升約 1.69 倍。
+2. Pipeline 版本把資料路徑切成 2 個 stage，中間插入暫存器，把原本一次算完的長路徑拆成兩段較短的路徑，單一 stage 的關鍵路徑延遲由 6.710ns 降至 3.813ns，收斂後 Fmax 約 253.2MHz，相較 baseline 提升約 1.69 倍。
    
-3. trade-off ：
-   * 用「面積換取速度」換來的：FF 用量從 103 增加到 172（多了約 69 顆暫存器，用於 Stage1/Stage2 之間鎖存中繼資料）
-   * LUT 用量反而略降（327→317），代表邏輯本身沒有變複雜，資源增加主要來自新增的暫存器，不是額外的運算邏輯。
-   * Latency 則從 1 cycle 增加為 2 cycle
-   * 犧牲單筆資料的延遲，換取整體吞吐量（throughput）與可運作頻率的提升。
+3. trade-off:
+	* 用「暫存器(FF)數量換取頻率/吞吐量」:FF 用量從 103 增加到 172(多了約 69 顆暫存器,用於 Stage1/Stage2 之間鎖存中繼資料)
+	* LUT 用量反而略降(327→317)：因為 Baseline 中 ADD/SUB、邏輯運算、移位、SLT 四種結果各自需要獨立的輸出多工器(4-to-1 MUX)依 op_code 選擇；Pipeline 版本因為 Stage1 已提前算出並鎖存 add_sub 結果，Stage2 的 final_res 選擇邏輯改為直接從已鎖存的中間值中選取，讓 Synthesizer 得以合併重複的選擇邏輯，因此 LUT 不增反減——資源增加主要來自新增的暫存器，而非額外的運算邏輯。
+	* Latency 則從 1 cycle 增加為 2 cycle，犧牲單筆資料的延遲，換取整體吞吐量(throughput)與可運作頻率的提升
 
 4. 兩個版本的功能都用同一組 testbench 驗證過，結果完全等價，確保這組時序數據的比較是建立在功能正確、公平的基準。
-
+   
 ## 未來優化方向（依 Timing Report 的 Net/Logic Delay 比例修正）
 1. Timing Report
 <img width="1062" height="387" alt="image" src="https://github.com/user-attachments/assets/6beb2c5e-173a-4285-907e-b0ef765f42f5" />
