@@ -422,25 +422,38 @@ endmodule
 * Fmax ≈ 149.6 MHz
 * Data Path Delay(關鍵路徑實際延遲)： 6.710ns
 * LUT = 327, FF = 103
-<img width="1703" height="214" alt="image" src="https://github.com/user-attachments/assets/f049cacc-aa64-4e97-86c7-ec478c4f5276" />
+<img width="1909" height="496" alt="image" src="https://github.com/user-attachments/assets/cd72dd8c-dcbc-4e5c-b5ea-c294d14696f5" />
 
 
 ### ALU_V2（pipeline） - pipeline ALU 設計規劃
 <img width="581" height="648" alt="image" src="https://github.com/user-attachments/assets/084ded80-5b4e-479d-ac07-4312b5f50bf4" />
 
 1. 在 alu_v1 中的 critical path
-   * Barrel Shifter（桶型移位器）：最主要的 Critical Path
-     * 邏輯結構： 採用 5 階串聯的條件選擇器（`b[0]` ~ `b[4]` 對應 1, 2, 4, 8, 16 bits 移位）。
-	 * 延遲原因： 訊號必須**連續穿過 5 個 32-bit MUX**。每一個 MUX 的 Gate Delay 會**線性累加**，形成全模組最長的邏輯鏈（Logic Chain）。
 
-   * 33-bit Add/Sub（加減法器）：次要瓶頸
-	 * 邏輯結構： `assign add_sub = {1'b0, a} + {1'b0, b_op} + sub;`
-	 * 延遲原因： 高位元（MSB）必須等待低位元（LSB）一路傳遞上來的**進位訊號（Carry Chain）**，需等待 32 個 Full Adder 的傳遞延遲。
+* Barrel Shifter + Zero Flag（最主要的 Critical Path，實際终點是 flag_out_reg[3]，而非 res_out）
+  * 邏輯結構：採用 5 階串聯的條件選擇器（b[0] ~ b[4]）對應 1, 2, 4, 8, 16 bits 移位，
+    移位結果再經過 32-bit NOR Reduction 判斷 Zero Flag。
+  * 延遲原因：訊號必須連續穿過 5 個 32-bit MUX，每一個 MUX 的 Gate Delay 會線性累加；
+    移位結果出來後，還要再疊加一段 32-bit NOR Reduction 樹才能鎖入 flag_out，
+    兩段邏輯相加才是全模組最長的邏輯鏈（實測 Data Path Delay = 6.710ns，對應 flag_out_reg[3]）。
+  * 補充：走到 res_out 的路徑（純移位、不含 Flag 判斷）Slack 還有 1.4ns 以上餘裕，
+    並非真正瓶頸，代表 Zero Flag 的判斷邏輯才是壓垮 WNS 的最後一根稻草。
 
-   * 位元邏輯運算（AND / OR / XOR）：非瓶頸
-	 * 邏輯結構： 32-bit 平行運算。
-	 * 延遲原因： 僅需經過 **1 階邏輯門**，無位元間的依賴關係，延遲極短。
+* 33-bit Add/Sub（加減法器）：次要瓶頸
+  * 邏輯結構：assign add_sub = {1'b0, a} + {1'b0, b_op} + sub;
+  * 延遲原因：高位元（MSB）必須等待低位元（LSB）一路傳遞上來的進位訊號（Carry Chain），
+    需等待 32 個 Full Adder 的傳遞延遲。
 
+* 位元邏輯運算（AND / OR / XOR）：非瓶頸
+  * 邏輯結構：32-bit 平行運算。
+  * 延遲原因：僅需經過 1 階邏輯門，無位元間的依賴關係，延遲極短。
+
+* SLT（Set Less Than）：非瓶頸
+  * 邏輯結構：直接沿用 33-bit Add/Sub 運算出的最高位元（符號位）與 Overflow 判斷結果，
+    不需額外的比較運算路徑。
+  * 延遲原因：與 Flag 產生邏輯共用同一組加法器輸出，延遲可忽略，
+    不會拖累整體 critical path。
+  
 2. 流水線（Pipelining）切割策略
    * 為什麼不採用 16-bit / 16-bit 高低位拆分？
    	 * **加法器 Carry 依賴：** 高 16-bit 必須等待低 16-bit 的 Carry Out，橫向拆分無法打破時間依賴。
@@ -464,7 +477,11 @@ endmodule
     
 	* 簡化 Stage 2 的 SLT 與 Flag 計算
 	  * 因為加法器在 Stage 1 已經算完了 add_sub
-      * Stage 2 就可以直接利用 Stage 1 留下來的 add / sub 結果來判斷溢位（Overflow）與產生 Flag，不會擠壓到 Stage 2 的時序。  
+      * Stage 2 就可以直接利用 Stage 1 留下來的 add / sub 結果來判斷溢位（Overflow）與產生 Flag，不會擠壓到 Stage 2 的時序。
+
+    * Pipeline 化後 Zero Flag 不再是瓶頸
+      * Baseline 中，Zero Flag 需等移位器 5 級 MUX 全部跑完後，再疊加一層 32-bit NOR Reduction，是實測中真正決定 WNS 的路徑。
+      * Pipeline 化後，因為切成兩級，Stage 2 只需處理後 2 級 MUX（8, 16 bits）加上收斂後的 Flag/最終選擇邏輯，NOR Reduction 疊加在較短的路徑上，不再是全模組最長路徑；實測顯示 V2 的最長路徑（Path 1）反而落在 res_reg 的移位輸出，而非 flag_out——代表 pipeline 切割同時解決了「移位延遲」與「Flag 延遲疊加」兩個問題，而不只是單純把加法器和移位器分開。
 
 ## 遇到的困難與解決方案：
 ### 問題：
