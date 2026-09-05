@@ -420,7 +420,10 @@ endmodule
 ### ALU_V1（Baseline）最終基準線數據
 * Period = 7.2ns, WNS = 0.516ns
 * Fmax ≈ 149.6 MHz
+* Data Path Delay(關鍵路徑實際延遲)： 6.710ns
 * LUT = 327, FF = 103
+<img width="1703" height="214" alt="image" src="https://github.com/user-attachments/assets/f049cacc-aa64-4e97-86c7-ec478c4f5276" />
+
 
 ### ALU_V2（pipeline） - pipeline ALU 設計規劃
 <img width="581" height="648" alt="image" src="https://github.com/user-attachments/assets/084ded80-5b4e-479d-ac07-4312b5f50bf4" />
@@ -821,6 +824,8 @@ create_clock -period 4.5 -name clk [get_ports clk]
 * Period = 4.5 ns, WNS = 0.551 ns
 * Fmax ≈ 253.2 MHz
 * LUT = 317, FF = 172
+* Data Path Delay(關鍵路徑實際延遲)： 3.813ns
+<img width="1062" height="387" alt="image" src="https://github.com/user-attachments/assets/6beb2c5e-173a-4285-907e-b0ef765f42f5" />
 
 ### Baseline vs Pipeline 最終對照表
 
@@ -829,6 +834,7 @@ create_clock -period 4.5 -name clk [get_ports clk]
 | Period（收斂值） | 7.2 ns | 4.5 ns |
 | WNS | 0.516 ns | 0.551 ns |
 | Fmax | ≈ 149.6 MHz | ≈ 253.2 MHz |
+| Data Path Delay(關鍵路徑實際延遲) | 6.710ns | 3.813ns |
 | LUT | 327 | 317 |
 | FF | 103 | 172 |
 | Latency | 1 cycle | 2 cycle |
