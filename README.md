@@ -248,6 +248,7 @@
 * ALU_V1（Baseline）最終基準線數據
 <img width="214" height="251" alt="image" src="https://github.com/user-attachments/assets/806079cd-4cc0-4a13-b4b7-5297b3a1180a" />
 <img width="1327" height="99" alt="image" src="https://github.com/user-attachments/assets/a5696367-fd6b-4b48-9b5b-79145aaacbf5" />
+<img width="1909" height="496" alt="image" src="https://github.com/user-attachments/assets/cd72dd8c-dcbc-4e5c-b5ea-c294d14696f5" />
 
 * Period = 7.2ns, WNS = 0.516ns
 * Fmax ≈ 149.6 MHz
@@ -257,6 +258,7 @@
 * ALU_V2（pipeline）最終基準線數據
 <img width="213" height="257" alt="image" src="https://github.com/user-attachments/assets/e6e79d99-8720-451a-ae4d-08f9bbb5e3b7" />
 <img width="1334" height="90" alt="image" src="https://github.com/user-attachments/assets/2dbb2fc8-a190-44de-8fe9-cfb091fc207f" />
+<img width="1062" height="387" alt="image" src="https://github.com/user-attachments/assets/6beb2c5e-173a-4285-907e-b0ef765f42f5" />
 
 * Period = 4.5 ns, WNS = 0.551 ns
 * Fmax ≈ 253.2 MHz
