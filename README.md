@@ -88,8 +88,7 @@
       * 兩大運算單元可以在同一個時脈邊緣（Clock Edge） 一起將結果鎖進 Stage 1 暫存器。
         
 	 * 簡化 Stage 2 的 SLT 與 Flag 計算
-	    * 因為加法器在 Stage 1 已經算完了 add_sub
-      * Stage 2 就可以直接利用 Stage 1 留下來的 add / sub 結果來判斷溢位（Overflow）與產生 Flag，不會擠壓到 Stage 2 的時序。
+	  * 因為加法器在 Stage 1 已經算完了 add_sub ，所以 Stage 2 就可以直接利用 Stage 1 留下來的 add / sub 結果來判斷溢位（Overflow）與產生 Flag，不會擠壓到 Stage 2 的時序。
 
    * Pipeline 化後 Zero Flag 不再是瓶頸
       * Baseline 中，Zero Flag 需等移位器 5 級 MUX 全部跑完後，再疊加一層 32-bit NOR Reduction，是實測中真正決定 WNS 的路徑。
