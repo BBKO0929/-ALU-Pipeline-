@@ -13,18 +13,27 @@
 
 針對 Baseline（純組合邏輯）與 Pipeline（2-Stage 流水線）版本進行 STA 靜態時序分析對比，結果如下：
 
-| 評估項目 | Baseline (`alu_v1`) | Pipeline (`alu_v2`) | 效能 / 資源變化 |
-| :--- | :--- | :--- | :--- |
-| **工作週期 (Period)** | 7.2 ns | **4.5 ns** | **-37.5% (速度提升)** |
-| **最高頻率 ($F_{max}$)** | ~149.6 MHz | **~253.2 MHz** | **+69.2% (1.69 倍)** |
-| **Worst Negative Slack (WNS)** | 0.516 ns | **0.551 ns** | 時序完全收斂 ($WNS > 0$) |
-| **組合邏輯 (LUT)** | 327 | **317** | **-3.0% (資源共用成功)** |
-| **暫存器 (Flip-Flop)** | 103 | **172** | **+67.0% (階段鎖存代價)** |
-| **運算延遲** | 1 Cycle | **2 Cycles** | 犧牲 1 Cycle 延遲換取極限頻率 |
+| 項目 | Baseline（alu_v1） | Pipeline（alu_v2, 2-stage） |
+|---|---|---|
+| Period（收斂值） | 7.2 ns | 4.5 ns |
+| WNS | 0.516 ns | 0.551 ns |
+| Fmax | ≈ 149.6 MHz | ≈ 253.2 MHz |
+| Data Path Delay(關鍵路徑實際延遲) | 6.710ns | 3.813ns |
+| LUT | 327 | 317 |
+| FF | 103 | 172 |
+| Latency | 1 cycle | 2 cycle |
 
 **核心要點：**
-1. 透過 2-Stage 縱向切割，成功將 5-stage Barrel Shifter 與 Carry Chain 的時延平分，提升工作頻率、吞吐量
-2. 透過 Stage 2 統一選通多工器（Mux）設計避免重複邏輯，達成 **LUT 不升反降** 的微架構優化
+1. Baseline 版本是純組合邏輯，加法器用 Ripple Carry Adder，關鍵路徑是進位一路傳到最高位，限制了整體時脈上限，收斂後 Fmax 約 149.6MHz(對應關鍵路徑實際延遲 6.710ns)。
+   
+2. Pipeline 版本把資料路徑切成 2 個 stage，中間插入暫存器，把原本一次算完的長路徑拆成兩段較短的路徑，單一 stage 的關鍵路徑延遲由 6.710ns 降至 3.813ns，收斂後 Fmax 約 253.2MHz，相較 baseline 提升約 1.69 倍。
+   
+3. trade-off:
+	* 用「暫存器(FF)數量換取頻率/吞吐量」:FF 用量從 103 增加到 172(多了約 69 顆暫存器,用於 Stage1/Stage2 之間鎖存中繼資料)
+	* LUT 用量反而略降(327→317)：因為 Baseline 中 ADD/SUB、邏輯運算、移位、SLT 四種結果各自需要獨立的輸出多工器(4-to-1 MUX)依 op_code 選擇；Pipeline 版本因為 Stage1 已提前算出並鎖存 add_sub 結果，Stage2 的 final_res 選擇邏輯改為直接從已鎖存的中間值中選取，讓 Synthesizer 得以合併重複的選擇邏輯，因此 LUT 不增反減——資源增加主要來自新增的暫存器，而非額外的運算邏輯。
+	* Latency 則從 1 cycle 增加為 2 cycle，犧牲單筆資料的延遲，換取整體吞吐量(throughput)與可運作頻率的提升
+
+4. 兩個版本的功能都用同一組 testbench 驗證過，結果完全等價，確保這組時序數據的比較是建立在功能正確、公平的基準。
 ---
 
 ## 架構設計與流水線切割策略 (Microarchitecture)
@@ -60,6 +69,7 @@
 
 ### 2. 流水線（Pipelining）切割策略
 <img width="581" height="648" alt="image" src="https://github.com/user-attachments/assets/084ded80-5b4e-479d-ac07-4312b5f50bf4" />
+
    
    * 2-Stage Pipeline 切割方案 (縱向階段切割)
      * Stage 1：Shifter 前 3 階 (b[0]~b[2]: 1, 2, 4 bits 移位) ； 33-bit 加減法運算 (ADD / SUB / SLT)
