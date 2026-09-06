@@ -264,8 +264,6 @@
 * LUT = 317, FF = 172
 
 ### 4. 未來實體布局優化方向 (Physical Design & Fanout)
-<img width="1062" height="387" alt="image" src="https://github.com/user-attachments/assets/6beb2c5e-173a-4285-907e-b0ef765f42f5" />
-
 * 根據 Vivado Implementation Timing Report 分析：
   * Net Delay 遠大於 Logic Delay（如 Net: 2.611ns vs Logic: 1.202ns），控制訊號高扇出（High Fanout = 16~32）為最後瓶頸。
 
