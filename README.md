@@ -4,8 +4,8 @@
 
 ## 開發進度與自主學習日誌
 
-- **[點我觀看完整的「每日學習與 Debug 日誌」](./learning_log.md)**
-- **[點我觀看完整的「專題製作過程與 Debug 日誌」](./32-bit_ALU_log.md)**
+- **[點我觀看完整的「每日學習與 Debug 日誌」—— 記錄由 Verilog 語法自學到 Vivado 工具鏈操作的每日進度與踩坑經驗](./learning_log.md)**
+- **[點我觀看完整的「專題製作過程與 Debug 日誌 —— 完整記錄 ALU 從 baseline 到 pipeline 化的架構決策與除錯過程」](./32-bit_ALU_log.md)**
 - **[點我觀看「參考文獻」](./References.md)**
 ------------------------------
 
