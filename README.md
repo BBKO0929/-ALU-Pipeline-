@@ -1,4 +1,4 @@
-# 32-bit 的加法器/運算單元（ALU）Pipeline-MAC-Accelerator
+# 32-bit 的加法器/運算單元（ALU）Pipeline
 
 本專案旨在基於硬體流水線（Pipeline）架構，設計一款兼具高效能與面積效益的 32 位元運算單元。
 
