@@ -24,7 +24,7 @@
 | Latency | 1 cycle | 2 cycle |
 
 **核心要點：**
-1. Baseline 版本是純組合邏輯，加法器用 Ripple Carry Adder，關鍵路徑是進位一路傳到最高位，限制了整體時脈上限，收斂後 Fmax 約 149.6MHz(對應關鍵路徑實際延遲 6.710ns)。
+1. Baseline 版本是純組合邏輯，加法器用 Ripple Carry Adder（RCA 的 critical path 隨位元數線性成長，這也是業界會改用 Carry Lookahead Adder 或 Carry Select Adder 的原因；本專題保留 RCA 作為 baseline 正是為了凸顯 pipeline 優化前的瓶頸來源。），關鍵路徑是進位一路傳到最高位，限制了整體時脈上限，收斂後 Fmax 約 149.6MHz(對應關鍵路徑實際延遲 6.710ns)。
    
 2. Pipeline 版本把資料路徑切成 2 個 stage，中間插入暫存器，把原本一次算完的長路徑拆成兩段較短的路徑，單一 stage 的關鍵路徑延遲由 6.710ns 降至 3.813ns，收斂後 Fmax 約 253.2MHz，相較 baseline 提升約 1.69 倍。
    
@@ -77,6 +77,7 @@
 
    * 2-Stage Pipeline 切割方案原因
      * 時間延遲的「均等平分」（Timing Balance）
+     * Pipeline 切割遵循『各級延遲盡量平衡』原則（balanced pipeline staging），避免單一 stage 成為新的瓶頸，此為流水線設計的基本準則（參考 Hennessy & Patterson, Computer Organization and Design, Pipelining 章節）。
        * 桶型移位器總共有 5 階 MUX 選擇器
        * Stage 1 切前 3 階（1, 2, 4 bits）： 穿過 3 個 MUX。
        * Stage 2 切後 2 階（8, 16 bits）： 穿過 2 個 MUX ＋ 1 個最終輸出的 MUX（多路選擇 case）。
@@ -192,6 +193,7 @@
 * Verilog Event Queue Race Condition 解決：
   * 問題： Testbench 與 RTL 同步在 posedge clk 採樣，由於非阻塞賦值（NBA）在同點更新，導致讀取到舊值（Race condition）。
   * 解法： 在比對前加入 #1 時間延遲（@(posedge clk); #1;），確保讀值時 NBA 已真正落地（Settled）。
+  	* 在 testbench 中加入 #1 delay 屬於 Verilog 模擬中常見的 race condition 規避手法，因為非阻塞賦值（NBA）在同一時脈邊緣的實際更新時機晚於觸發，此為 IEEE 1364 Verilog 標準中定義的排程語意（scheduling semantics）。
     ```verilog
     @(posedge clk); // 第1拍：鎖進 Stage1
     @(posedge clk); // 第2拍：鎖進 Stage2
